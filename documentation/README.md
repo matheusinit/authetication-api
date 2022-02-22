@@ -17,11 +17,11 @@
 
 ## Regras de negócio
 
- + Para o cadastro ser realizado, é necessário nome de usuário, email e senha.
+ + Para o cadastro ser realizado, é necessário nome de usuário, email e senha e confirmação de senha.
  + O endereço de email deve ser válido.
  + O nome de usuário deve ser único, então deve ser um não registrado no sistema.
  + Ao cadastrar-se, o usuário precisa confirmar a senha. E as senhas devem ser iguais.
-A senha deve ter pelo menos 8 caracteres, letras minúsculas e maiúsculas, números e pelo menos um caractere especial (sem ser < e >).
+ + A senha deve ter pelo menos 8 caracteres, letras minúsculas e maiúsculas, números e pelo menos um caractere especial (sem ser < e >).
  + Ao cadastrar-se, a conta se mantém inativa até que seja ativada.
  + Ao cadastrar um usuário, uma mensagem deve ser enviada para confirmar o endereço de email para ativar a conta.
  + O email de confirmação tem validade de 24 horas.
