@@ -1,0 +1,33 @@
+## Documentação
+
+## Requisitos funcionais
+ + Criar cadastro do usuário
+ + Autenticar-se com credenciais
+ + Recuperar senha
+ + Login automático
+ + Enviar email
+ + Editar informações do usuário (mudar email, mudar avatar)
+
+## Requisitos não funcionais
+ + Utilização do framework Express (Node.js).
+ + Encriptação da senha para então ser armazenada no banco de dados.
+ + Utilização do MongoDB como banco de dados.
+ + A API pode ser utilizada em qualquer navegador ou cliente HTTP com leitura JSON.
+ + Utilizar Arquitetura Limpa como modelo para arquitetura de software.
+
+## Regras de negócio
+
+ + Para o cadastro ser realizado, é necessário nome de usuário, email e senha.
+ + Ao cadastrar-se, o usuário precisa confirmar a senha. E as senhas devem ser iguais.
+A senha deve ter pelo menos 8 caracteres, letras minúsculas e maiúsculas, números e pelo menos um caractere especial (sem ser < e >).
+ + Ao cadastrar-se, a conta se mantém inativa até que seja ativada.
+ + Ao cadastrar um usuário, uma mensagem deve ser enviada para confirmar o endereço de email para ativar a conta.
+ + O email de confirmação tem validade de 24 horas.
+ + Para confirmar o email, é preciso confirmar a senha.
+ + Para se autenticar é necessário endereço de email e senha.
+ + Se der erro 3 vezes consecutivo ao autenticar-se, o usuário fica impossibilitado de se autenticar por 5 minutos. E uma mensagem é enviada ao email cadastrado com o IP público de quem tentou se autenticar e a mensagem informando o erro.
+ + Para recuperar a senha, é necessário informar o email cadastrado da conta. Uma mensagem de email é enviada para restaurar a senha.
+ + O email de restauração de senha tem validade de 48 horas.
+ + Ao definir uma nova senha, a senha deve ser confirmada e devem ser iguais.
+ + O login automático tem tempo de vida de 1 semana. Quando se autenticar, o tempo de vida é restaurado.
+ + Para fazer a mudança do email, o email precisa ser confirmado em até 48 horas, senão será desconsiderado.
