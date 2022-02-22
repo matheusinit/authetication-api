@@ -1,5 +1,7 @@
+import { HttpRequest, HttpResponse } from '../protocols/http'
+
 export class SignUpController {
-  handle (httpRequest: any): any {
+  handle (httpRequest: HttpRequest): HttpResponse {
     if (!httpRequest.body.username) {
       return {
         statusCode: 400,
@@ -12,6 +14,11 @@ export class SignUpController {
         statusCode: 400,
         body: new Error('Expecting param: email')
       }
+    }
+
+    return {
+      statusCode: 0,
+      body: ''
     }
   }
 }
