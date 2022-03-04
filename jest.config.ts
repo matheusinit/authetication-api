@@ -18,6 +18,11 @@ export default {
   // A map from regular expressions to paths to transformers
   transform: {
     '.+\\.ts$': 'ts-jest'
-  }
+  },
 
+  // The glob patterns Jest uses to detect test files
+  testMatch: [
+    '**/__tests__/**/*.[jt]s?(x)',
+    '**/?(*.)+(spec|test).[tj]s?(x)'
+  ]
 }
