@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
-    "@shelf/jest-mongodb": "^2.2.1",
+    "@shelf/jest-mongodb": "1.2.5",
     "@types/bcrypt": "^5.0.0",
     "@types/jest": "^27.4.0",
     "@types/mongodb": "^4.0.7",
