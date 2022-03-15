@@ -20,6 +20,8 @@ export default {
     '.+\\.ts$': 'ts-jest'
   },
 
+  preset: '@shelf/jest-mongodb',
+
   // The glob patterns Jest uses to detect test files
   testMatch: [
     '**/__tests__/**/*.[jt]s?(x)',
