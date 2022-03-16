@@ -1,0 +1,8 @@
+version: "3.7"
+
+services:
+  database:
+    image: mongo:4.4.1
+    container_name: mongodb
+    restart: always
+    network_mode: host
