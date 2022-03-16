@@ -31,7 +31,7 @@
   "scripts": {
     "dev": "tsnd --ignore node_modules src/main/server.ts",
     "test": "jest --passWithNoTests --silent --noStackTrace --runInBand",
-    "verbose": "jest --passWithNoTests --runInBand",
+    "test:verbose": "jest --passWithNoTests --runInBand",
     "test:unit": "yarn test --watch -c jest-unit-config.ts",
     "test:integration": "yarn test --watch -c jest-integration-config.ts",
     "test:staged": "yarn test --findRelatedTests",
