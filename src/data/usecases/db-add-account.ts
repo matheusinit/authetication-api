@@ -13,7 +13,7 @@ export class DbAddAccount implements AddAccount {
   }
 
   async add (accountData: AddAccountModel): Promise<AccountModel | AccountError> {
-    const isUsernameAvailable = await this.checkUsernameRepository.check(accountData.username)
+    const isUsernameAvailable = await this.checkUsernameRepository.checkUsername(accountData.username)
     if (!isUsernameAvailable) {
       return {
         error: new Error('Unavailable username')

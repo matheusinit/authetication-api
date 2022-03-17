@@ -36,7 +36,7 @@ const makeAddAccountRepository = (): AddAccountRepository => {
 
 const makeSut = (): SutTypes => {
   class CheckUsernameRepositoryStub implements CheckUsernameRepository {
-    async check (username: string): Promise<boolean> {
+    async checkUsername (username: string): Promise<boolean> {
       return true
     }
   }
@@ -57,7 +57,7 @@ const makeSut = (): SutTypes => {
 describe('DbAddAccount Usecase', () => {
   it('Should call CheckUsernameRepository with correct username', async () => {
     const { sut, checkUsernameRepositoryStub } = makeSut()
-    const checkSpy = jest.spyOn(checkUsernameRepositoryStub, 'check')
+    const checkUsernameSpy = jest.spyOn(checkUsernameRepositoryStub, 'checkUsername')
     const accountData = {
       username: 'valid_username',
       email: 'valid_email@email.com',
@@ -66,12 +66,12 @@ describe('DbAddAccount Usecase', () => {
 
     await sut.add(accountData)
 
-    expect(checkSpy).toHaveBeenCalledWith('valid_username')
+    expect(checkUsernameSpy).toHaveBeenCalledWith('valid_username')
   })
 
   it('Should throw if CheckUsernameRepository throws', () => {
     const { sut, checkUsernameRepositoryStub } = makeSut()
-    jest.spyOn(checkUsernameRepositoryStub, 'check').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+    jest.spyOn(checkUsernameRepositoryStub, 'checkUsername').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
     const accountData = {
       username: 'valid_username',
       email: 'valid_email@email.com',
@@ -81,6 +81,20 @@ describe('DbAddAccount Usecase', () => {
     const promise = sut.add(accountData)
 
     void expect(promise).rejects.toThrow()
+  })
+
+  it('Should return an error if CheckUsernameRepository return false', async () => {
+    const { sut, checkUsernameRepositoryStub } = makeSut()
+    jest.spyOn(checkUsernameRepositoryStub, 'checkUsername').mockReturnValueOnce(new Promise(resolve => resolve(false)))
+    const accountData = {
+      username: 'unavailable_username',
+      email: 'valid_email@email.com',
+      password: 'valid_password'
+    }
+
+    const error = await sut.add(accountData)
+
+    expect(error).toEqual({ error: Error('Unavailable username') })
   })
 
   it('Should call Encrypter with correct password', async () => {
