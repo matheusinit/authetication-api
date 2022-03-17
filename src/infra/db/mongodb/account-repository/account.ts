@@ -13,6 +13,8 @@ export class AccountMongoRepository implements AddAccountRepository, CheckUserna
   }
 
   async checkUsername (username: string): Promise<boolean> {
-    return true
+    const accountCollection = MongoHelper.getCollection('accounts')
+    const isAvailable = await accountCollection.findOne({ username })
+    return isAvailable === null
   }
 }
