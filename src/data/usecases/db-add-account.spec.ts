@@ -1,10 +1,12 @@
 import { AccountModel, AddAccountModel, AddAccountRepository, Encrypter } from './db-add-account-protocols'
 import { DbAddAccount } from './db-add-account'
+import { CheckUsernameRepository } from '../protocols/check-username-repository'
 
 interface SutTypes {
   sut: DbAddAccount
   encrypterStub: Encrypter
   addAccountRepositoryStub: AddAccountRepository
+  checkUsernameRepositoryStub: CheckUsernameRepository
 }
 
 const makeEncrypter = (): Encrypter => {
@@ -33,18 +35,40 @@ const makeAddAccountRepository = (): AddAccountRepository => {
 }
 
 const makeSut = (): SutTypes => {
+  class CheckUsernameRepositoryStub implements CheckUsernameRepository {
+    async check (username: string): Promise<boolean> {
+      return true
+    }
+  }
+
   const addAccountRepositoryStub = makeAddAccountRepository()
   const encrypterStub = makeEncrypter()
-  const sut = new DbAddAccount(encrypterStub, addAccountRepositoryStub)
+  const checkUsernameRepositoryStub = new CheckUsernameRepositoryStub()
+  const sut = new DbAddAccount(encrypterStub, addAccountRepositoryStub, checkUsernameRepositoryStub)
 
   return {
     sut,
     encrypterStub,
-    addAccountRepositoryStub
+    addAccountRepositoryStub,
+    checkUsernameRepositoryStub
   }
 }
 
 describe('DbAddAccount Usecase', () => {
+  it('Should call CheckUsernameRepository with correct username', async () => {
+    const { sut, checkUsernameRepositoryStub } = makeSut()
+    const checkSpy = jest.spyOn(checkUsernameRepositoryStub, 'check')
+    const accountData = {
+      username: 'valid_username',
+      email: 'valid_email@email.com',
+      password: 'valid_password'
+    }
+
+    await sut.add(accountData)
+
+    expect(checkSpy).toHaveBeenCalledWith('valid_username')
+  })
+
   it('Should call Encrypter with correct password', async () => {
     const { sut, encrypterStub } = makeSut()
     const encryptSpy = jest.spyOn(encrypterStub, 'encrypt')
