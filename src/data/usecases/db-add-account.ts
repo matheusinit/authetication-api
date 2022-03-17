@@ -1,3 +1,4 @@
+import { UsernameError } from '../errors/username-error'
 import { CheckUsernameRepository } from '../protocols/check-username-repository'
 import { AccountError, AccountModel, AddAccount, AddAccountModel, AddAccountRepository, Encrypter } from './db-add-account-protocols'
 
@@ -16,7 +17,7 @@ export class DbAddAccount implements AddAccount {
     const isUsernameAvailable = await this.checkUsernameRepository.checkUsername(accountData.username)
     if (!isUsernameAvailable) {
       return {
-        error: new Error('Unavailable username')
+        error: new UsernameError()
       }
     }
     const hashedPassword = await this.encrypter.encrypt(accountData.password)
