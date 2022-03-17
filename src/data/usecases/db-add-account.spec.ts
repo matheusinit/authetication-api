@@ -34,16 +34,20 @@ const makeAddAccountRepository = (): AddAccountRepository => {
   return new AddAccountRepositoryStub()
 }
 
-const makeSut = (): SutTypes => {
+const makeCheckUsernameRepository = (): CheckUsernameRepository => {
   class CheckUsernameRepositoryStub implements CheckUsernameRepository {
     async checkUsername (username: string): Promise<boolean> {
       return true
     }
   }
 
+  return new CheckUsernameRepositoryStub()
+}
+
+const makeSut = (): SutTypes => {
   const addAccountRepositoryStub = makeAddAccountRepository()
   const encrypterStub = makeEncrypter()
-  const checkUsernameRepositoryStub = new CheckUsernameRepositoryStub()
+  const checkUsernameRepositoryStub = makeCheckUsernameRepository()
   const sut = new DbAddAccount(encrypterStub, addAccountRepositoryStub, checkUsernameRepositoryStub)
 
   return {
