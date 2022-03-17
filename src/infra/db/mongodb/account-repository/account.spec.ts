@@ -32,4 +32,10 @@ describe('Account Mongo Repository', () => {
     expect(account.email).toBe('any_email@mail.com')
     expect(account.password).toBe('any_password')
   })
+
+  it('Should checkUsername return true if username is available', async () => {
+    const sut = makeSut()
+    const isAvailable = await sut.checkUsername('available_username')
+    expect(isAvailable).toBe(true)
+  })
 })
