@@ -38,4 +38,16 @@ describe('Account Mongo Repository', () => {
     const isAvailable = await sut.checkUsername('available_username')
     expect(isAvailable).toBe(true)
   })
+
+  it('Should checkUsername return false if username is unavailable', async () => {
+    const sut = makeSut()
+    const fakeAccount = {
+      username: 'unavailable_username',
+      email: 'valid_email@email.com',
+      password: 'hashed_password'
+    }
+    await MongoHelper.getCollection('accounts').insertOne(fakeAccount)
+    const isAvailable = await sut.checkUsername('unavailable_username')
+    expect(isAvailable).toBe(false)
+  })
 })
