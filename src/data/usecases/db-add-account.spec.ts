@@ -1,7 +1,7 @@
 import { AccountModel, AddAccountModel, AddAccountRepository, Encrypter } from './db-add-account-protocols'
 import { DbAddAccount } from './db-add-account'
 import { CheckUsernameRepository } from '../protocols/check-username-repository'
-import { UsernameError } from '../errors/username-error'
+import { UnavailableUsernameError } from '../errors/unavailable-username-error'
 
 interface SutTypes {
   sut: DbAddAccount
@@ -99,7 +99,7 @@ describe('DbAddAccount Usecase', () => {
 
     const promise = sut.add(accountData)
 
-    void expect(promise).rejects.toThrow(new UsernameError())
+    void expect(promise).rejects.toThrow(new UnavailableUsernameError())
   })
 
   it('Should call Encrypter with correct password', async () => {
