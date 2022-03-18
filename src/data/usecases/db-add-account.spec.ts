@@ -3,6 +3,7 @@ import { DbAddAccount } from './db-add-account'
 import { CheckUsernameRepository } from '../protocols/check-username-repository'
 import { UnavailableUsernameError } from '../errors/unavailable-username-error'
 import { CheckEmailRepository } from '../protocols/check-email-repository'
+import { UnavailableEmailError } from '../errors/unavailable-email-error'
 
 interface SutTypes {
   sut: DbAddAccount
@@ -149,7 +150,7 @@ describe('DbAddAccount Usecase', () => {
       password: 'valid_password'
     }
     const promise = sut.add(accountData)
-    await expect(promise).rejects.toThrow(new Error('Already exists an account with this email'))
+    await expect(promise).rejects.toThrow(new UnavailableEmailError())
   })
 
   it('Should call Encrypter with correct password', async () => {

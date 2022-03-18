@@ -1,3 +1,4 @@
+import { UnavailableEmailError } from '../errors/unavailable-email-error'
 import { UnavailableUsernameError } from '../errors/unavailable-username-error'
 import { CheckEmailRepository } from '../protocols/check-email-repository'
 import { CheckUsernameRepository } from '../protocols/check-username-repository'
@@ -23,7 +24,7 @@ export class DbAddAccount implements AddAccount {
     }
     const isEmailAvailable = await this.checkEmailRepository.checkEmail(accountData.email)
     if (!isEmailAvailable) {
-      throw new Error('Already exists an account with this email')
+      throw new UnavailableEmailError()
     }
     const hashedPassword = await this.encrypter.encrypt(accountData.password)
     const accountWithHashedPassword = Object.assign({}, accountData, { password: hashedPassword })
