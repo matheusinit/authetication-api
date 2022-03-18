@@ -40,7 +40,11 @@ export class SignUpController implements Controller {
       })
 
       return ok(account)
-    } catch (error) {
+    } catch (err) {
+      const error = err as Error
+      if (error.name === 'UnavailableUsernameError') {
+        return badRequest(error)
+      }
       return serverError()
     }
   }
