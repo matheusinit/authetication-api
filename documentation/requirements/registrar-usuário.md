@@ -20,6 +20,7 @@
  - [x] Retorna **HTTP status** como 400 se **password** e **passwordConfirmation** forem diferentes
  - [x] Retorna **HTTP status** como 400 caso **username** esteja não disponível
  - [x] Retorna **HTTP status** como 400 caso **email** seja não válido
+ - [ ] Retorna **HTTP status** como 400 caso **email** não esteja disponível
  - [ ] Retorna **HTTP status** como 400 caso **password** não cumpra com as restrições de senha
  - [x] Retorna **HTTP status** como 500 caso a criptografia resulte em erro 
  - [x] Retorna **HTTP status** como 500 caso ao armazenar os dados no banco de dados resulte em erro
