@@ -124,6 +124,18 @@ describe('DbAddAccount Usecase', () => {
     expect(checkEmailSpy).toHaveBeenCalledWith('valid_email@email.com')
   })
 
+  it('Should throw if CheckEmailRepository throws', async () => {
+    const { sut, checkEmailRepositoryStub } = makeSut()
+    jest.spyOn(checkEmailRepositoryStub, 'checkEmail').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+    const accountData = {
+      username: 'valid_username',
+      email: 'valid_email@email.com',
+      password: 'valid_password'
+    }
+    const promise = sut.add(accountData)
+    await expect(promise).rejects.toThrow()
+  })
+
   it('Should call Encrypter with correct password', async () => {
     const { sut, encrypterStub } = makeSut()
     const encryptSpy = jest.spyOn(encrypterStub, 'encrypt')
