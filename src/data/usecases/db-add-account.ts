@@ -21,7 +21,10 @@ export class DbAddAccount implements AddAccount {
     if (!isUsernameAvailable) {
       throw new UnavailableUsernameError()
     }
-    await this.checkEmailRepository.checkEmail(accountData.email)
+    const isEmailAvailable = await this.checkEmailRepository.checkEmail(accountData.email)
+    if (!isEmailAvailable) {
+      throw new Error('Already exists an account with this email')
+    }
     const hashedPassword = await this.encrypter.encrypt(accountData.password)
     const accountWithHashedPassword = Object.assign({}, accountData, { password: hashedPassword })
     const accountDb = await this.addAccountRepository.add(accountWithHashedPassword)
