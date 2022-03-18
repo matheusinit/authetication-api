@@ -2,12 +2,14 @@ import { AccountModel, AddAccountModel, AddAccountRepository, Encrypter } from '
 import { DbAddAccount } from './db-add-account'
 import { CheckUsernameRepository } from '../protocols/check-username-repository'
 import { UnavailableUsernameError } from '../errors/unavailable-username-error'
+import { CheckEmailRepository } from '../protocols/check-email-repository'
 
 interface SutTypes {
   sut: DbAddAccount
   encrypterStub: Encrypter
   addAccountRepositoryStub: AddAccountRepository
   checkUsernameRepositoryStub: CheckUsernameRepository
+  checkEmailRepositoryStub: CheckEmailRepository
 }
 
 const makeEncrypter = (): Encrypter => {
@@ -46,16 +48,24 @@ const makeCheckUsernameRepository = (): CheckUsernameRepository => {
 }
 
 const makeSut = (): SutTypes => {
+  class CheckEmailRepositoryStub implements CheckEmailRepository {
+    async checkEmail (email: string): Promise<boolean> {
+      return true
+    }
+  }
+
   const addAccountRepositoryStub = makeAddAccountRepository()
   const encrypterStub = makeEncrypter()
   const checkUsernameRepositoryStub = makeCheckUsernameRepository()
-  const sut = new DbAddAccount(encrypterStub, addAccountRepositoryStub, checkUsernameRepositoryStub)
+  const checkEmailRepositoryStub = new CheckEmailRepositoryStub()
+  const sut = new DbAddAccount(encrypterStub, addAccountRepositoryStub, checkUsernameRepositoryStub, checkEmailRepositoryStub)
 
   return {
     sut,
     encrypterStub,
     addAccountRepositoryStub,
-    checkUsernameRepositoryStub
+    checkUsernameRepositoryStub,
+    checkEmailRepositoryStub
   }
 }
 
@@ -100,6 +110,18 @@ describe('DbAddAccount Usecase', () => {
     const promise = sut.add(accountData)
 
     void expect(promise).rejects.toThrow(new UnavailableUsernameError())
+  })
+
+  it('Should call CheckEmailRepository with correct email', async () => {
+    const { sut, checkEmailRepositoryStub } = makeSut()
+    const checkEmailSpy = jest.spyOn(checkEmailRepositoryStub, 'checkEmail')
+    const accountData = {
+      username: 'unavailable_username',
+      email: 'valid_email@email.com',
+      password: 'valid_password'
+    }
+    await sut.add(accountData)
+    expect(checkEmailSpy).toHaveBeenCalledWith('valid_email@email.com')
   })
 
   it('Should call Encrypter with correct password', async () => {
