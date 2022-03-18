@@ -136,6 +136,18 @@ describe('DbAddAccount Usecase', () => {
     await expect(promise).rejects.toThrow()
   })
 
+  it('Should throw an error if CheckEmailRepository return false', async () => {
+    const { sut, checkEmailRepositoryStub } = makeSut()
+    jest.spyOn(checkEmailRepositoryStub, 'checkEmail').mockReturnValueOnce(new Promise(resolve => resolve(false)))
+    const accountData = {
+      username: 'valid_username',
+      email: 'email_in_use@email.com',
+      password: 'valid_password'
+    }
+    const promise = sut.add(accountData)
+    await expect(promise).rejects.toThrow(new Error('Already exists an account with this email'))
+  })
+
   it('Should call Encrypter with correct password', async () => {
     const { sut, encrypterStub } = makeSut()
     const encryptSpy = jest.spyOn(encrypterStub, 'encrypt')
