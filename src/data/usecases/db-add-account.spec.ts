@@ -47,17 +47,21 @@ const makeCheckUsernameRepository = (): CheckUsernameRepository => {
   return new CheckUsernameRepositoryStub()
 }
 
-const makeSut = (): SutTypes => {
+const makeCheckEmailRepository = (): CheckEmailRepository => {
   class CheckEmailRepositoryStub implements CheckEmailRepository {
     async checkEmail (email: string): Promise<boolean> {
       return true
     }
   }
 
+  return new CheckEmailRepositoryStub()
+}
+
+const makeSut = (): SutTypes => {
   const addAccountRepositoryStub = makeAddAccountRepository()
   const encrypterStub = makeEncrypter()
   const checkUsernameRepositoryStub = makeCheckUsernameRepository()
-  const checkEmailRepositoryStub = new CheckEmailRepositoryStub()
+  const checkEmailRepositoryStub = makeCheckEmailRepository()
   const sut = new DbAddAccount(encrypterStub, addAccountRepositoryStub, checkUsernameRepositoryStub, checkEmailRepositoryStub)
 
   return {
