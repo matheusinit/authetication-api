@@ -6,10 +6,6 @@ export interface AddAccountModel {
   password: string
 }
 
-export interface AccountError {
-  error: Error
-}
-
 export interface AddAccount {
-  add: (accountData: AddAccountModel) => Promise<AccountModel | AccountError>
+  add: (accountData: AddAccountModel) => Promise<AccountModel>
 }

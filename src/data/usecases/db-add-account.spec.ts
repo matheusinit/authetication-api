@@ -1,6 +1,7 @@
 import { AccountModel, AddAccountModel, AddAccountRepository, Encrypter } from './db-add-account-protocols'
 import { DbAddAccount } from './db-add-account'
 import { CheckUsernameRepository } from '../protocols/check-username-repository'
+import { UsernameError } from '../errors/username-error'
 
 interface SutTypes {
   sut: DbAddAccount
@@ -87,7 +88,7 @@ describe('DbAddAccount Usecase', () => {
     void expect(promise).rejects.toThrow()
   })
 
-  it('Should return an error if CheckUsernameRepository return false', async () => {
+  it('Should throw an error if CheckUsernameRepository return false', async () => {
     const { sut, checkUsernameRepositoryStub } = makeSut()
     jest.spyOn(checkUsernameRepositoryStub, 'checkUsername').mockReturnValueOnce(new Promise(resolve => resolve(false)))
     const accountData = {
@@ -96,9 +97,9 @@ describe('DbAddAccount Usecase', () => {
       password: 'valid_password'
     }
 
-    const error = await sut.add(accountData)
+    const promise = sut.add(accountData)
 
-    expect(error).toEqual({ error: Error('Unavailable username') })
+    void expect(promise).rejects.toThrow(new UsernameError())
   })
 
   it('Should call Encrypter with correct password', async () => {
