@@ -45,6 +45,9 @@ export class SignUpController implements Controller {
       if (error.name === 'UnavailableUsernameError') {
         return badRequest(error)
       }
+      if (error.name === 'UnavailableEmailError') {
+        return badRequest(error)
+      }
       return serverError()
     }
   }
