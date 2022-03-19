@@ -40,4 +40,20 @@ describe('SignUp Routes', () => {
       passwordConfirmation: 'senha123'
     }).expect(400)
   })
+
+  it('Should return a bad request error if email is unavailable', async () => {
+    await request(app).post('/api/signup').send({
+      username: 'Matheus Silva',
+      email: 'matheus.silva@gmail.com',
+      password: 'senha123',
+      passwordConfirmation: 'senha123'
+    })
+
+    await request(app).post('/api/signup').send({
+      username: 'Matheus Oliveira',
+      email: 'matheus.silva@gmail.com',
+      password: 'senha1234',
+      passwordConfirmation: 'senha1234'
+    }).expect(400)
+  })
 })
