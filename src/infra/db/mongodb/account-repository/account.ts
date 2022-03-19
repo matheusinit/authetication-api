@@ -20,6 +20,8 @@ export class AccountMongoRepository implements AddAccountRepository, CheckUserna
   }
 
   async checkEmail (email: string): Promise<boolean> {
-    return true
+    const accountCollection = MongoHelper.getCollection('accounts')
+    const isAvailable = await accountCollection.findOne({ email })
+    return isAvailable === null
   }
 }
