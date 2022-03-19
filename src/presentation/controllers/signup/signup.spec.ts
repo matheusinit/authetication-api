@@ -2,6 +2,7 @@ import { AccountModel, AddAccount, AddAccountModel, EmailValidator } from './sig
 import { InvalidParamError, MissingParamError, ServerError } from '../../errors'
 import { SignUpController } from './signup'
 import { UnavailableUsernameError } from '../../../data/errors/unavailable-username-error'
+import { UnavailableEmailError } from '../../../data/errors/unavailable-email-error'
 
 interface SutTypes {
   sut: SignUpController
@@ -220,6 +221,22 @@ describe('SignUp Controller', () => {
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new UnavailableUsernameError())
+  })
+
+  it('Should return 400 if email is unavailable', async () => {
+    const { sut, addAccountStub } = makeSut()
+    jest.spyOn(addAccountStub, 'add').mockRejectedValueOnce(new UnavailableEmailError())
+    const httpRequest = {
+      body: {
+        username: 'unavailable_username',
+        email: 'any_email@email.com',
+        password: 'any_password',
+        passwordConfirmation: 'any_password'
+      }
+    }
+    const httpResponse = await sut.handle(httpRequest)
+    expect(httpResponse.statusCode).toBe(400)
+    expect(httpResponse.body).toEqual(new UnavailableEmailError())
   })
 
   it('Should return 200 if valid data is provided', async () => {
