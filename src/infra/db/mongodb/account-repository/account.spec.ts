@@ -50,4 +50,10 @@ describe('Account Mongo Repository', () => {
     const isAvailable = await sut.checkUsername('unavailable_username')
     expect(isAvailable).toBe(false)
   })
+
+  it('Should checkEmail return true if email is available', async () => {
+    const sut = makeSut()
+    const isAvailable = await sut.checkEmail('available_email@mail.com')
+    expect(isAvailable).toBe(true)
+  })
 })
