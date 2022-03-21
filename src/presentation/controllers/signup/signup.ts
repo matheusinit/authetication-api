@@ -40,7 +40,11 @@ export class SignUpController implements Controller {
         return badRequest(new InvalidParamError('email'))
       }
 
-      this.passwordValidator.isValid(password)
+      const isPasswordValid = this.passwordValidator.isValid(password)
+
+      if (!isPasswordValid) {
+        return badRequest(new Error('Invalid password'))
+      }
 
       const account = await this.addAccount.add({
         username,
