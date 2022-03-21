@@ -3,11 +3,13 @@ import { InvalidParamError, MissingParamError, ServerError } from '../../errors'
 import { SignUpController } from './signup'
 import { UnavailableUsernameError } from '../../../data/errors/unavailable-username-error'
 import { UnavailableEmailError } from '../../../data/errors/unavailable-email-error'
+import { PasswordValidator } from '../../protocols/password-validator'
 
 interface SutTypes {
   sut: SignUpController
   emailValidatorStub: EmailValidator
   addAccountStub: AddAccount
+  passwordValidatorStub: PasswordValidator
 }
 
 const makeAddAccount = (): AddAccount => {
@@ -37,14 +39,21 @@ const makeEmailValidator = (): EmailValidator => {
 }
 
 const makeSut = (): SutTypes => {
+  class PasswordValidatorStub implements PasswordValidator {
+    isValid (password: string): boolean {
+      return true
+    }
+  }
   const addAccountStub = makeAddAccount()
   const emailValidatorStub = makeEmailValidator()
-  const sut = new SignUpController(emailValidatorStub, addAccountStub)
+  const passwordValidatorStub = new PasswordValidatorStub()
+  const sut = new SignUpController(emailValidatorStub, addAccountStub, passwordValidatorStub)
 
   return {
     sut,
     emailValidatorStub,
-    addAccountStub
+    addAccountStub,
+    passwordValidatorStub
   }
 }
 
@@ -237,6 +246,21 @@ describe('SignUp Controller', () => {
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new UnavailableEmailError())
+  })
+
+  it('Should call PasswordValidator with correct password', async () => {
+    const { sut, passwordValidatorStub } = makeSut()
+    const isValidSpy = jest.spyOn(passwordValidatorStub, 'isValid')
+    const httpRequest = {
+      body: {
+        username: 'unavailable_username',
+        email: 'any_email@email.com',
+        password: 'any_password',
+        passwordConfirmation: 'any_password'
+      }
+    }
+    await sut.handle(httpRequest)
+    expect(isValidSpy).toHaveBeenCalledWith('any_password')
   })
 
   it('Should return 200 if valid data is provided', async () => {
