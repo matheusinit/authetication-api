@@ -7,7 +7,7 @@
  - [x] Verifica se o **username** é um disponível
  - [x] Verifica se existe uma conta existente com o **email** fornecido
  - [x] Valida se **password** e **passwordConfirmation** são iguais
- - [ ] Valida se a senha tem pelo menos 8 caracteres, letras minúsculas e maiúsculas, números e pelo menos um caractere especial (sem ser < e >).
+ - [ ] Valida se a senha tem se categoriza como forte.
  - [x] O campo **password** é criptografado
  - [ ] O campo **status** é definido como **inactive**
  - [x] Os **username**, **email**, **hashedPassword** é armazenado no banco de dados
