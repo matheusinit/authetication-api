@@ -263,6 +263,22 @@ describe('SignUp Controller', () => {
     expect(isValidSpy).toHaveBeenCalledWith('any_password')
   })
 
+  it('Should return 400 if PasswordValidator return false', async () => {
+    const { sut, passwordValidatorStub } = makeSut()
+    jest.spyOn(passwordValidatorStub, 'isValid').mockReturnValueOnce(false)
+    const httpRequest = {
+      body: {
+        username: 'unavailable_username',
+        email: 'any_email@email.com',
+        password: 'any_password',
+        passwordConfirmation: 'any_password'
+      }
+    }
+    const httpResponse = await sut.handle(httpRequest)
+    expect(httpResponse.statusCode).toBe(400)
+    expect(httpResponse.body).toEqual(new Error('Invalid password'))
+  })
+
   it('Should return 200 if valid data is provided', async () => {
     const { sut } = makeSut()
     const httpRequest = {
