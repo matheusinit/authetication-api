@@ -20,8 +20,8 @@ describe('SignUp Routes', () => {
     await request(app).post('/api/signup').send({
       username: 'Matheus Oliveira',
       email: 'matheus.oliveira@gmail.com',
-      password: 'senha123',
-      passwordConfirmation: 'senha123'
+      password: 'Senhaa.123',
+      passwordConfirmation: 'Senhaa.123'
     }).expect(200)
   })
 
@@ -54,6 +54,15 @@ describe('SignUp Routes', () => {
       email: 'matheus.silva@gmail.com',
       password: 'senha1234',
       passwordConfirmation: 'senha1234'
+    }).expect(400)
+  })
+
+  it('Should return a bad request error if password is invalid', async () => {
+    await request(app).post('/api/signup').send({
+      username: 'Matheus Silva',
+      email: 'matheus.silva@gmail.com',
+      password: 'senha123',
+      passwordConfirmation: 'senha123'
     }).expect(400)
   })
 })
