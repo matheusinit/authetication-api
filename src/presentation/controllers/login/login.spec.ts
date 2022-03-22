@@ -1,5 +1,5 @@
 import { AuthAccount, Credentials, Session } from '../../../domain/usecases/auth-account'
-import { MissingParamError } from '../../errors'
+import { MissingParamError, ServerError } from '../../errors'
 import { LoginController } from './login'
 
 interface SutTypes {
@@ -67,6 +67,20 @@ describe('Login Controller', () => {
       email: 'any_email@mail.com',
       password: 'any_password'
     })
+  })
+
+  it('Should return 500 if AuthAccount throws', async () => {
+    const { sut, authAccountStub } = makeSut()
+    jest.spyOn(authAccountStub, 'auth').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+    const httpRequest = {
+      body: {
+        email: 'any_email@mail.com',
+        password: 'any_password'
+      }
+    }
+    const httpResponse = await sut.handle(httpRequest)
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
   })
 
   it('Should return 200 if valid data is provided', async () => {
