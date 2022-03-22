@@ -20,7 +20,8 @@ const makeAddAccount = (): AddAccount => {
         id: 'valid_id',
         username: 'valid_username',
         email: 'valid_email@email.com',
-        password: 'valid_password'
+        password: 'valid_password',
+        status: 'inactive'
       }
 
       return await new Promise(resolve => resolve(fakeAccount))
@@ -314,7 +315,8 @@ describe('SignUp Controller', () => {
       id: 'valid_id',
       username: 'valid_username',
       email: 'valid_email@email.com',
-      password: 'valid_password'
+      password: 'valid_password',
+      status: 'inactive'
     })
   })
 })
