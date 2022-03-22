@@ -19,11 +19,11 @@ export class LoginController implements Controller {
       return badRequest(new MissingParamError('password'))
     }
 
-    await this.authAccount.auth({
+    const session = await this.authAccount.auth({
       email: httpRequest.body.email,
       password: httpRequest.body.password
     })
 
-    return ok('')
+    return ok(session)
   }
 }
