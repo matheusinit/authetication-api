@@ -1,6 +1,5 @@
-import { AuthAccount, Credentials } from '../../../domain/usecases/auth-account'
+import { AuthAccount, Credentials, Session } from '../../../domain/usecases/auth-account'
 import { MissingParamError } from '../../errors'
-import { AccountModel } from '../signup/signup-protocols'
 import { LoginController } from './login'
 
 interface SutTypes {
@@ -10,13 +9,11 @@ interface SutTypes {
 
 const makeSut = (): SutTypes => {
   class AuthAccountStub implements AuthAccount {
-    async auth (credentials: Credentials): Promise<AccountModel> {
+    async auth (credentials: Credentials): Promise<Session> {
       const fakeAccount = {
-        id: 'valid_id',
+        token: 'valid_token',
         username: 'valid_username',
-        email: 'valid_email@email.com',
-        password: 'valid_password',
-        status: 'inactive'
+        email: 'valid_email@email.com'
       }
       return await new Promise(resolve => resolve(fakeAccount))
     }
@@ -69,6 +66,23 @@ describe('Login Controller', () => {
     expect(authSpy).toHaveBeenCalledWith({
       email: 'any_email@mail.com',
       password: 'any_password'
+    })
+  })
+
+  it('Should return 200 if valid data is provided', async () => {
+    const { sut } = makeSut()
+    const httpRequest = {
+      body: {
+        email: 'valid_email@mail.com',
+        password: 'valid_password'
+      }
+    }
+    const httpResponse = await sut.handle(httpRequest)
+    expect(httpResponse.statusCode).toBe(200)
+    expect(httpResponse.body).toEqual({
+      token: 'valid_token',
+      username: 'valid_username',
+      email: 'valid_email@email.com'
     })
   })
 })
