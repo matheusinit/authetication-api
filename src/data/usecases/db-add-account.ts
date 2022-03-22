@@ -27,7 +27,10 @@ export class DbAddAccount implements AddAccount {
       throw new UnavailableEmailError()
     }
     const hashedPassword = await this.encrypter.encrypt(accountData.password)
-    const accountWithHashedPassword = Object.assign({}, accountData, { password: hashedPassword })
+    const accountWithHashedPassword = Object.assign({}, accountData, {
+      password: hashedPassword,
+      status: 'inactive'
+    })
     const accountDb = await this.addAccountRepository.add(accountWithHashedPassword)
 
     return accountDb
