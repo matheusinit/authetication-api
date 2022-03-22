@@ -7,7 +7,7 @@
  - [x] Verifica se o **username** é um disponível
  - [x] Verifica se existe uma conta existente com o **email** fornecido
  - [x] Valida se **password** e **passwordConfirmation** são iguais
- - [ ] Valida se a senha tem se categoriza como forte.
+ - [x] Valida se a senha corresponde as restrições.
  - [x] O campo **password** é criptografado
  - [ ] O campo **status** é definido como **inactive**
  - [x] Os **username**, **email**, **hashedPassword** é armazenado no banco de dados
@@ -21,6 +21,6 @@
  - [x] Retorna **HTTP status** como 400 caso **username** esteja não disponível
  - [x] Retorna **HTTP status** como 400 caso **email** seja não válido
  - [x] Retorna **HTTP status** como 400 caso **email** não esteja disponível
- - [ ] Retorna **HTTP status** como 400 caso **password** não cumpra com as restrições de senha
+ - [x] Retorna **HTTP status** como 400 caso **password** não cumpra com as restrições de senha
  - [x] Retorna **HTTP status** como 500 caso a criptografia resulte em erro 
  - [x] Retorna **HTTP status** como 500 caso ao armazenar os dados no banco de dados resulte em erro
