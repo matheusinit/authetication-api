@@ -28,7 +28,6 @@
  + O email de confirmação tem validade de 24 horas.
  + Para confirmar o email, é preciso confirmar a senha.
  + Para se autenticar é necessário endereço de email e senha.
- + Se der erro 3 vezes consecutivo ao autenticar-se, o usuário fica impossibilitado de se autenticar por 5 minutos. E uma mensagem é enviada ao email cadastrado com o IP público de quem tentou se autenticar e a mensagem informando o erro.
  + Para recuperar a senha, é necessário informar o email cadastrado da conta. Uma mensagem de email é enviada para restaurar a senha.
  + O email de restauração de senha tem validade de 48 horas.
  + Ao definir uma nova senha, a senha deve ser confirmada e devem ser iguais.
