@@ -2,6 +2,7 @@ import { AddAccount, Controller, EmailValidator, HttpRequest, HttpResponse } fro
 import { InvalidParamError, MissingParamError } from '../../errors'
 import { badRequest, ok, serverError } from '../../helpers/http-helper'
 import { PasswordValidator } from '../../protocols/password-validator'
+import { InvalidPasswordError } from '../../errors/invalid-password-error'
 
 export class SignUpController implements Controller {
   private readonly emailValidator: EmailValidator
@@ -43,7 +44,7 @@ export class SignUpController implements Controller {
       const isPasswordValid = this.passwordValidator.isValid(password)
 
       if (!isPasswordValid) {
-        return badRequest(new Error('Invalid password'))
+        return badRequest(new InvalidPasswordError())
       }
 
       const account = await this.addAccount.add({

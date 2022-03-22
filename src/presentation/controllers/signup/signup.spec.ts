@@ -4,6 +4,7 @@ import { SignUpController } from './signup'
 import { UnavailableUsernameError } from '../../../data/errors/unavailable-username-error'
 import { UnavailableEmailError } from '../../../data/errors/unavailable-email-error'
 import { PasswordValidator } from '../../protocols/password-validator'
+import { InvalidPasswordError } from '../../errors/invalid-password-error'
 
 interface SutTypes {
   sut: SignUpController
@@ -276,7 +277,7 @@ describe('SignUp Controller', () => {
     }
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual(new Error('Invalid password'))
+    expect(httpResponse.body).toEqual(new InvalidPasswordError())
   })
 
   it('Should return 500 if PasswordValidator throws', async () => {
