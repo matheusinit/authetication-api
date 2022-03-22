@@ -29,7 +29,8 @@ const makeAddAccountRepository = (): AddAccountRepository => {
         id: 'valid_id',
         username: 'valid_username',
         email: 'valid_email@mail.com',
-        password: 'hashed_password'
+        password: 'hashed_password',
+        status: 'inactive'
       }
 
       return await new Promise(resolve => resolve(fakeAccount))
@@ -181,7 +182,7 @@ describe('DbAddAccount Usecase', () => {
     void expect(promise).rejects.toThrow()
   })
 
-  it('Should call AddAccountRepository with correct password', async () => {
+  it('Should call AddAccountRepository with correct values', async () => {
     const { sut, addAccountRepositoryStub } = makeSut()
     const addSpy = jest.spyOn(addAccountRepositoryStub, 'add')
     const accountData = {
@@ -195,7 +196,8 @@ describe('DbAddAccount Usecase', () => {
     expect(addSpy).toHaveBeenCalledWith({
       username: 'valid_username',
       email: 'valid_email@mail.com',
-      password: 'hashed_password'
+      password: 'hashed_password',
+      status: 'inactive'
     })
   })
 
@@ -213,6 +215,20 @@ describe('DbAddAccount Usecase', () => {
     void expect(promise).rejects.toThrow()
   })
 
+  it('Should add account with property status as inactive', async () => {
+    const { sut } = makeSut()
+    const accountData = {
+      username: 'valid_username',
+      email: 'valid_email@mail.com',
+      password: 'valid_password'
+    }
+
+    const account = await sut.add(accountData)
+
+    expect(account).toHaveProperty('status')
+    expect(account.status).toBe('inactive')
+  })
+
   it('Should return an account on success', async () => {
     const { sut } = makeSut()
     const accountData = {
@@ -227,6 +243,7 @@ describe('DbAddAccount Usecase', () => {
       id: 'valid_id',
       username: 'valid_username',
       email: 'valid_email@mail.com',
+      status: 'inactive',
       password: 'hashed_password'
     })
   })
