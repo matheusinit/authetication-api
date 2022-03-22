@@ -9,7 +9,7 @@
 </h4>
 
 ## Features
- - [ ] Cadastro do usuário
+ - [x] Cadastro do usuário
  - [ ] Autenticação
  - [ ] Recuperação de senha
  - [ ] Login automático

@@ -9,7 +9,7 @@
  - [x] Valida se **password** e **passwordConfirmation** são iguais
  - [x] Valida se a senha corresponde as restrições.
  - [x] O campo **password** é criptografado
- - [ ] O campo **status** é definido como **inactive**
+ - [x] O campo **status** é definido como **inactive**
  - [x] Os **username**, **email**, **hashedPassword** é armazenado no banco de dados
  - [x] O **HTTP status** da resposta é definido como 200
  - [x] O campo **HTTP body** é retornado com os dados do usuário: **id**, **username**, **email** e **hashedPassword**
