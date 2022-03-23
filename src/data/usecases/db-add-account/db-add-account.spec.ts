@@ -1,9 +1,9 @@
 import { AccountModel, AddAccountModel, AddAccountRepository, Encrypter } from './db-add-account-protocols'
 import { DbAddAccount } from './db-add-account'
-import { CheckUsernameRepository } from '../protocols/check-username-repository'
-import { UnavailableUsernameError } from '../errors/unavailable-username-error'
-import { CheckEmailRepository } from '../protocols/check-email-repository'
-import { UnavailableEmailError } from '../errors/unavailable-email-error'
+import { CheckUsernameRepository } from '../../protocols/check-username-repository'
+import { UnavailableUsernameError } from '../../errors/unavailable-username-error'
+import { CheckEmailRepository } from '../../protocols/check-email-repository'
+import { UnavailableEmailError } from '../../errors/unavailable-email-error'
 
 interface SutTypes {
   sut: DbAddAccount

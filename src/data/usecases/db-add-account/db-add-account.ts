@@ -1,7 +1,7 @@
-import { UnavailableEmailError } from '../errors/unavailable-email-error'
-import { UnavailableUsernameError } from '../errors/unavailable-username-error'
-import { CheckEmailRepository } from '../protocols/check-email-repository'
-import { CheckUsernameRepository } from '../protocols/check-username-repository'
+import { UnavailableEmailError } from '../../errors/unavailable-email-error'
+import { UnavailableUsernameError } from '../../errors/unavailable-username-error'
+import { CheckEmailRepository } from '../../protocols/check-email-repository'
+import { CheckUsernameRepository } from '../../protocols/check-username-repository'
 import { AccountModel, AddAccount, AddAccountModel, AddAccountRepository, Encrypter } from './db-add-account-protocols'
 
 export class DbAddAccount implements AddAccount {
