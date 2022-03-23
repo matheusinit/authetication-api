@@ -12,11 +12,11 @@ export class DbAuthAccount implements AuthAccount {
   }
 
   async auth (credentials: Credentials): Promise<Session> {
-    await this.authAccountRepository.auth(credentials)
+    const account = await this.authAccountRepository.auth(credentials)
 
     this.tokenGenerator.generate({
-      id: 'valid_id',
-      email: 'any_email@mail.com'
+      id: account.id,
+      email: account.email
     })
 
     return {
