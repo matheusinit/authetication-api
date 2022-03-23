@@ -68,8 +68,44 @@ describe('DbAuthAccount', () => {
     }
     await sut.auth(accountInfo)
     expect(generateSpy).toHaveBeenCalledWith({
-      id: 'valid_id',
+      id: 'any_id',
       email: 'any_email@mail.com'
+    })
+  })
+
+  it('Should call TokenGenerator with the results of AuthAccountRepository', async () => {
+    const { sut, tokenGeneratorStub, authAccountRepositoryStub } = makeSut()
+    const authSpy = jest.spyOn(authAccountRepositoryStub, 'auth')
+    authSpy.mockReturnValueOnce(new Promise(resolve => resolve({
+      id: 'this_account_id',
+      username: 'this_account_id',
+      email: 'this_account_email@mail.com',
+      password: 'hashed_password',
+      status: 'any_status'
+    })))
+    const generateSpy = jest.spyOn(tokenGeneratorStub, 'generate')
+    const accountInfo = {
+      email: 'any_email@mail.com',
+      password: 'any_password'
+    }
+    await sut.auth(accountInfo)
+    expect(generateSpy).toHaveBeenCalledWith({
+      id: 'this_account_id',
+      email: 'this_account_email@mail.com'
+    })
+
+    authSpy.mockReturnValueOnce(new Promise(resolve => resolve({
+      id: 'another_account_id',
+      username: 'another_account_id',
+      email: 'another_account_email@mail.com',
+      password: 'hashed_password',
+      status: 'any_status'
+    })))
+
+    await sut.auth(accountInfo)
+    expect(generateSpy).toHaveBeenCalledWith({
+      id: 'another_account_id',
+      email: 'another_account_email@mail.com'
     })
   })
 })
