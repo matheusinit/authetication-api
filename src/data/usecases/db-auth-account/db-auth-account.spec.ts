@@ -108,4 +108,18 @@ describe('DbAuthAccount', () => {
       email: 'another_account_email@mail.com'
     })
   })
+
+  it('Should return a session on success', async () => {
+    const { sut } = makeSut()
+    const accountInfo = {
+      email: 'any_email@mail.com',
+      password: 'any_password'
+    }
+    const session = await sut.auth(accountInfo)
+    expect(session).toEqual({
+      token: 'any_token',
+      username: 'any_username',
+      email: 'any_email@mail.com'
+    })
+  })
 })
