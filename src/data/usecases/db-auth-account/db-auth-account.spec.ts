@@ -6,15 +6,18 @@ interface SutTypes {
   tokenGeneratorStub: TokenGenerator
 }
 
-const makeSut = (): SutTypes => {
+const makeTokenGeneratorStub = (): TokenGenerator => {
   class TokenGeneratorStub implements TokenGenerator {
     generate (payload: any): string {
-      return ''
+      return 'any_token'
     }
   }
 
-  const tokenGeneratorStub = new TokenGeneratorStub()
+  return new TokenGeneratorStub()
+}
 
+const makeSut = (): SutTypes => {
+  const tokenGeneratorStub = makeTokenGeneratorStub()
   const sut = new DbAuthAccount(tokenGeneratorStub)
   return {
     sut,
