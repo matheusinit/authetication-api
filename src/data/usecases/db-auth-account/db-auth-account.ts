@@ -14,15 +14,15 @@ export class DbAuthAccount implements AuthAccount {
   async auth (credentials: Credentials): Promise<Session> {
     const account = await this.authAccountRepository.auth(credentials)
 
-    this.tokenGenerator.generate({
+    const token = this.tokenGenerator.generate({
       id: account.id,
       email: account.email
     })
 
     return {
-      token: '',
-      username: '',
-      email: ''
+      token,
+      username: account.username,
+      email: account.email
     }
   }
 }
