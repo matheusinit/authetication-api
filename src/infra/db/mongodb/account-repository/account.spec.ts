@@ -1,5 +1,8 @@
+import { Collection } from 'mongodb'
 import { MongoHelper } from '../helpers/mongo-helper'
 import { AccountMongoRepository } from './account'
+
+let collection: Collection
 
 describe('Account Mongo Repository', () => {
   beforeAll(async () => {
@@ -11,7 +14,7 @@ describe('Account Mongo Repository', () => {
   })
 
   beforeEach(async () => {
-    const collection = MongoHelper.getCollection('accounts')
+    collection = MongoHelper.getCollection('accounts')
     await collection.deleteMany({})
   })
 
@@ -49,7 +52,7 @@ describe('Account Mongo Repository', () => {
         email: 'valid_email@email.com',
         password: 'hashed_password'
       }
-      await MongoHelper.getCollection('accounts').insertOne(fakeAccount)
+      await collection.insertOne(fakeAccount)
       const isAvailable = await sut.checkUsername('unavailable_username')
       expect(isAvailable).toBe(false)
     })
@@ -69,7 +72,7 @@ describe('Account Mongo Repository', () => {
         email: 'unavailable_email@email.com',
         password: 'hashed_password'
       }
-      await MongoHelper.getCollection('accounts').insertOne(fakeAccount)
+      await collection.insertOne(fakeAccount)
       const isAvailable = await sut.checkEmail('unavailable_email@email.com')
       expect(isAvailable).toBe(false)
     })
