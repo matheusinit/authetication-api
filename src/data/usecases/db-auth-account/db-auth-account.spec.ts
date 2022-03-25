@@ -1,5 +1,4 @@
-import { Credentials } from '../../../domain/usecases/auth-account'
-import { AuthAccountRepository } from '../../protocols/auth-account-repository'
+import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
 import { TokenGenerator } from '../../protocols/token-generator'
 import { AccountModel } from '../db-add-account/db-add-account-protocols'
 import { DbAuthAccount } from './db-auth-account'
@@ -7,7 +6,7 @@ import { DbAuthAccount } from './db-auth-account'
 interface SutTypes {
   sut: DbAuthAccount
   tokenGeneratorStub: TokenGenerator
-  authAccountRepositoryStub: AuthAccountRepository
+  loadAccountByEmailRepositoryStub: LoadAccountByEmailRepository
 }
 
 const makeTokenGeneratorStub = (): TokenGenerator => {
@@ -21,8 +20,8 @@ const makeTokenGeneratorStub = (): TokenGenerator => {
 }
 
 const makeSut = (): SutTypes => {
-  class AuthAccountRepositoryStub implements AuthAccountRepository {
-    async auth (credentials: Credentials): Promise<AccountModel> {
+  class LoadAccountByEmailRepositoryStub implements LoadAccountByEmailRepository {
+    async loadByEmail (password: string): Promise<AccountModel> {
       const fakeAccount: AccountModel = {
         id: 'any_id',
         username: 'any_username',
@@ -35,28 +34,25 @@ const makeSut = (): SutTypes => {
     }
   }
   const tokenGeneratorStub = makeTokenGeneratorStub()
-  const authAccountRepositoryStub = new AuthAccountRepositoryStub()
-  const sut = new DbAuthAccount(tokenGeneratorStub, authAccountRepositoryStub)
+  const loadAccountByEmailRepositoryStub = new LoadAccountByEmailRepositoryStub()
+  const sut = new DbAuthAccount(tokenGeneratorStub, loadAccountByEmailRepositoryStub)
   return {
     sut,
     tokenGeneratorStub,
-    authAccountRepositoryStub
+    loadAccountByEmailRepositoryStub
   }
 }
 
 describe('DbAuthAccount', () => {
-  it('Should call AuthAccountRepository with correct values', async () => {
-    const { sut, authAccountRepositoryStub } = makeSut()
-    const authSpy = jest.spyOn(authAccountRepositoryStub, 'auth')
+  it('Should call LoadAccountByEmailRepository with correct values', async () => {
+    const { sut, loadAccountByEmailRepositoryStub } = makeSut()
+    const loadByEmailSpy = jest.spyOn(loadAccountByEmailRepositoryStub, 'loadByEmail')
     const accountInfo = {
       email: 'any_email@mail.com',
       password: 'any_password'
     }
     await sut.auth(accountInfo)
-    expect(authSpy).toHaveBeenCalledWith({
-      email: 'any_email@mail.com',
-      password: 'any_password'
-    })
+    expect(loadByEmailSpy).toHaveBeenCalledWith('any_email@mail.com')
   })
 
   it('Should call TokenGenerator with correct values', async () => {
@@ -73,10 +69,10 @@ describe('DbAuthAccount', () => {
     })
   })
 
-  it('Should call TokenGenerator with the results of AuthAccountRepository', async () => {
-    const { sut, tokenGeneratorStub, authAccountRepositoryStub } = makeSut()
-    const authSpy = jest.spyOn(authAccountRepositoryStub, 'auth')
-    authSpy.mockReturnValueOnce(new Promise(resolve => resolve({
+  it('Should call TokenGenerator with the results of LoadAccountByEmailRepository', async () => {
+    const { sut, tokenGeneratorStub, loadAccountByEmailRepositoryStub } = makeSut()
+    const loadByEmailSpy = jest.spyOn(loadAccountByEmailRepositoryStub, 'loadByEmail')
+    loadByEmailSpy.mockReturnValueOnce(new Promise(resolve => resolve({
       id: 'this_account_id',
       username: 'this_account_id',
       email: 'this_account_email@mail.com',
@@ -94,7 +90,7 @@ describe('DbAuthAccount', () => {
       email: 'this_account_email@mail.com'
     })
 
-    authSpy.mockReturnValueOnce(new Promise(resolve => resolve({
+    loadByEmailSpy.mockReturnValueOnce(new Promise(resolve => resolve({
       id: 'another_account_id',
       username: 'another_account_id',
       email: 'another_account_email@mail.com',

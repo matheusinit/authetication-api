@@ -1,18 +1,18 @@
 import { AuthAccount, Credentials, Session } from '../../../domain/usecases/auth-account'
-import { AuthAccountRepository } from '../../protocols/auth-account-repository'
+import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
 import { TokenGenerator } from '../../protocols/token-generator'
 
 export class DbAuthAccount implements AuthAccount {
   private readonly tokenGenerator: TokenGenerator
-  private readonly authAccountRepository: AuthAccountRepository
+  private readonly loadAccountByEmailRepository: LoadAccountByEmailRepository
 
-  constructor (tokenGenerator: TokenGenerator, authAccountRepository: AuthAccountRepository) {
+  constructor (tokenGenerator: TokenGenerator, loadAccountByEmailRepository: LoadAccountByEmailRepository) {
     this.tokenGenerator = tokenGenerator
-    this.authAccountRepository = authAccountRepository
+    this.loadAccountByEmailRepository = loadAccountByEmailRepository
   }
 
   async auth (credentials: Credentials): Promise<Session> {
-    const account = await this.authAccountRepository.auth(credentials)
+    const account = await this.loadAccountByEmailRepository.loadByEmail(credentials.email)
 
     const token = this.tokenGenerator.generate({
       id: account.id,
