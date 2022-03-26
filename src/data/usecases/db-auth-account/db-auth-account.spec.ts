@@ -77,7 +77,7 @@ describe('DbAuthAccount', () => {
       password: 'any_password'
     }
     const promise = sut.auth(accountInfo)
-    await expect(promise).rejects.toThrow(new Error('EmailInUse'))
+    await expect(promise).rejects.toThrow(new Error('Email is not registered'))
   })
 
   it('Should call HashComparator with correct values', async () => {

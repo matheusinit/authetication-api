@@ -22,7 +22,7 @@ export class DbAuthAccount implements AuthAccount {
     const account = await this.loadAccountByEmailRepository.loadByEmail(credentials.email)
 
     if (!account) {
-      throw new Error('EmailInUse')
+      throw new Error('Email is not registered')
     }
 
     const isValid = await this.hashComparator.compare(credentials.password, account.password)
