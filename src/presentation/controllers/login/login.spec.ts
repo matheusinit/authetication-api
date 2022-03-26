@@ -88,6 +88,6 @@ describe('Login Controller', () => {
     }
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(200)
-    expect(httpResponse.body).toBe('any_token')
+    expect(httpResponse.body).toEqual({ token: 'any_token' })
   })
 })
