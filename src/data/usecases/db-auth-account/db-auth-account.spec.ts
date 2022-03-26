@@ -19,7 +19,7 @@ const makeTokenGeneratorStub = (): TokenGenerator => {
   return new TokenGeneratorStub()
 }
 
-const makeSut = (): SutTypes => {
+const makeLoadAccountByEmailRepositoryStub = (): LoadAccountByEmailRepository => {
   class LoadAccountByEmailRepositoryStub implements LoadAccountByEmailRepository {
     async loadByEmail (password: string): Promise<AccountModel> {
       const fakeAccount: AccountModel = {
@@ -33,8 +33,13 @@ const makeSut = (): SutTypes => {
       return await new Promise(resolve => resolve(fakeAccount))
     }
   }
+
+  return new LoadAccountByEmailRepositoryStub()
+}
+
+const makeSut = (): SutTypes => {
   const tokenGeneratorStub = makeTokenGeneratorStub()
-  const loadAccountByEmailRepositoryStub = new LoadAccountByEmailRepositoryStub()
+  const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepositoryStub()
   const sut = new DbAuthAccount(tokenGeneratorStub, loadAccountByEmailRepositoryStub)
   return {
     sut,
