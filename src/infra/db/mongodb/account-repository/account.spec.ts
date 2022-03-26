@@ -6,7 +6,7 @@ let collection: Collection
 
 describe('Account Mongo Repository', () => {
   beforeAll(async () => {
-    await MongoHelper.connect(process.env.MONGO_URL as string)
+    await MongoHelper.connect(process.env.MONGO_URL)
   })
 
   afterAll(async () => {
@@ -39,13 +39,13 @@ describe('Account Mongo Repository', () => {
   })
 
   describe('checkUsername()', () => {
-    it('Should checkUsername return true if username is available', async () => {
+    it('Should return true if username is available', async () => {
       const sut = makeSut()
       const isAvailable = await sut.checkUsername('available_username')
       expect(isAvailable).toBe(true)
     })
 
-    it('Should checkUsername return false if username is unavailable', async () => {
+    it('Should return false if username is unavailable', async () => {
       const sut = makeSut()
       const fakeAccount = {
         username: 'unavailable_username',
@@ -59,13 +59,13 @@ describe('Account Mongo Repository', () => {
   })
 
   describe('checkEmail()', () => {
-    it('Should checkEmail return true if email is available', async () => {
+    it('Should return true if email is available', async () => {
       const sut = makeSut()
       const isAvailable = await sut.checkEmail('available_email@mail.com')
       expect(isAvailable).toBe(true)
     })
 
-    it('Should checkEmail return false if email is unavailable', async () => {
+    it('Should return false if email is unavailable', async () => {
       const sut = makeSut()
       const fakeAccount = {
         username: 'valid_username',
