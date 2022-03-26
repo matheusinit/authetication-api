@@ -1,4 +1,4 @@
-import { AuthAccount, Credentials, Session } from '../../../domain/usecases/auth-account'
+import { AuthAccount, Credentials } from '../../../domain/usecases/auth-account'
 import { MissingParamError, ServerError } from '../../errors'
 import { LoginController } from './login'
 
@@ -9,13 +9,8 @@ interface SutTypes {
 
 const makeSut = (): SutTypes => {
   class AuthAccountStub implements AuthAccount {
-    async auth (credentials: Credentials): Promise<Session> {
-      const fakeAccount = {
-        token: 'valid_token',
-        username: 'valid_username',
-        email: 'valid_email@email.com'
-      }
-      return await new Promise(resolve => resolve(fakeAccount))
+    async auth (credentials: Credentials): Promise<String> {
+      return await new Promise(resolve => resolve('any_token'))
     }
   }
 
@@ -93,10 +88,6 @@ describe('Login Controller', () => {
     }
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(200)
-    expect(httpResponse.body).toEqual({
-      token: 'valid_token',
-      username: 'valid_username',
-      email: 'valid_email@email.com'
-    })
+    expect(httpResponse.body).toBe('any_token')
   })
 })

@@ -112,10 +112,6 @@ describe('DbAuthAccount', () => {
       password: 'any_password'
     }
     const session = await sut.auth(accountInfo)
-    expect(session).toEqual({
-      token: 'any_token',
-      username: 'any_username',
-      email: 'any_email@mail.com'
-    })
+    expect(session).toBe('any_token')
   })
 })

@@ -10,5 +10,5 @@ export interface Session {
 }
 
 export interface AuthAccount {
-  auth: (credentials: Credentials) => Promise<Session>
+  auth: (credentials: Credentials) => Promise<String>
 }
