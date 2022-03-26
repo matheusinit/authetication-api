@@ -80,6 +80,17 @@ describe('DbAuthAccount', () => {
     expect(compareSpy).toHaveBeenCalledWith('any_password', 'hashed_password')
   })
 
+  it('Should throw an error if HashComparator return false', async () => {
+    const { sut, hashComparatorStub } = makeSut()
+    jest.spyOn(hashComparatorStub, 'compare').mockReturnValueOnce(false)
+    const accountInfo = {
+      email: 'any_email@mail.com',
+      password: 'any_password'
+    }
+    const promise = sut.auth(accountInfo)
+    await expect(promise).rejects.toThrow(new Error('InvalidPassword'))
+  })
+
   it('Should call TokenGenerator with correct values', async () => {
     const { sut, tokenGeneratorStub } = makeSut()
     const generateSpy = jest.spyOn(tokenGeneratorStub, 'generate')
