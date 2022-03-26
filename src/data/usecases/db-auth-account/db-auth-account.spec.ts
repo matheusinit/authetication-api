@@ -41,15 +41,19 @@ const makeLoadAccountByEmailRepositoryStub = (): LoadAccountByEmailRepository =>
   return new LoadAccountByEmailRepositoryStub()
 }
 
-const makeSut = (): SutTypes => {
+const makeHashComparatorStub = (): HashComparator => {
   class HashComparatorStub implements HashComparator {
     async compare (password: string, hash: string): Promise<boolean> {
       return true
     }
   }
+  return new HashComparatorStub()
+}
+
+const makeSut = (): SutTypes => {
   const tokenGeneratorStub = makeTokenGeneratorStub()
   const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepositoryStub()
-  const hashComparatorStub = new HashComparatorStub()
+  const hashComparatorStub = makeHashComparatorStub()
   const sut = new DbAuthAccount(tokenGeneratorStub, loadAccountByEmailRepositoryStub, hashComparatorStub)
   return {
     sut,
