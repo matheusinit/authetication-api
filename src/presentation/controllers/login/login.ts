@@ -1,3 +1,4 @@
+import { EmailNotRegisteredError } from '../../../data/errors/email-not-registered-error'
 import { AuthAccount } from '../../../domain/usecases/auth-account'
 import { MissingParamError } from '../../errors'
 import { badRequest, ok, serverError } from '../../helpers/http-helper'
@@ -26,6 +27,10 @@ export class LoginController implements Controller {
 
       return ok({ token })
     } catch (error) {
+      if (error instanceof EmailNotRegisteredError) {
+        return badRequest(error)
+      }
+
       return serverError()
     }
   }
