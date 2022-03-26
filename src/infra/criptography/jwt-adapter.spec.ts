@@ -18,5 +18,15 @@ describe('Jwt Adapter', () => {
       sut.generate(payload)
       expect(signSpy).toHaveBeenCalledWith(payload, env.secret)
     })
+
+    it('Should return a token on success', () => {
+      const sut = makeSut()
+      const payload = {
+        id: 'any_id',
+        email: 'any_email@mail.com'
+      }
+      const token = sut.generate(payload)
+      expect(token).toBeTruthy()
+    })
   })
 })
