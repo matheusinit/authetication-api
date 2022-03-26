@@ -78,9 +78,9 @@ describe('DbAuthAccount', () => {
     const { sut, tokenGeneratorStub, loadAccountByEmailRepositoryStub } = makeSut()
     const loadByEmailSpy = jest.spyOn(loadAccountByEmailRepositoryStub, 'loadByEmail')
     loadByEmailSpy.mockReturnValueOnce(new Promise(resolve => resolve({
-      id: 'this_account_id',
-      username: 'this_account_id',
-      email: 'this_account_email@mail.com',
+      id: 'valid_id',
+      username: 'valid_username',
+      email: 'valid_email@mail.com',
       password: 'hashed_password',
       status: 'any_status'
     })))
@@ -91,22 +91,8 @@ describe('DbAuthAccount', () => {
     }
     await sut.auth(accountInfo)
     expect(generateSpy).toHaveBeenCalledWith({
-      id: 'this_account_id',
-      email: 'this_account_email@mail.com'
-    })
-
-    loadByEmailSpy.mockReturnValueOnce(new Promise(resolve => resolve({
-      id: 'another_account_id',
-      username: 'another_account_id',
-      email: 'another_account_email@mail.com',
-      password: 'hashed_password',
-      status: 'any_status'
-    })))
-
-    await sut.auth(accountInfo)
-    expect(generateSpy).toHaveBeenCalledWith({
-      id: 'another_account_id',
-      email: 'another_account_email@mail.com'
+      id: 'valid_id',
+      email: 'valid_email@mail.com'
     })
   })
 
