@@ -1,4 +1,5 @@
 import { EmailNotRegisteredError } from '../../errors/email-not-registered-error'
+import { PasswordNotMatchError } from '../../errors/password-not-match-error'
 import { HashComparator } from '../../protocols/hash-comparator'
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
 import { TokenGenerator } from '../../protocols/token-generator'
@@ -100,7 +101,7 @@ describe('DbAuthAccount', () => {
       password: 'any_password'
     }
     const promise = sut.auth(accountInfo)
-    await expect(promise).rejects.toThrow(new Error('InvalidPassword'))
+    await expect(promise).rejects.toThrow(new PasswordNotMatchError())
   })
 
   it('Should call TokenGenerator with correct values', async () => {
