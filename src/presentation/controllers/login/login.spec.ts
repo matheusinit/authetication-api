@@ -1,3 +1,4 @@
+import { EmailNotRegisteredError } from '../../../data/errors/email-not-registered-error'
 import { AuthAccount, Credentials } from '../../../domain/usecases/auth-account'
 import { MissingParamError, ServerError } from '../../errors'
 import { LoginController } from './login'
@@ -46,6 +47,20 @@ describe('Login Controller', () => {
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new MissingParamError('password'))
+  })
+
+  it('Should return 400 if email is not registered', async () => {
+    const { sut, authAccountStub } = makeSut()
+    jest.spyOn(authAccountStub, 'auth').mockReturnValueOnce(new Promise((resolve, reject) => reject(new EmailNotRegisteredError())))
+    const httpRequest = {
+      body: {
+        email: 'any_email@mail.com',
+        password: 'any_password'
+      }
+    }
+    const httpResponse = await sut.handle(httpRequest)
+    expect(httpResponse.statusCode).toBe(400)
+    expect(httpResponse.body).toEqual(new EmailNotRegisteredError())
   })
 
   it('Should call AuthAccount with correct values', async () => {
