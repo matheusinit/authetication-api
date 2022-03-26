@@ -21,6 +21,10 @@ export class DbAuthAccount implements AuthAccount {
   async auth (credentials: Credentials): Promise<String> {
     const account = await this.loadAccountByEmailRepository.loadByEmail(credentials.email)
 
+    if (!account) {
+      throw new Error('EmailInUse')
+    }
+
     const isValid = this.hashComparator.compare(credentials.password, account.password)
 
     if (!isValid) {
