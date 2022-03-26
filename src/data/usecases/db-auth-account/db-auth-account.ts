@@ -25,7 +25,7 @@ export class DbAuthAccount implements AuthAccount {
       throw new Error('EmailInUse')
     }
 
-    const isValid = this.hashComparator.compare(credentials.password, account.password)
+    const isValid = await this.hashComparator.compare(credentials.password, account.password)
 
     if (!isValid) {
       throw new Error('InvalidPassword')

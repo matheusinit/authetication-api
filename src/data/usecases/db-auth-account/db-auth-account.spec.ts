@@ -41,7 +41,7 @@ const makeLoadAccountByEmailRepositoryStub = (): LoadAccountByEmailRepository =>
 
 const makeSut = (): SutTypes => {
   class HashComparatorStub implements HashComparator {
-    compare (password: string, hash: string): boolean {
+    async compare (password: string, hash: string): Promise<boolean> {
       return true
     }
   }
@@ -93,7 +93,7 @@ describe('DbAuthAccount', () => {
 
   it('Should throw an error if HashComparator return false', async () => {
     const { sut, hashComparatorStub } = makeSut()
-    jest.spyOn(hashComparatorStub, 'compare').mockReturnValueOnce(false)
+    jest.spyOn(hashComparatorStub, 'compare').mockReturnValueOnce(new Promise(resolve => resolve(false)))
     const accountInfo = {
       email: 'any_email@mail.com',
       password: 'any_password'
