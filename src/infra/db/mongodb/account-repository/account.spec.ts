@@ -98,5 +98,11 @@ describe('Account Mongo Repository', () => {
       expect(account.password).toBeTruthy()
       expect(account.status).toBeTruthy()
     })
+
+    it('Should return null if account with email doest not exist', async () => {
+      const sut = makeSut()
+      const account = await sut.loadByEmail('email_not_registered@mail.com')
+      expect(account).toBeFalsy()
+    })
   })
 })
