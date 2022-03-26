@@ -69,6 +69,17 @@ describe('DbAuthAccount', () => {
     expect(loadByEmailSpy).toHaveBeenCalledWith('any_email@mail.com')
   })
 
+  it('Should throw an error if LoadAccountByEmailRepository return null', async () => {
+    const { sut, loadAccountByEmailRepositoryStub } = makeSut()
+    jest.spyOn(loadAccountByEmailRepositoryStub, 'loadByEmail').mockReturnValueOnce(null)
+    const accountInfo = {
+      email: 'any_email@mail.com',
+      password: 'any_password'
+    }
+    const promise = sut.auth(accountInfo)
+    await expect(promise).rejects.toThrow(new Error('EmailInUse'))
+  })
+
   it('Should call HashComparator with correct values', async () => {
     const { sut, hashComparatorStub } = makeSut()
     const compareSpy = jest.spyOn(hashComparatorStub, 'compare')
