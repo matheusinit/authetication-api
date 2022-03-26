@@ -2,10 +2,14 @@ import env from './../../main/config/env'
 import jwt from 'jsonwebtoken'
 import { JwtAdapter } from './jwt-adapter'
 
+const makeSut = (): JwtAdapter => {
+  return new JwtAdapter()
+}
+
 describe('Jwt Adapter', () => {
   describe('generate()', () => {
     it('Should call Jwt with correct values', () => {
-      const sut = new JwtAdapter()
+      const sut = makeSut()
       const signSpy = jest.spyOn(jwt, 'sign')
       const payload = {
         id: 'any_id',
