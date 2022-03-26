@@ -1,3 +1,4 @@
+import { HashComparator } from '../../protocols/hash-comparator'
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
 import { TokenGenerator } from '../../protocols/token-generator'
 import { AccountModel } from '../db-add-account/db-add-account-protocols'
@@ -7,6 +8,7 @@ interface SutTypes {
   sut: DbAuthAccount
   tokenGeneratorStub: TokenGenerator
   loadAccountByEmailRepositoryStub: LoadAccountByEmailRepository
+  hashComparatorStub: HashComparator
 }
 
 const makeTokenGeneratorStub = (): TokenGenerator => {
@@ -38,13 +40,20 @@ const makeLoadAccountByEmailRepositoryStub = (): LoadAccountByEmailRepository =>
 }
 
 const makeSut = (): SutTypes => {
+  class HashComparatorStub implements HashComparator {
+    compare (password: string, hash: string): boolean {
+      return true
+    }
+  }
   const tokenGeneratorStub = makeTokenGeneratorStub()
   const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepositoryStub()
-  const sut = new DbAuthAccount(tokenGeneratorStub, loadAccountByEmailRepositoryStub)
+  const hashComparatorStub = new HashComparatorStub()
+  const sut = new DbAuthAccount(tokenGeneratorStub, loadAccountByEmailRepositoryStub, hashComparatorStub)
   return {
     sut,
     tokenGeneratorStub,
-    loadAccountByEmailRepositoryStub
+    loadAccountByEmailRepositoryStub,
+    hashComparatorStub
   }
 }
 
@@ -58,6 +67,17 @@ describe('DbAuthAccount', () => {
     }
     await sut.auth(accountInfo)
     expect(loadByEmailSpy).toHaveBeenCalledWith('any_email@mail.com')
+  })
+
+  it('Should call HashComparator with correct values', async () => {
+    const { sut, hashComparatorStub } = makeSut()
+    const compareSpy = jest.spyOn(hashComparatorStub, 'compare')
+    const accountInfo = {
+      email: 'any_email@mail.com',
+      password: 'any_password'
+    }
+    await sut.auth(accountInfo)
+    expect(compareSpy).toHaveBeenCalledWith('any_password', 'hashed_password')
   })
 
   it('Should call TokenGenerator with correct values', async () => {
