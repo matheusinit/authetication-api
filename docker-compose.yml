@@ -1,6 +1,13 @@
 version: "3.7"
 
 services:
+  app:
+    build: .
+    container_name: auth_api
+    volumes:
+      - .:/usr/app
+    network_mode: host
+
   database:
     image: mongo:4.4.1
     container_name: mongodb
