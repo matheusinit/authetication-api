@@ -9,14 +9,18 @@ interface SutTypes {
   authAccountStub: AuthAccount
 }
 
-const makeSut = (): SutTypes => {
+const makeAuthAccountStub = (): AuthAccount => {
   class AuthAccountStub implements AuthAccount {
     async auth (credentials: Credentials): Promise<String> {
       return await new Promise(resolve => resolve('any_token'))
     }
   }
 
-  const authAccountStub = new AuthAccountStub()
+  return new AuthAccountStub()
+}
+
+const makeSut = (): SutTypes => {
+  const authAccountStub = makeAuthAccountStub()
   const sut = new LoginController(authAccountStub)
 
   return {
