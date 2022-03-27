@@ -35,4 +35,11 @@ describe('Login Routes', () => {
       password: 'senha123'
     }).expect(200)
   })
+
+  it('Should return a bad request error if email is not registered', async () => {
+    await request(app).post('/api/login').send({
+      email: 'matheus.oliveira@gmail.com',
+      password: 'senha123'
+    }).expect(400)
+  })
 })
