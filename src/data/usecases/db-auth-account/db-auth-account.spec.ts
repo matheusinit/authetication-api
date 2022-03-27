@@ -144,7 +144,7 @@ describe('DbAuthAccount', () => {
     })
   })
 
-  it('Should return a session on success', async () => {
+  it('Should return a token on success', async () => {
     const { sut } = makeSut()
     const accountInfo = {
       email: 'any_email@mail.com',
