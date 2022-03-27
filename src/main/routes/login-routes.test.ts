@@ -42,4 +42,20 @@ describe('Login Routes', () => {
       password: 'senha123'
     }).expect(400)
   })
+
+  it('Should return a bad request error if password not match', async () => {
+    const fakeAccount = {
+      username: 'Matheus Oliveira',
+      email: 'matheus.oliveira@gmail.com',
+      password: await bcrypt.hash('senha123', 12),
+      status: 'inactive'
+    }
+
+    await collection.insertOne(fakeAccount)
+
+    await request(app).post('/api/login').send({
+      email: 'matheus.oliveira@gmail.com',
+      password: 'senha12'
+    }).expect(400)
+  })
 })
