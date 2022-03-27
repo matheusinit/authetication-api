@@ -10,7 +10,7 @@
 
 ## Features
  - [x] Cadastro do usuário
- - [ ] Autenticação
+ - [x] Autenticação
  - [ ] Recuperação de senha
  - [ ] Enviar código de confirmação
  - [ ] Ativar conta

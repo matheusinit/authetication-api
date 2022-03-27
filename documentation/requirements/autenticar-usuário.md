@@ -12,5 +12,4 @@
  - [x] Retorna **HTTP status** como 400 se um dos campos **email** ou **password** não for fornecido
  - [x] Retorna **HTTP status** como 400 se não existir uma conta com o email fornecido
  - [x] Retorna **HTTP status** como 400 se a senha não conferir
- - [ ] Retorna **HTTP status** como 400 se a conta estiver inativa.
  - [x] Retorna **HTTP status** como 500 caso ocorra um erro interno.
