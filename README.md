@@ -12,8 +12,8 @@
  - [x] Cadastro do usuário
  - [ ] Autenticação
  - [ ] Recuperação de senha
- - [ ] Login automático
- - [ ] Enviar email
+ - [ ] Enviar código de confirmação
+ - [ ] Ativar conta
  - [ ] Editar informações do usuário
 
 Para mais detalhes de requisitos e regras de negócio, veja a [documentação](documentation/README.md).
