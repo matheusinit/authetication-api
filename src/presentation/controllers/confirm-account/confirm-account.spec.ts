@@ -1,9 +1,9 @@
 import { MissingParamError } from '../../errors'
-import { SendConfirmationEmailController } from './send-confirmation-email'
+import { ConfirmAccountController } from './confirm-account'
 
-describe('SendConfirmationEmail Controller', () => {
+describe('ConfirmAccount Controller', () => {
   it('Should return 400 if no email is provided', async () => {
-    const sut = new SendConfirmationEmailController()
+    const sut = new ConfirmAccountController()
     const httpRequest = {
       body: {
         email: 'any_email@mail.com'
