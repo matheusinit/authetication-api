@@ -29,6 +29,7 @@ Para mais detalhes de requisitos e regras de negócio, veja a [documentação](d
  + lint-staged
  + husky
  + Eslint
+ + validator
 
 ## Como rodar
 
