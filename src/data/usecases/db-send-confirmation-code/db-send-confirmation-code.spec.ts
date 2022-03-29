@@ -19,7 +19,7 @@ const makeCheckEmailRepositoryStub = (): CheckEmailRepository => {
   return new CheckEmailRepositoryStub()
 }
 
-const makeSut = (): SutTypes => {
+const makeLoadAccountByEmailRepositoryStub = (): LoadAccountByEmailRepository => {
   class LoadAccountByEmailRepositoryStub implements LoadAccountByEmailRepository {
     async loadByEmail (email: string): Promise<AccountModel> {
       return {
@@ -31,8 +31,12 @@ const makeSut = (): SutTypes => {
       }
     }
   }
+  return new LoadAccountByEmailRepositoryStub()
+}
+
+const makeSut = (): SutTypes => {
   const checkEmailRepositoryStub = makeCheckEmailRepositoryStub()
-  const loadAccountByEmailRepositoryStub = new LoadAccountByEmailRepositoryStub()
+  const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepositoryStub()
   const sut = new DbSendConfirmationCode(checkEmailRepositoryStub, loadAccountByEmailRepositoryStub)
   return {
     sut,
