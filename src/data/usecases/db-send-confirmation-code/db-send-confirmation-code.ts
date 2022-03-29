@@ -10,6 +10,10 @@ export class DbSendConfirmationCode implements SendConfirmationCode {
   }
 
   async send (email: string): Promise<void> {
-    throw new EmailNotRegisteredError()
+    const isExistentEmail = await this.checkEmailRepository.checkEmail(email)
+
+    if (isExistentEmail) {
+      throw new EmailNotRegisteredError()
+    }
   }
 }
