@@ -3,6 +3,7 @@ import { CheckEmailRepository } from '../../protocols/check-email-repository'
 import { DbSendConfirmationCode } from './db-send-confirmation-code'
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
 import { AccountModel } from '../db-add-account/db-add-account-protocols'
+import { AccountIsActiveError } from '../../errors/account-is-active-error'
 
 interface SutTypes {
   sut: DbSendConfirmationCode
@@ -86,6 +87,6 @@ describe('DbSendConfirmationCode', () => {
       })
     }))
     const promise = sut.send('any_email@mail.com')
-    await expect(promise).rejects.toThrow(new Error('Account is already active'))
+    await expect(promise).rejects.toThrow(new AccountIsActiveError())
   })
 })
