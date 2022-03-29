@@ -6,6 +6,7 @@ import { AccountModel } from '../db-add-account/db-add-account-protocols'
 import { AccountIsActiveError } from '../../errors/account-is-active-error'
 import { CodeGenerator } from '../../protocols/code-generator'
 import { StoreConfirmationCodeRepository } from '../../protocols/store-confirmation-code-repository'
+import { EmailSender } from '../../protocols/email-sender'
 
 interface SutTypes {
   sut: DbSendConfirmationCode
@@ -13,6 +14,7 @@ interface SutTypes {
   loadAccountByEmailRepositoryStub: LoadAccountByEmailRepository
   codeGeneratorStub: CodeGenerator
   storeConfirmationCodeRepositoryStub: StoreConfirmationCodeRepository
+  emailSenderStub: EmailSender
 }
 
 const makeCheckEmailRepositoryStub = (): CheckEmailRepository => {
@@ -58,22 +60,31 @@ const makeStoreConfirmationCodeRepositoryStub = (): StoreConfirmationCodeReposit
 }
 
 const makeSut = (): SutTypes => {
+  class EmailSenderStub implements EmailSender {
+    async sendEmail (to: string, content: any): Promise<void> {
+      return null
+    }
+  }
+
   const checkEmailRepositoryStub = makeCheckEmailRepositoryStub()
   const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepositoryStub()
   const codeGeneratorStub = makeCodeGeneratorStub()
   const storeConfirmationCodeRepositoryStub = makeStoreConfirmationCodeRepositoryStub()
+  const emailSenderStub = new EmailSenderStub()
   const sut = new DbSendConfirmationCode(
     checkEmailRepositoryStub,
     loadAccountByEmailRepositoryStub,
     codeGeneratorStub,
-    storeConfirmationCodeRepositoryStub
+    storeConfirmationCodeRepositoryStub,
+    emailSenderStub
   )
   return {
     sut,
     checkEmailRepositoryStub,
     loadAccountByEmailRepositoryStub,
     codeGeneratorStub,
-    storeConfirmationCodeRepositoryStub
+    storeConfirmationCodeRepositoryStub,
+    emailSenderStub
   }
 }
 
@@ -149,5 +160,12 @@ describe('DbSendConfirmationCode', () => {
     jest.spyOn(storeConfirmationCodeRepositoryStub, 'storeConfirmationCode').mockReturnValue(new Promise((resolve, reject) => reject(new Error())))
     const promise = sut.send('any_email@mail.com')
     await expect(promise).rejects.toThrow()
+  })
+
+  it('Should call EmailSender with correct values', async () => {
+    const { sut, emailSenderStub } = makeSut()
+    const sendEmailSpy = jest.spyOn(emailSenderStub, 'sendEmail')
+    await sut.send('any_email@mail.com')
+    expect(sendEmailSpy).toHaveBeenCalledWith('any_email@mail.com', 'any_code')
   })
 })
