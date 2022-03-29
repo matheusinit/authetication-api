@@ -48,17 +48,20 @@ const makeCodeGeneratorStub = (): CodeGenerator => {
   return new CodeGeneratorStub()
 }
 
-const makeSut = (): SutTypes => {
+const makeStoreConfirmationCodeRepositoryStub = (): StoreConfirmationCodeRepository => {
   class StoreConfirmationCodeRepositoryStub implements StoreConfirmationCodeRepository {
     async storeConfirmationCode (confirmationCode: string, email: string): Promise<void> {
       return null
     }
   }
+  return new StoreConfirmationCodeRepositoryStub()
+}
 
+const makeSut = (): SutTypes => {
   const checkEmailRepositoryStub = makeCheckEmailRepositoryStub()
   const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepositoryStub()
   const codeGeneratorStub = makeCodeGeneratorStub()
-  const storeConfirmationCodeRepositoryStub = new StoreConfirmationCodeRepositoryStub()
+  const storeConfirmationCodeRepositoryStub = makeStoreConfirmationCodeRepositoryStub()
   const sut = new DbSendConfirmationCode(
     checkEmailRepositoryStub,
     loadAccountByEmailRepositoryStub,
