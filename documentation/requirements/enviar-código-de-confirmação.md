@@ -16,3 +16,4 @@
  - [ ] Retorna **HTTP status** como 400 se o email não for fornecido
  - [ ] Retorna **HTTP status** como 400 se o email não for válido
  - [ ] Retorna **HTTP status** como 500 se o email não pôde ser enviado
+ - [ ] Retorna **HTTP status** como 404 se o email não estiver registrado
