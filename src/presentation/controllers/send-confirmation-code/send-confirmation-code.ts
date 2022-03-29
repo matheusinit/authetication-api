@@ -1,6 +1,6 @@
 import { SendConfirmationCode } from '../../../domain/usecases/send-confirmation-code'
 import { InvalidParamError, MissingParamError } from '../../errors'
-import { badRequest } from '../../helpers/http-helper'
+import { badRequest, ok } from '../../helpers/http-helper'
 import { Controller, HttpRequest, HttpResponse } from '../../protocols'
 import { EmailValidator } from '../signup/signup-protocols'
 
@@ -27,5 +27,7 @@ export class SendConfirmationCodeController implements Controller {
     }
 
     await this.sendConfirmationCode.send(email)
+
+    return ok({ message: 'Email with code sent' })
   }
 }
