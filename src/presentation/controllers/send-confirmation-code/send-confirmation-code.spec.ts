@@ -72,4 +72,16 @@ describe('SendConfirmartionCode Controller', () => {
     await sut.handle(httpRequest)
     expect(sendSpy).toHaveBeenCalledWith('any_email@mail.com')
   })
+
+  it('Should return 200 if code is sent successfully', async () => {
+    const { sut } = makeSut()
+    const httpRequest = {
+      body: {
+        email: 'any_email@mail.com'
+      }
+    }
+    const httpResponse = await sut.handle(httpRequest)
+    expect(httpResponse.statusCode).toBe(200)
+    expect(httpResponse.body).toEqual({ message: 'Email with code sent' })
+  })
 })
