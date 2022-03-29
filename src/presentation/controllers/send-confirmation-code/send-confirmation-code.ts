@@ -14,16 +14,18 @@ export class SendConfirmationCodeController implements Controller {
   }
 
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
-    if (!httpRequest.body.email) {
+    const { email } = httpRequest.body
+
+    if (!email) {
       return badRequest(new MissingParamError('email'))
     }
 
-    const isEmailValid = this.emailValidator.isValid(httpRequest.body.email)
+    const isEmailValid = this.emailValidator.isValid(email)
 
     if (!isEmailValid) {
       return badRequest(new InvalidParamError('email'))
     }
 
-    await this.sendConfirmationCode.send(httpRequest.body.email)
+    await this.sendConfirmationCode.send(email)
   }
 }
