@@ -69,4 +69,19 @@ describe('DbSendConfirmationCode', () => {
     await sut.send('any_email@mail.com')
     expect(loadByEmailSpy).toHaveBeenCalledWith('any_email@mail.com')
   })
+
+  it('Should throw an error if account is active', async () => {
+    const { sut, loadAccountByEmailRepositoryStub } = makeSut()
+    jest.spyOn(loadAccountByEmailRepositoryStub, 'loadByEmail').mockReturnValueOnce(new Promise(resolve => {
+      resolve({
+        id: 'any_id',
+        username: 'any_username',
+        email: 'any_email@mail.com',
+        password: 'hashed_password',
+        status: 'active'
+      })
+    }))
+    const promise = sut.send('any_email@mail.com')
+    await expect(promise).rejects.toThrow(new Error('Account is already active'))
+  })
 })
