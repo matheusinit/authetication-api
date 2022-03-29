@@ -4,11 +4,13 @@ import { DbSendConfirmationCode } from './db-send-confirmation-code'
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
 import { AccountModel } from '../db-add-account/db-add-account-protocols'
 import { AccountIsActiveError } from '../../errors/account-is-active-error'
+import { CodeGenerator } from '../../protocols/code-generator'
 
 interface SutTypes {
   sut: DbSendConfirmationCode
   checkEmailRepositoryStub: CheckEmailRepository
   loadAccountByEmailRepositoryStub: LoadAccountByEmailRepository
+  codeGeneratorStub: CodeGenerator
 }
 
 const makeCheckEmailRepositoryStub = (): CheckEmailRepository => {
@@ -36,13 +38,21 @@ const makeLoadAccountByEmailRepositoryStub = (): LoadAccountByEmailRepository =>
 }
 
 const makeSut = (): SutTypes => {
+  class CodeGeneratorStub implements CodeGenerator {
+    generate (): string {
+      return 'any_code'
+    }
+  }
+
   const checkEmailRepositoryStub = makeCheckEmailRepositoryStub()
   const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepositoryStub()
-  const sut = new DbSendConfirmationCode(checkEmailRepositoryStub, loadAccountByEmailRepositoryStub)
+  const codeGeneratorStub = new CodeGeneratorStub()
+  const sut = new DbSendConfirmationCode(checkEmailRepositoryStub, loadAccountByEmailRepositoryStub, codeGeneratorStub)
   return {
     sut,
     checkEmailRepositoryStub,
-    loadAccountByEmailRepositoryStub
+    loadAccountByEmailRepositoryStub,
+    codeGeneratorStub
   }
 }
 
@@ -88,5 +98,12 @@ describe('DbSendConfirmationCode', () => {
     }))
     const promise = sut.send('any_email@mail.com')
     await expect(promise).rejects.toThrow(new AccountIsActiveError())
+  })
+
+  it('Should call CodeGenerator', async () => {
+    const { sut, codeGeneratorStub } = makeSut()
+    const generateSpy = jest.spyOn(codeGeneratorStub, 'generate')
+    await sut.send('any_email@mail.com')
+    expect(generateSpy).toHaveBeenCalled()
   })
 })
