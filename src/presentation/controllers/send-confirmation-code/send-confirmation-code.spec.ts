@@ -19,15 +19,19 @@ const makeEmailValidatorStub = (): EmailValidator => {
   return new EmailValidatorStub()
 }
 
-const makeSut = (): SutTypes => {
-  class SendConfirmartionCodeStub implements SendConfirmationCode {
+const makeSendConfirmationCodeStub = (): SendConfirmationCode => {
+  class SendConfirmationCodeStub implements SendConfirmationCode {
     async send (email: string): Promise<void> {
       return null
     }
   }
 
+  return new SendConfirmationCodeStub()
+}
+
+const makeSut = (): SutTypes => {
   const emailValidatorStub = makeEmailValidatorStub()
-  const sendConfirmationCodeStub = new SendConfirmartionCodeStub()
+  const sendConfirmationCodeStub = makeSendConfirmationCodeStub()
   const sut = new SendConfirmationCodeController(emailValidatorStub, sendConfirmationCodeStub)
 
   return {
