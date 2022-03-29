@@ -37,16 +37,19 @@ const makeLoadAccountByEmailRepositoryStub = (): LoadAccountByEmailRepository =>
   return new LoadAccountByEmailRepositoryStub()
 }
 
-const makeSut = (): SutTypes => {
+const makeCodeGeneratorStub = (): CodeGenerator => {
   class CodeGeneratorStub implements CodeGenerator {
     generate (): string {
       return 'any_code'
     }
   }
+  return new CodeGeneratorStub()
+}
 
+const makeSut = (): SutTypes => {
   const checkEmailRepositoryStub = makeCheckEmailRepositoryStub()
   const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepositoryStub()
-  const codeGeneratorStub = new CodeGeneratorStub()
+  const codeGeneratorStub = makeCodeGeneratorStub()
   const sut = new DbSendConfirmationCode(checkEmailRepositoryStub, loadAccountByEmailRepositoryStub, codeGeneratorStub)
   return {
     sut,
