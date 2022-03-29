@@ -22,6 +22,10 @@ export class DbSendConfirmationCode implements SendConfirmationCode {
       throw new EmailNotRegisteredError()
     }
 
-    await this.loadAccountByEmailRepository.loadByEmail(email)
+    const account = await this.loadAccountByEmailRepository.loadByEmail(email)
+
+    if (account.status === 'active') {
+      throw new Error('Account is already active')
+    }
   }
 }
