@@ -4,8 +4,8 @@
  + Criar cadastro do usuário
  + Autenticar-se com credenciais
  + Recuperar senha
- + Login automático
- + Enviar email
+ + Enviar código de confirmação
+ + Ativar conta
  + Editar informações do usuário (mudar email, mudar avatar)
 
 ## Requisitos não funcionais
@@ -24,7 +24,6 @@
  + Ao cadastrar-se, o usuário precisa confirmar a senha. E as senhas devem ser iguais.
  + A senha deve ter pelo menos 8 caracteres, letras minúsculas e maiúsculas, números e pelo menos um caractere especial (sem ser < e >).
  + Ao cadastrar-se, a conta se mantém inativa até que seja ativada.
- + Ao cadastrar um usuário, uma mensagem deve ser enviada para confirmar o endereço de email para ativar a conta.
  + O email de confirmação tem validade de 24 horas.
  + Para confirmar o email, é preciso confirmar a senha.
  + Para se autenticar é necessário endereço de email e senha.
