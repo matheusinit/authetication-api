@@ -171,4 +171,11 @@ describe('DbSendConfirmationCode', () => {
     await sut.send('any_email@mail.com')
     expect(sendEmailSpy).toHaveBeenCalledWith('any_email@mail.com', 'any_code')
   })
+
+  it('Should throw if EmailSender throws', async () => {
+    const { sut, emailSenderStub } = makeSut()
+    jest.spyOn(emailSenderStub, 'sendEmail').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+    const promise = sut.send('any_email@mail.com')
+    await expect(promise).rejects.toThrow()
+  })
 })
