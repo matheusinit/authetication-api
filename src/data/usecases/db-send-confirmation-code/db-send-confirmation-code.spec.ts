@@ -5,12 +5,14 @@ import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-em
 import { AccountModel } from '../db-add-account/db-add-account-protocols'
 import { AccountIsActiveError } from '../../errors/account-is-active-error'
 import { CodeGenerator } from '../../protocols/code-generator'
+import { StoreConfirmationCodeRepository } from '../../protocols/store-confirmation-code-repository'
 
 interface SutTypes {
   sut: DbSendConfirmationCode
   checkEmailRepositoryStub: CheckEmailRepository
   loadAccountByEmailRepositoryStub: LoadAccountByEmailRepository
   codeGeneratorStub: CodeGenerator
+  storeConfirmationCodeRepositoryStub: StoreConfirmationCodeRepository
 }
 
 const makeCheckEmailRepositoryStub = (): CheckEmailRepository => {
@@ -47,15 +49,28 @@ const makeCodeGeneratorStub = (): CodeGenerator => {
 }
 
 const makeSut = (): SutTypes => {
+  class StoreConfirmationCodeRepositoryStub implements StoreConfirmationCodeRepository {
+    async storeConfirmationCode (confirmationCode: string, email: string): Promise<void> {
+      return null
+    }
+  }
+
   const checkEmailRepositoryStub = makeCheckEmailRepositoryStub()
   const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepositoryStub()
   const codeGeneratorStub = makeCodeGeneratorStub()
-  const sut = new DbSendConfirmationCode(checkEmailRepositoryStub, loadAccountByEmailRepositoryStub, codeGeneratorStub)
+  const storeConfirmationCodeRepositoryStub = new StoreConfirmationCodeRepositoryStub()
+  const sut = new DbSendConfirmationCode(
+    checkEmailRepositoryStub,
+    loadAccountByEmailRepositoryStub,
+    codeGeneratorStub,
+    storeConfirmationCodeRepositoryStub
+  )
   return {
     sut,
     checkEmailRepositoryStub,
     loadAccountByEmailRepositoryStub,
-    codeGeneratorStub
+    codeGeneratorStub,
+    storeConfirmationCodeRepositoryStub
   }
 }
 
@@ -117,5 +132,12 @@ describe('DbSendConfirmationCode', () => {
     })
     const promise = sut.send('any_email@mail.com')
     await expect(promise).rejects.toThrow()
+  })
+
+  it('Should call StoreConfirmationCodeRepository with correct values', async () => {
+    const { sut, storeConfirmationCodeRepositoryStub } = makeSut()
+    const storeConfirmationCodeSpy = jest.spyOn(storeConfirmationCodeRepositoryStub, 'storeConfirmationCode')
+    await sut.send('any_email@mail.com')
+    expect(storeConfirmationCodeSpy).toHaveBeenCalledWith('any_code', 'any_email@mail.com')
   })
 })
