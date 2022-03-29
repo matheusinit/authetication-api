@@ -3,6 +3,7 @@ import { AccountIsActiveError } from '../../errors/account-is-active-error'
 import { EmailNotRegisteredError } from '../../errors/email-not-registered-error'
 import { CheckEmailRepository } from '../../protocols/check-email-repository'
 import { CodeGenerator } from '../../protocols/code-generator'
+import { EmailSender } from '../../protocols/email-sender'
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
 import { StoreConfirmationCodeRepository } from '../../protocols/store-confirmation-code-repository'
 
@@ -11,17 +12,20 @@ export class DbSendConfirmationCode implements SendConfirmationCode {
   private readonly loadAccountByEmailRepository: LoadAccountByEmailRepository
   private readonly codeGenerator: CodeGenerator
   private readonly storeConfirmationCodeRepository: StoreConfirmationCodeRepository
+  private readonly emailSender: EmailSender
 
   constructor (
     checkEmailRepository: CheckEmailRepository,
     loadAccountByEmailRepository: LoadAccountByEmailRepository,
     codeGenerator: CodeGenerator,
-    storeConfirmationCodeRepository: StoreConfirmationCodeRepository
+    storeConfirmationCodeRepository: StoreConfirmationCodeRepository,
+    emailSender: EmailSender
   ) {
     this.checkEmailRepository = checkEmailRepository
     this.loadAccountByEmailRepository = loadAccountByEmailRepository
     this.codeGenerator = codeGenerator
     this.storeConfirmationCodeRepository = storeConfirmationCodeRepository
+    this.emailSender = emailSender
   }
 
   async send (email: string): Promise<void> {
@@ -40,5 +44,7 @@ export class DbSendConfirmationCode implements SendConfirmationCode {
     const confirmationCode = this.codeGenerator.generate()
 
     await this.storeConfirmationCodeRepository.storeConfirmationCode(confirmationCode, email)
+
+    await this.emailSender.sendEmail(email, confirmationCode)
   }
 }
