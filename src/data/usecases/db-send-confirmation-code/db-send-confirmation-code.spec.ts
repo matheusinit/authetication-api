@@ -7,13 +7,17 @@ interface SutTypes {
   checkEmailRepositoryStub: CheckEmailRepository
 }
 
-const makeSut = (): SutTypes => {
+const makeCheckEmailRepositoryStub = (): CheckEmailRepository => {
   class CheckEmailRepositoryStub implements CheckEmailRepository {
     async checkEmail (email: string): Promise<boolean> {
       return true
     }
   }
-  const checkEmailRepositoryStub = new CheckEmailRepositoryStub()
+  return new CheckEmailRepositoryStub()
+}
+
+const makeSut = (): SutTypes => {
+  const checkEmailRepositoryStub = makeCheckEmailRepositoryStub()
   const sut = new DbSendConfirmationCode(checkEmailRepositoryStub)
   return {
     sut,
