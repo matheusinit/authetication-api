@@ -1,3 +1,4 @@
+import { SendConfirmationCode } from '../../../domain/usecases/send-confirmation-code'
 import { InvalidParamError, MissingParamError } from '../../errors'
 import { badRequest } from '../../helpers/http-helper'
 import { Controller, HttpRequest, HttpResponse } from '../../protocols'
@@ -5,9 +6,11 @@ import { EmailValidator } from '../signup/signup-protocols'
 
 export class SendConfirmationCodeController implements Controller {
   private readonly emailValidator: EmailValidator
+  private readonly sendConfirmationCode: SendConfirmationCode
 
-  constructor (emailValidator: EmailValidator) {
+  constructor (emailValidator: EmailValidator, sendConfirmationCode: SendConfirmationCode) {
     this.emailValidator = emailValidator
+    this.sendConfirmationCode = sendConfirmationCode
   }
 
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
@@ -20,5 +23,7 @@ export class SendConfirmationCodeController implements Controller {
     if (!isEmailValid) {
       return badRequest(new InvalidParamError('email'))
     }
+
+    await this.sendConfirmationCode.send(httpRequest.body.email)
   }
 }
