@@ -1,3 +1,4 @@
+import { SendConfirmationCode } from '../../../domain/usecases/send-confirmation-code'
 import { InvalidParamError, MissingParamError } from '../../errors'
 import { EmailValidator } from '../signup/signup-protocols'
 import { SendConfirmationCodeController } from './send-confirmation-code'
@@ -5,6 +6,7 @@ import { SendConfirmationCodeController } from './send-confirmation-code'
 interface SutTypes {
   sut: SendConfirmationCodeController
   emailValidatorStub: EmailValidator
+  sendConfirmationCodeStub: SendConfirmationCode
 }
 
 const makeEmailValidatorStub = (): EmailValidator => {
@@ -18,12 +20,20 @@ const makeEmailValidatorStub = (): EmailValidator => {
 }
 
 const makeSut = (): SutTypes => {
+  class SendConfirmartionCodeStub implements SendConfirmationCode {
+    async send (email: string): Promise<void> {
+      return null
+    }
+  }
+
   const emailValidatorStub = makeEmailValidatorStub()
-  const sut = new SendConfirmationCodeController(emailValidatorStub)
+  const sendConfirmationCodeStub = new SendConfirmartionCodeStub()
+  const sut = new SendConfirmationCodeController(emailValidatorStub, sendConfirmationCodeStub)
 
   return {
     sut,
-    emailValidatorStub
+    emailValidatorStub,
+    sendConfirmationCodeStub
   }
 }
 
@@ -49,5 +59,17 @@ describe('SendConfirmartionCode Controller', () => {
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new InvalidParamError('email'))
+  })
+
+  it('Should call SendConfirmationCode with correct email', async () => {
+    const { sut, sendConfirmationCodeStub } = makeSut()
+    const sendSpy = jest.spyOn(sendConfirmationCodeStub, 'send')
+    const httpRequest = {
+      body: {
+        email: 'any_email@mail.com'
+      }
+    }
+    await sut.handle(httpRequest)
+    expect(sendSpy).toHaveBeenCalledWith('any_email@mail.com')
   })
 })
