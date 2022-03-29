@@ -1,5 +1,5 @@
 import { SendConfirmationCode } from '../../../domain/usecases/send-confirmation-code'
-import { InvalidParamError, MissingParamError } from '../../errors'
+import { InvalidParamError, MissingParamError, ServerError } from '../../errors'
 import { EmailValidator } from '../signup/signup-protocols'
 import { SendConfirmationCodeController } from './send-confirmation-code'
 
@@ -75,6 +75,19 @@ describe('SendConfirmartionCode Controller', () => {
     }
     await sut.handle(httpRequest)
     expect(sendSpy).toHaveBeenCalledWith('any_email@mail.com')
+  })
+
+  it('Should return 500 if SendConfirmationCode throws', async () => {
+    const { sut, sendConfirmationCodeStub } = makeSut()
+    jest.spyOn(sendConfirmationCodeStub, 'send').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+    const httpRequest = {
+      body: {
+        email: 'any_email@mail.com'
+      }
+    }
+    const httpResponse = await sut.handle(httpRequest)
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
   })
 
   it('Should return 200 if code is sent successfully', async () => {
