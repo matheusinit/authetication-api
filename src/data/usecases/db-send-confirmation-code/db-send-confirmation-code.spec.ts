@@ -1,10 +1,13 @@
 import { EmailNotRegisteredError } from '../../errors/email-not-registered-error'
 import { CheckEmailRepository } from '../../protocols/check-email-repository'
 import { DbSendConfirmationCode } from './db-send-confirmation-code'
+import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
+import { AccountModel } from '../db-add-account/db-add-account-protocols'
 
 interface SutTypes {
   sut: DbSendConfirmationCode
   checkEmailRepositoryStub: CheckEmailRepository
+  loadAccountByEmailRepositoryStub: LoadAccountByEmailRepository
 }
 
 const makeCheckEmailRepositoryStub = (): CheckEmailRepository => {
@@ -17,11 +20,24 @@ const makeCheckEmailRepositoryStub = (): CheckEmailRepository => {
 }
 
 const makeSut = (): SutTypes => {
+  class LoadAccountByEmailRepositoryStub implements LoadAccountByEmailRepository {
+    async loadByEmail (email: string): Promise<AccountModel> {
+      return {
+        id: 'any_id',
+        username: 'any_username',
+        email: 'any_email@mail.com',
+        password: 'hashed_password',
+        status: 'inactive'
+      }
+    }
+  }
   const checkEmailRepositoryStub = makeCheckEmailRepositoryStub()
-  const sut = new DbSendConfirmationCode(checkEmailRepositoryStub)
+  const loadAccountByEmailRepositoryStub = new LoadAccountByEmailRepositoryStub()
+  const sut = new DbSendConfirmationCode(checkEmailRepositoryStub, loadAccountByEmailRepositoryStub)
   return {
     sut,
-    checkEmailRepositoryStub
+    checkEmailRepositoryStub,
+    loadAccountByEmailRepositoryStub
   }
 }
 
@@ -45,5 +61,12 @@ describe('DbSendConfirmationCode', () => {
     jest.spyOn(checkEmailRepositoryStub, 'checkEmail').mockReturnValueOnce(new Promise(resolve => resolve(true)))
     const promise = sut.send('any_email@mail.com')
     await expect(promise).rejects.toThrow(new EmailNotRegisteredError())
+  })
+
+  it('Should call LoadAccountByEmailRepository with correct email', async () => {
+    const { sut, loadAccountByEmailRepositoryStub } = makeSut()
+    const loadByEmailSpy = jest.spyOn(loadAccountByEmailRepositoryStub, 'loadByEmail')
+    await sut.send('any_email@mail.com')
+    expect(loadByEmailSpy).toHaveBeenCalledWith('any_email@mail.com')
   })
 })
