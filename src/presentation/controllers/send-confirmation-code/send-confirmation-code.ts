@@ -1,7 +1,7 @@
 import { EmailNotRegisteredError } from '../../../data/errors/email-not-registered-error'
 import { SendConfirmationCode } from '../../../domain/usecases/send-confirmation-code'
 import { InvalidParamError, MissingParamError } from '../../errors'
-import { badRequest, ok, serverError } from '../../helpers/http-helper'
+import { badRequest, notFound, ok, serverError } from '../../helpers/http-helper'
 import { Controller, HttpRequest, HttpResponse } from '../../protocols'
 import { EmailValidator } from '../signup/signup-protocols'
 
@@ -33,10 +33,7 @@ export class SendConfirmationCodeController implements Controller {
       return ok({ message: 'Email with code sent' })
     } catch (error) {
       if (error instanceof EmailNotRegisteredError) {
-        return {
-          statusCode: 404,
-          body: error
-        }
+        return notFound(error)
       }
 
       return serverError()
