@@ -106,4 +106,13 @@ describe('DbSendConfirmationCode', () => {
     await sut.send('any_email@mail.com')
     expect(generateSpy).toHaveBeenCalled()
   })
+
+  it('Should throws if CodeGenerator throws', async () => {
+    const { sut, codeGeneratorStub } = makeSut()
+    jest.spyOn(codeGeneratorStub, 'generate').mockImplementationOnce(() => {
+      throw new Error()
+    })
+    const promise = sut.send('any_email@mail.com')
+    await expect(promise).rejects.toThrow()
+  })
 })
