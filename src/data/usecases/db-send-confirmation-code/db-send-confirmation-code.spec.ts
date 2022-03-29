@@ -59,18 +59,21 @@ const makeStoreConfirmationCodeRepositoryStub = (): StoreConfirmationCodeReposit
   return new StoreConfirmationCodeRepositoryStub()
 }
 
-const makeSut = (): SutTypes => {
+const makeEmailSenderStub = (): EmailSender => {
   class EmailSenderStub implements EmailSender {
     async sendEmail (to: string, content: any): Promise<void> {
       return null
     }
   }
+  return new EmailSenderStub()
+}
 
+const makeSut = (): SutTypes => {
   const checkEmailRepositoryStub = makeCheckEmailRepositoryStub()
   const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepositoryStub()
   const codeGeneratorStub = makeCodeGeneratorStub()
   const storeConfirmationCodeRepositoryStub = makeStoreConfirmationCodeRepositoryStub()
-  const emailSenderStub = new EmailSenderStub()
+  const emailSenderStub = makeEmailSenderStub()
   const sut = new DbSendConfirmationCode(
     checkEmailRepositoryStub,
     loadAccountByEmailRepositoryStub,
