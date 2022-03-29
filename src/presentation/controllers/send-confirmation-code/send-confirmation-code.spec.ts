@@ -1,3 +1,4 @@
+import { EmailNotRegisteredError } from '../../../data/errors/email-not-registered-error'
 import { SendConfirmationCode } from '../../../domain/usecases/send-confirmation-code'
 import { InvalidParamError, MissingParamError, ServerError } from '../../errors'
 import { EmailValidator } from '../signup/signup-protocols'
@@ -75,6 +76,19 @@ describe('SendConfirmartionCode Controller', () => {
     }
     await sut.handle(httpRequest)
     expect(sendSpy).toHaveBeenCalledWith('any_email@mail.com')
+  })
+
+  it('Should return 400 if email is not registered', async () => {
+    const { sut, sendConfirmationCodeStub } = makeSut()
+    jest.spyOn(sendConfirmationCodeStub, 'send').mockReturnValueOnce(new Promise((resolve, reject) => reject(new EmailNotRegisteredError())))
+    const httpRequest = {
+      body: {
+        email: 'any_email@mail.com'
+      }
+    }
+    const httpResponse = await sut.handle(httpRequest)
+    expect(httpResponse.statusCode).toBe(404)
+    expect(httpResponse.body).toEqual(new EmailNotRegisteredError())
   })
 
   it('Should return 500 if SendConfirmationCode throws', async () => {
