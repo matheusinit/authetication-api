@@ -33,6 +33,13 @@ describe('DbSendConfirmationCode', () => {
     expect(checkEmailSpy).toHaveBeenCalledWith('any_email@mail.com')
   })
 
+  it('Should throws if CheckEmailRepository throws', async () => {
+    const { sut, checkEmailRepositoryStub } = makeSut()
+    jest.spyOn(checkEmailRepositoryStub, 'checkEmail').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+    const promise = sut.send('any_email@mail.com')
+    await expect(promise).rejects.toThrow()
+  })
+
   it('Should throw an error if email is not registered', async () => {
     const { sut, checkEmailRepositoryStub } = makeSut()
     jest.spyOn(checkEmailRepositoryStub, 'checkEmail').mockReturnValueOnce(new Promise(resolve => resolve(true)))
