@@ -9,4 +9,13 @@ describe('Code Generator', () => {
 
     expect(code).toMatch(re)
   })
+
+  it('Should return only uppercase characters and numbers', () => {
+    const sut = new Generator()
+    const re = /^[A-Z0-9]+/
+
+    const code = sut.generateCode()
+
+    expect(code).toMatch(re)
+  })
 })
