@@ -1,3 +1,4 @@
+import { AccountIsActiveError } from '../../../data/errors/account-is-active-error'
 import { EmailNotRegisteredError } from '../../../data/errors/email-not-registered-error'
 import { SendConfirmationCode } from '../../../domain/usecases/send-confirmation-code'
 import { InvalidParamError, MissingParamError, ServerError } from '../../errors'
@@ -89,6 +90,19 @@ describe('SendConfirmartionCode Controller', () => {
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(404)
     expect(httpResponse.body).toEqual(new EmailNotRegisteredError())
+  })
+
+  it('Should return 404 if account is already active', async () => {
+    const { sut, sendConfirmationCodeStub } = makeSut()
+    jest.spyOn(sendConfirmationCodeStub, 'send').mockReturnValueOnce(new Promise((resolve, reject) => reject(new AccountIsActiveError())))
+    const httpRequest = {
+      body: {
+        email: 'any_email@mail.com'
+      }
+    }
+    const httpResponse = await sut.handle(httpRequest)
+    expect(httpResponse.statusCode).toBe(404)
+    expect(httpResponse.body).toEqual(new AccountIsActiveError())
   })
 
   it('Should return 500 if SendConfirmationCode throws', async () => {
