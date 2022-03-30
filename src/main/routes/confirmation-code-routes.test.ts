@@ -39,4 +39,18 @@ describe('ConfirmationCode Routes', () => {
       email: 'matheus.oliveira@gmail.com'
     }).expect(400)
   })
+
+  it('Should return a bad request if account is already active', async () => {
+    const fakeAccount = {
+      username: 'Matheus Oliveira',
+      email: 'matheus.oliveira@gmail.com',
+      password: await bcrypt.hash('senha123', 12),
+      status: 'active'
+    }
+    await collection.insertOne(fakeAccount)
+
+    await request(app).post('/api/account/confirmation').send({
+      email: 'matheus.oliveira@gmail.com'
+    }).expect(400)
+  })
 })
