@@ -6,7 +6,7 @@ import { AccountModel } from '../db-add-account/db-add-account-protocols'
 import { AccountIsActiveError } from '../../errors/account-is-active-error'
 import { CodeGenerator } from '../../protocols/code-generator'
 import { StoreConfirmationCodeRepository } from '../../protocols/store-confirmation-code-repository'
-import { EmailSender } from '../../protocols/email-sender'
+import { EmailContent, EmailSender } from '../../protocols/email-sender'
 
 interface SutTypes {
   sut: DbSendConfirmationCode
@@ -61,7 +61,7 @@ const makeStoreConfirmationCodeRepositoryStub = (): StoreConfirmationCodeReposit
 
 const makeEmailSenderStub = (): EmailSender => {
   class EmailSenderStub implements EmailSender {
-    async sendEmail (to: string, content: any): Promise<void> {
+    async sendEmail (content: EmailContent): Promise<void> {
       return null
     }
   }
@@ -169,7 +169,12 @@ describe('DbSendConfirmationCode', () => {
     const { sut, emailSenderStub } = makeSut()
     const sendEmailSpy = jest.spyOn(emailSenderStub, 'sendEmail')
     await sut.send('any_email@mail.com')
-    expect(sendEmailSpy).toHaveBeenCalledWith('any_email@mail.com', 'any_code')
+    expect(sendEmailSpy).toHaveBeenCalledWith({
+      to: 'any_email@mail.com',
+      from: 'Auth API <confirm@authapi.com>',
+      subject: 'Authentication API - Código de confirmação',
+      html: '<p><b>Authentication API</b> Código: any_code</p>'
+    })
   })
 
   it('Should throw if EmailSender throws', async () => {

@@ -1,3 +1,10 @@
+export interface EmailContent {
+  to: string
+  from: string
+  subject: string
+  html: string
+}
+
 export interface EmailSender {
-  sendEmail: (to: string, content: any) => Promise<void>
+  sendEmail: (content: EmailContent) => Promise<void>
 }

@@ -1,9 +1,9 @@
 import nodemailer from 'nodemailer'
-import { EmailSender } from '../../data/protocols/email-sender'
+import { EmailContent, EmailSender } from '../../data/protocols/email-sender'
 import env from '../../main/config/env'
 
 export class NodemailerAdapter implements EmailSender {
-  async sendEmail (to: string, content: any): Promise<void> {
+  async sendEmail (content: EmailContent): Promise<void> {
     const transport = nodemailer.createTransport({
       host: env.smtpHost,
       port: env.smtpPort,
@@ -12,11 +12,9 @@ export class NodemailerAdapter implements EmailSender {
         pass: env.smtpPass
       }
     })
-    await transport.sendMail({
-      from: 'Matheus <sender@example.com>',
-      to,
-      subject: 'Authentication API - Código de confirmação',
-      html: `<p><b>Authentication API</b> Código: ${content as string}</p>`
-    })
+
+    const { to, from, subject, html } = content
+
+    await transport.sendMail({ to, from, subject, html })
   }
 }
