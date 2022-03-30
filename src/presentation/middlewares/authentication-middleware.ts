@@ -1,3 +1,4 @@
+import { serverError } from '../helpers/http-helper'
 import { HttpRequest, HttpResponse } from '../protocols'
 import { Middleware } from '../protocols/middleware'
 import { TokenValidator } from '../protocols/token-validator'
@@ -10,7 +11,10 @@ export class AuthenticationMiddleware implements Middleware {
   }
 
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
-    await this.tokenValidator.verify(httpRequest.token)
-    return null
+    try {
+      await this.tokenValidator.verify(httpRequest.token)
+    } catch (error) {
+      return serverError()
+    }
   }
 }
