@@ -1,3 +1,3 @@
 export interface CodeGenerator {
-  generate: () => string
+  generateCode: () => string
 }

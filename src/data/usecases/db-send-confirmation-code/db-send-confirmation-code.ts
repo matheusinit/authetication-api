@@ -41,7 +41,7 @@ export class DbSendConfirmationCode implements SendConfirmationCode {
       throw new AccountIsActiveError()
     }
 
-    const confirmationCode = this.codeGenerator.generate()
+    const confirmationCode = this.codeGenerator.generateCode()
 
     await this.storeConfirmationCodeRepository.storeConfirmationCode(confirmationCode, email)
 

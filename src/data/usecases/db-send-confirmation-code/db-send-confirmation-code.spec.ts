@@ -43,7 +43,7 @@ const makeLoadAccountByEmailRepositoryStub = (): LoadAccountByEmailRepository =>
 
 const makeCodeGeneratorStub = (): CodeGenerator => {
   class CodeGeneratorStub implements CodeGenerator {
-    generate (): string {
+    generateCode (): string {
       return 'any_code'
     }
   }
@@ -137,14 +137,14 @@ describe('DbSendConfirmationCode', () => {
 
   it('Should call CodeGenerator', async () => {
     const { sut, codeGeneratorStub } = makeSut()
-    const generateSpy = jest.spyOn(codeGeneratorStub, 'generate')
+    const generateSpy = jest.spyOn(codeGeneratorStub, 'generateCode')
     await sut.send('any_email@mail.com')
     expect(generateSpy).toHaveBeenCalled()
   })
 
   it('Should throws if CodeGenerator throws', async () => {
     const { sut, codeGeneratorStub } = makeSut()
-    jest.spyOn(codeGeneratorStub, 'generate').mockImplementationOnce(() => {
+    jest.spyOn(codeGeneratorStub, 'generateCode').mockImplementationOnce(() => {
       throw new Error()
     })
     const promise = sut.send('any_email@mail.com')
