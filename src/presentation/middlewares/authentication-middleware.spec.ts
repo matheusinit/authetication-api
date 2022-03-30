@@ -1,3 +1,4 @@
+import { ServerError } from '../errors'
 import { TokenValidator } from '../protocols/token-validator'
 import { AuthenticationMiddleware } from './authentication-middleware'
 
@@ -34,5 +35,16 @@ describe('Authentication Middleware', () => {
     }
     await sut.handle(httpRequest)
     expect(verifySpy).toHaveBeenCalledWith('any_token')
+  })
+
+  it('Should return 500 if TokenValidator throws', async () => {
+    const { sut, tokenValidatorStub } = makeSut()
+    jest.spyOn(tokenValidatorStub, 'verify').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+    const httpRequest = {
+      token: 'any_token'
+    }
+    const httpResponse = await sut.handle(httpRequest)
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
   })
 })
