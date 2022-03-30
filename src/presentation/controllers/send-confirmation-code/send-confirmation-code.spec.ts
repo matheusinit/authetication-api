@@ -88,11 +88,11 @@ describe('SendConfirmartionCode Controller', () => {
       }
     }
     const httpResponse = await sut.handle(httpRequest)
-    expect(httpResponse.statusCode).toBe(404)
+    expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new EmailNotRegisteredError())
   })
 
-  it('Should return 404 if account is already active', async () => {
+  it('Should return 400 if account is already active', async () => {
     const { sut, sendConfirmationCodeStub } = makeSut()
     jest.spyOn(sendConfirmationCodeStub, 'send').mockReturnValueOnce(new Promise((resolve, reject) => reject(new AccountIsActiveError())))
     const httpRequest = {
@@ -101,7 +101,7 @@ describe('SendConfirmartionCode Controller', () => {
       }
     }
     const httpResponse = await sut.handle(httpRequest)
-    expect(httpResponse.statusCode).toBe(404)
+    expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new AccountIsActiveError())
   })
 
