@@ -33,4 +33,10 @@ describe('ConfirmationCode Routes', () => {
       email: 'matheus.oliveira@gmail.com'
     }).expect(200)
   }, 60000)
+
+  it('Should return a bad request if email is not registered', async () => {
+    await request(app).post('/api/account/confirmation').send({
+      email: 'matheus.oliveira@gmail.com'
+    }).expect(400)
+  })
 })
