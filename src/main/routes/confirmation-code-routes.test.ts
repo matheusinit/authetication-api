@@ -16,7 +16,6 @@ describe('ConfirmationCode Routes', () => {
   })
 
   beforeEach(async () => {
-    jest.setTimeout(60000)
     collection = MongoHelper.getCollection('accounts')
     await collection.deleteMany({})
   })
@@ -33,5 +32,5 @@ describe('ConfirmationCode Routes', () => {
     await request(app).post('/api/account/confirmation').send({
       email: 'matheus.oliveira@gmail.com'
     }).expect(200)
-  })
+  }, 60000)
 })
