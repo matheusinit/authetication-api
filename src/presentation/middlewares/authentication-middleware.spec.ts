@@ -6,13 +6,17 @@ interface SutTypes {
   tokenValidatorStub: TokenValidator
 }
 
-const makeSut = (): SutTypes => {
+const makeTokenValidatorStub = (): TokenValidator => {
   class TokenValidatorStub implements TokenValidator {
     async verify (token: string): Promise<boolean> {
       return true
     }
   }
-  const tokenValidatorStub = new TokenValidatorStub()
+  return new TokenValidatorStub()
+}
+
+const makeSut = (): SutTypes => {
+  const tokenValidatorStub = makeTokenValidatorStub()
   const sut = new AuthenticationMiddleware(tokenValidatorStub)
 
   return {
