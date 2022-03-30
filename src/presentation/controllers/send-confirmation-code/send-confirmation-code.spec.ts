@@ -43,7 +43,7 @@ const makeSut = (): SutTypes => {
   }
 }
 
-describe('SendConfirmartionCode Controller', () => {
+describe('SendConfirmationCode Controller', () => {
   it('Should return 400 if no email is provided', async () => {
     const { sut } = makeSut()
     const httpRequest = {
