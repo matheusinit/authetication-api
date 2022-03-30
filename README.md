@@ -12,7 +12,7 @@
  - [x] Cadastro do usuário
  - [x] Autenticação
  - [ ] Recuperação de senha
- - [ ] Enviar código de confirmação
+ - [x] Enviar código de confirmação
  - [ ] Ativar conta
  - [ ] Editar informações do usuário
 
