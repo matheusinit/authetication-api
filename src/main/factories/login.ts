@@ -1,7 +1,7 @@
 import { DbAuthAccount } from '../../data/usecases/db-auth-account/db-auth-account'
 import { BcryptAdapter } from '../../infra/criptography/bcrypt-adapter'
 import { JwtAdapter } from '../../infra/criptography/jwt-adapter'
-import { AccountMongoRepository } from '../../infra/db/mongodb/account-repository/account'
+import { AccountMongoRepository } from '../../infra/db/mongodb/account/account-repository'
 import { LoginController } from '../../presentation/controllers/login/login'
 
 export const makeLoginController = (): LoginController => {
