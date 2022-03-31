@@ -2,6 +2,16 @@ import env from './../../main/config/env'
 import jwt from 'jsonwebtoken'
 import { JwtAdapter } from './jwt-adapter'
 
+jest.mock('jsonwebtoken', () => ({
+  sign (payload: any, secretOrPrivateKey: string): string {
+    return 'any_token'
+  },
+
+  verify (token: string, secretOrPrivateKey: string): any {
+    return 'any_data'
+  }
+}))
+
 const makeSut = (): JwtAdapter => {
   return new JwtAdapter()
 }
@@ -27,6 +37,15 @@ describe('Jwt Adapter', () => {
       }
       const token = sut.generate(payload)
       expect(token).toBeTruthy()
+    })
+  })
+
+  describe('verify()', () => {
+    it('Should call Jwt with correct values', async () => {
+      const sut = makeSut()
+      const verifySpy = jest.spyOn(jwt, 'verify')
+      await sut.verify('any_token')
+      expect(verifySpy).toHaveBeenCalledWith('any_token', env.secret)
     })
   })
 })
