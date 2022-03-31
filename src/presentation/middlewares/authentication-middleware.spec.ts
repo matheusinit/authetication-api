@@ -31,7 +31,7 @@ describe('Authentication Middleware', () => {
     const { sut, tokenValidatorStub } = makeSut()
     const verifySpy = jest.spyOn(tokenValidatorStub, 'verify')
     const httpRequest = {
-      token: 'any_token'
+      token: 'Berear: any_token'
     }
     await sut.handle(httpRequest)
     expect(verifySpy).toHaveBeenCalledWith('any_token')
