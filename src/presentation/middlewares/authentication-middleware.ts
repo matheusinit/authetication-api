@@ -1,4 +1,4 @@
-import { serverError } from '../helpers/http-helper'
+import { serverError, unauthenticated } from '../helpers/http-helper'
 import { HttpRequest, HttpResponse } from '../protocols'
 import { Middleware } from '../protocols/middleware'
 import { TokenValidator } from '../protocols/token-validator'
@@ -14,10 +14,7 @@ export class AuthenticationMiddleware implements Middleware {
     try {
       const isTokenValid = await this.tokenValidator.verify(httpRequest.token)
       if (!isTokenValid) {
-        return {
-          statusCode: 401,
-          body: new Error('Unauthenticated')
-        }
+        return unauthenticated()
       }
     } catch (error) {
       return serverError()
