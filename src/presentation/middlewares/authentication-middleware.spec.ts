@@ -58,4 +58,13 @@ describe('Authentication Middleware', () => {
     expect(httpResponse.statusCode).toBe(401)
     expect(httpResponse.body).toEqual(new Error('Unauthenticated'))
   })
+
+  it('Should return undefined if TokenValidator returns true', async () => {
+    const { sut } = makeSut()
+    const httpRequest = {
+      token: 'any_token'
+    }
+    const httpResponse = await sut.handle(httpRequest)
+    expect(httpResponse).toBe(undefined)
+  })
 })
