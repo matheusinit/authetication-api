@@ -12,7 +12,13 @@ export class AuthenticationMiddleware implements Middleware {
 
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
     try {
-      await this.tokenValidator.verify(httpRequest.token)
+      const isTokenValid = await this.tokenValidator.verify(httpRequest.token)
+      if (!isTokenValid) {
+        return {
+          statusCode: 401,
+          body: new Error('Unauthenticated')
+        }
+      }
     } catch (error) {
       return serverError()
     }
