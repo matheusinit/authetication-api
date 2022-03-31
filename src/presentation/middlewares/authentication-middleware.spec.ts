@@ -47,4 +47,15 @@ describe('Authentication Middleware', () => {
     expect(httpResponse.statusCode).toBe(500)
     expect(httpResponse.body).toEqual(new ServerError())
   })
+
+  it('Should return 401 if TokenValidator returns false', async () => {
+    const { sut, tokenValidatorStub } = makeSut()
+    jest.spyOn(tokenValidatorStub, 'verify').mockReturnValueOnce(new Promise((resolve, reject) => resolve(false)))
+    const httpRequest = {
+      token: 'any_token'
+    }
+    const httpResponse = await sut.handle(httpRequest)
+    expect(httpResponse.statusCode).toBe(401)
+    expect(httpResponse.body).toEqual(new Error('Unauthenticated'))
+  })
 })
