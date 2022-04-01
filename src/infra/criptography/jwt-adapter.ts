@@ -9,7 +9,10 @@ export class JwtAdapter implements TokenGenerator, TokenValidator {
   }
 
   async verify (token: string): Promise<boolean> {
-    jwt.verify(token, process.env.SECRET)
-    return null
+    try {
+      jwt.verify(token, process.env.SECRET)
+    } catch (error) {
+      return false
+    }
   }
 }
