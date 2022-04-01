@@ -56,5 +56,11 @@ describe('Jwt Adapter', () => {
       const isValid = await sut.verify('any_token')
       expect(isValid).toBe(false)
     })
+
+    it('Should return true if token is valid', async () => {
+      const sut = makeSut()
+      const isValid = await sut.verify('any_token')
+      expect(isValid).toBe(true)
+    })
   })
 })
