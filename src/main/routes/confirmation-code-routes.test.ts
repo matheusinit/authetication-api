@@ -75,4 +75,12 @@ describe('ConfirmationCode Routes', () => {
       email: 'matheus.oliveira@gmai.com'
     }).expect(401)
   })
+
+  it('Should return an unauthorized if authentication token is invalid', async () => {
+    const token = jwt.sign({ id: 'valid_id', email: 'any_email' }, 'any_secret')
+
+    await request(app).post('/api/account/confirmation').set('Authorization', `Bearer: ${token}`).send({
+      email: 'matheus.oliveira@gmai.com'
+    }).expect(401)
+  })
 })
