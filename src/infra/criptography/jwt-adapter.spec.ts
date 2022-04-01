@@ -47,5 +47,14 @@ describe('Jwt Adapter', () => {
       await sut.verify('any_token')
       expect(verifySpy).toHaveBeenCalledWith('any_token', env.secret)
     })
+
+    it('Should return false if token is not valid', async () => {
+      const sut = makeSut()
+      jest.spyOn(jwt, 'verify').mockImplementationOnce(() => {
+        throw new Error()
+      })
+      const isValid = await sut.verify('any_token')
+      expect(isValid).toBe(false)
+    })
   })
 })
