@@ -1,8 +1,10 @@
 import request from 'supertest'
 import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
 import { Collection } from 'mongodb'
 import { MongoHelper } from '../../infra/db/mongodb/helpers/mongo-helper'
 import app from '../config/app'
+import env from '../config/env'
 
 let collection: Collection
 
@@ -27,16 +29,28 @@ describe('ConfirmationCode Routes', () => {
       password: await bcrypt.hash('senha123', 12),
       status: 'inactive'
     }
-    await collection.insertOne(fakeAccount)
+    const { insertedId: id } = await collection.insertOne(fakeAccount)
 
-    await request(app).post('/api/account/confirmation').send({
+    const token = jwt.sign({ id, email: 'matheus.oliveira@gmail.com' }, env.secret)
+
+    await request(app).post('/api/account/confirmation').set('Authorization', `Bearer: ${token}`).send({
       email: 'matheus.oliveira@gmail.com'
     }).expect(200)
   }, 60000)
 
   it('Should return a bad request if email is not registered', async () => {
-    await request(app).post('/api/account/confirmation').send({
-      email: 'matheus.oliveira@gmail.com'
+    const fakeAccount = {
+      username: 'Matheus Oliveira',
+      email: 'matheus.oliveira@gmail.com',
+      password: await bcrypt.hash('senha123', 12),
+      status: 'inactive'
+    }
+    const { insertedId: id } = await collection.insertOne(fakeAccount)
+
+    const token = jwt.sign({ id, email: 'matheus.oliveira@gmail.com' }, env.secret)
+
+    await request(app).post('/api/account/confirmation').set('Authorization', `Bearer: ${token}`).send({
+      email: 'matheus.oliveira1@gmail.com'
     }).expect(400)
   })
 
@@ -47,9 +61,11 @@ describe('ConfirmationCode Routes', () => {
       password: await bcrypt.hash('senha123', 12),
       status: 'active'
     }
-    await collection.insertOne(fakeAccount)
+    const { insertedId: id } = await collection.insertOne(fakeAccount)
 
-    await request(app).post('/api/account/confirmation').send({
+    const token = jwt.sign({ id, email: 'matheus.oliveira@gmail.com' }, env.secret)
+
+    await request(app).post('/api/account/confirmation').set('Authorization', `Bearer: ${token}`).send({
       email: 'matheus.oliveira@gmail.com'
     }).expect(400)
   })
