@@ -69,4 +69,10 @@ describe('ConfirmationCode Routes', () => {
       email: 'matheus.oliveira@gmail.com'
     }).expect(400)
   })
+
+  it('Should return a unauthorized if authentication token is not provided', async () => {
+    await request(app).post('/api/account/confirmation').send({
+      email: 'matheus.oliveira@gmai.com'
+    }).expect(401)
+  })
 })
