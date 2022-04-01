@@ -30,6 +30,8 @@ Para mais detalhes de requisitos e regras de negócio, veja a [documentação](d
  + husky
  + Eslint
  + validator
+ + fast-glob
+ + Nodemailer
 
 ## Como rodar
 
