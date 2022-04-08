@@ -2,6 +2,7 @@ import { AccountIsActiveError } from '../../../data/errors/account-is-active-err
 import { EmailNotRegisteredError } from '../../../data/errors/email-not-registered-error'
 import { SendConfirmationCode } from '../../../domain/usecases/send-confirmation-code'
 import { InvalidParamError, MissingParamError, ServerError } from '../../errors'
+import { appError } from '../../helpers/error-helper'
 import { EmailValidator } from '../signup/signup-protocols'
 import { SendConfirmationCodeController } from './send-confirmation-code'
 
@@ -51,7 +52,7 @@ describe('SendConfirmationCode Controller', () => {
     }
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual(new MissingParamError('email'))
+    expect(httpResponse.body).toEqual(appError(new MissingParamError('email')))
   })
 
   it('Should return 400 if email provided is invalid', async () => {
@@ -64,7 +65,7 @@ describe('SendConfirmationCode Controller', () => {
     }
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual(new InvalidParamError('email'))
+    expect(httpResponse.body).toEqual(appError(new InvalidParamError('email')))
   })
 
   it('Should call SendConfirmationCode with correct email', async () => {
@@ -89,7 +90,7 @@ describe('SendConfirmationCode Controller', () => {
     }
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual(new EmailNotRegisteredError())
+    expect(httpResponse.body).toEqual(appError(new EmailNotRegisteredError()))
   })
 
   it('Should return 400 if account is already active', async () => {
@@ -102,7 +103,7 @@ describe('SendConfirmationCode Controller', () => {
     }
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual(new AccountIsActiveError())
+    expect(httpResponse.body).toEqual(appError(new AccountIsActiveError()))
   })
 
   it('Should return 500 if SendConfirmationCode throws', async () => {
@@ -115,7 +116,7 @@ describe('SendConfirmationCode Controller', () => {
     }
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(500)
-    expect(httpResponse.body).toEqual(new ServerError())
+    expect(httpResponse.body).toEqual(appError(new ServerError()))
   })
 
   it('Should return 200 if code is sent successfully', async () => {

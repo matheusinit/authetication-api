@@ -2,6 +2,7 @@ import { EmailNotRegisteredError } from '../../../data/errors/email-not-register
 import { PasswordNotMatchError } from '../../../data/errors/password-not-match-error'
 import { AuthAccount, Credentials } from '../../../domain/usecases/auth-account'
 import { MissingParamError, ServerError } from '../../errors'
+import { appError } from '../../helpers/error-helper'
 import { LoginController } from './login'
 
 interface SutTypes {
@@ -39,7 +40,7 @@ describe('Login Controller', () => {
     }
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual(new MissingParamError('email'))
+    expect(httpResponse.body).toEqual(appError(new MissingParamError('email')))
   })
 
   it('Should return 400 if no password is provided', async () => {
@@ -51,7 +52,7 @@ describe('Login Controller', () => {
     }
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual(new MissingParamError('password'))
+    expect(httpResponse.body).toEqual(appError(new MissingParamError('password')))
   })
 
   it('Should return 400 if email is not registered', async () => {
@@ -65,7 +66,7 @@ describe('Login Controller', () => {
     }
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual(new EmailNotRegisteredError())
+    expect(httpResponse.body).toEqual(appError(new EmailNotRegisteredError()))
   })
 
   it('Should return 400 if password doest not match', async () => {
@@ -79,7 +80,7 @@ describe('Login Controller', () => {
     }
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual(new PasswordNotMatchError())
+    expect(httpResponse.body).toEqual(appError(new PasswordNotMatchError()))
   })
 
   it('Should call AuthAccount with correct values', async () => {
@@ -109,7 +110,7 @@ describe('Login Controller', () => {
     }
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(500)
-    expect(httpResponse.body).toEqual(new ServerError())
+    expect(httpResponse.body).toEqual(appError(new ServerError()))
   })
 
   it('Should return 200 if valid data is provided', async () => {

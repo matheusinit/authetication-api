@@ -1,4 +1,6 @@
 import { ServerError } from '../errors'
+import { UnauthenticatedError } from '../errors/unauthenticated-error'
+import { appError } from '../helpers/error-helper'
 import { TokenValidator } from '../protocols/token-validator'
 import { AuthenticationMiddleware } from './authentication-middleware'
 
@@ -45,7 +47,7 @@ describe('Authentication Middleware', () => {
     }
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(500)
-    expect(httpResponse.body).toEqual(new ServerError())
+    expect(httpResponse.body).toEqual(appError(new ServerError()))
   })
 
   it('Should return 401 if token is not provided', async () => {
@@ -53,7 +55,7 @@ describe('Authentication Middleware', () => {
     const httpRequest = {}
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(401)
-    expect(httpResponse.body).toEqual(new Error('Unauthenticated'))
+    expect(httpResponse.body).toEqual(appError(new UnauthenticatedError()))
   })
 
   it('Should return 401 if TokenValidator returns false', async () => {
@@ -64,7 +66,7 @@ describe('Authentication Middleware', () => {
     }
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(401)
-    expect(httpResponse.body).toEqual(new Error('Unauthenticated'))
+    expect(httpResponse.body).toEqual(appError(new UnauthenticatedError()))
   })
 
   it('Should return undefined if TokenValidator returns true', async () => {
