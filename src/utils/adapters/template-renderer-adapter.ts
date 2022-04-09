@@ -1,3 +1,7 @@
+import path from 'path'
+import fs from 'fs'
+import handlebars from 'handlebars'
+
 import { TemplateOptions, TemplateRenderer } from '../../infra/mail/protocols/template-renderer'
 
 export class TemplateRendererAdapter implements TemplateRenderer {
@@ -11,6 +15,12 @@ export class TemplateRendererAdapter implements TemplateRenderer {
   }
 
   render (templateName: string, context?: any): string {
-    return ''
+    const { baseDir, ext } = this.options
+
+    const templatePath = path.join(baseDir, templateName + ext)
+    const template = fs.readFileSync(templatePath, 'utf-8').toString()
+    const renderTemplate = handlebars.compile(template)
+
+    return renderTemplate(context)
   }
 }
