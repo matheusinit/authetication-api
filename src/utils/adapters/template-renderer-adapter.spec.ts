@@ -21,4 +21,13 @@ describe('TemplateRenderer Adapter', () => {
 
     expect(sut.options.ext).toBe('.handlebars')
   })
+
+  it('Can define a new extension name', () => {
+    const ext = '.hbs'
+    const sut = new TemplateRendererAdapter({ baseDir, ext })
+
+    sut.render('test')
+
+    expect(sut.options.ext).toBe('.hbs')
+  })
 })
