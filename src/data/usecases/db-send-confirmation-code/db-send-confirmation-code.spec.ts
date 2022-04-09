@@ -173,7 +173,9 @@ describe('DbSendConfirmationCode', () => {
       to: 'any_email@mail.com',
       from: 'Auth API <confirm@authapi.com>',
       subject: 'Authentication API - Código de confirmação',
-      html: '<p><b>Authentication API</b> Código: any_code</p>'
+      data: {
+        code: 'any_code'
+      }
     })
   })
 

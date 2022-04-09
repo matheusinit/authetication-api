@@ -49,7 +49,9 @@ export class DbSendConfirmationCode implements SendConfirmationCode {
       to: email,
       from: 'Auth API <confirm@authapi.com>',
       subject: 'Authentication API - Código de confirmação',
-      html: `<p><b>Authentication API</b> Código: ${confirmationCode}</p>`
+      data: {
+        code: confirmationCode
+      }
     })
   }
 }
