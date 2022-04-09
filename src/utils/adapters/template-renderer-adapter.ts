@@ -3,8 +3,11 @@ import { TemplateOptions, TemplateRenderer } from '../../infra/mail/protocols/te
 export class TemplateRendererAdapter implements TemplateRenderer {
   readonly options: TemplateOptions
 
-  constructor (options: TemplateOptions) {
-    this.options = options
+  constructor ({ baseDir, ext }: TemplateOptions) {
+    this.options = {
+      baseDir,
+      ext: ext ?? '.handlebars'
+    }
   }
 
   render (templateName: string, context?: any): string {
