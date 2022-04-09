@@ -1,4 +1,6 @@
 import path from 'path'
+import fs from 'fs'
+import handlebars from 'handlebars'
 import { TemplateRendererAdapter } from './template-renderer-adapter'
 
 const baseDir = path.join(__dirname, 'views')
@@ -29,5 +31,19 @@ describe('TemplateRenderer Adapter', () => {
     sut.render('test')
 
     expect(sut.options.ext).toBe('.hbs')
+  })
+
+  it('Should return html rendered from template', () => {
+    const sut = new TemplateRendererAdapter({ baseDir })
+
+    const template = fs.readFileSync(path.join(baseDir, 'test' + '.handlebars'), 'utf-8').toString()
+
+    const renderTemplate = handlebars.compile(template)
+    const htmlRendered = renderTemplate({ variable: 'Test' })
+
+    const html = sut.render('test', { variable: 'Test' })
+
+    expect(html).toBeTruthy()
+    expect(html).toBe(htmlRendered)
   })
 })
