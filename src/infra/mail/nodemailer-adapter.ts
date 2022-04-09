@@ -22,7 +22,7 @@ export class NodemailerAdapter implements EmailSender {
 
     const { to, from, subject, data } = content
 
-    const html = this.templateRenderer.render('mail', data)
+    const html = this.templateRenderer.render('confirmation-email', data)
 
     await transport.sendMail({ to, from, subject, html })
   }
