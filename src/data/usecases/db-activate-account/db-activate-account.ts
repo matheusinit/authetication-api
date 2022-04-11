@@ -1,4 +1,5 @@
 import { AccountInfo, ActivateAccount } from '../../../domain/usecases/activate-account'
+import { AccountIsActiveError } from '../../errors/account-is-active-error'
 import { EmailNotRegisteredError } from '../../errors/email-not-registered-error'
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
 import { AccountModel } from '../db-add-account/db-add-account-protocols'
@@ -15,6 +16,10 @@ export class DbActivateAccount implements ActivateAccount {
 
     if (!account) {
       throw new EmailNotRegisteredError()
+    }
+
+    if (account.status === 'active') {
+      throw new AccountIsActiveError()
     }
 
     return null
