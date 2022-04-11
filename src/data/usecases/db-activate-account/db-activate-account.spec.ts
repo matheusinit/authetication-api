@@ -59,4 +59,17 @@ describe('DbActivateAccount Usecase', () => {
 
     await expect(promise).rejects.toThrow(new EmailNotRegisteredError())
   })
+
+  it('Should throws if LoadAccountByEmailRepository throws', async () => {
+    const { sut, loadAccountByEmailRepositoryStub } = makeSut()
+    jest.spyOn(loadAccountByEmailRepositoryStub, 'loadByEmail').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+
+    const accountInfo = {
+      email: 'any_email@mail.com',
+      confirmationCode: 'any_code'
+    }
+    const promise = sut.activate(accountInfo)
+
+    await expect(promise).rejects.toThrow()
+  })
 })
