@@ -5,6 +5,7 @@ import { EmailNotRegisteredError } from '../../errors/email-not-registered-error
 import { InvalidConfirmationCodeError } from '../../errors/invalid-confirmation-code-error'
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
 import { LoadConfirmationCodeByEmailRepository } from '../../protocols/load-confirmation-code-by-email-repository'
+import { UpdateAccountRepository } from '../../protocols/update-account-repository'
 import { AccountModel } from '../db-add-account/db-add-account-protocols'
 import { DbActivateAccount } from './db-activate-account'
 
@@ -12,6 +13,7 @@ interface SutTypes {
   sut: DbActivateAccount
   loadAccountByEmailRepositoryStub: LoadAccountByEmailRepository
   loadConfirmationCodeByEmailRepositoryStub: LoadConfirmationCodeByEmailRepository
+  updateAccountRepositoryStub: UpdateAccountRepository
 }
 
 const makeLoadAccountByEmailRepositoryStub = (): LoadAccountByEmailRepository => {
@@ -43,14 +45,32 @@ const makeLoadConfirmationCodeByEmailRepositoryStub = (): LoadConfirmationCodeBy
 }
 
 const makeSut = (): SutTypes => {
+  class UpdateAccountRepositoryStub implements UpdateAccountRepository {
+    async update (id: string, update: any): Promise<AccountModel> {
+      return {
+        id: 'any_id',
+        username: 'any_username',
+        email: 'any_email@email.com',
+        password: 'hashed_password',
+        status: 'any_status'
+      }
+    }
+  }
+
+  const updateAccountRepositoryStub = new UpdateAccountRepositoryStub()
   const loadConfirmationCodeByEmailRepositoryStub = makeLoadConfirmationCodeByEmailRepositoryStub()
   const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepositoryStub()
-  const sut = new DbActivateAccount(loadAccountByEmailRepositoryStub, loadConfirmationCodeByEmailRepositoryStub)
+  const sut = new DbActivateAccount(
+    loadAccountByEmailRepositoryStub,
+    loadConfirmationCodeByEmailRepositoryStub,
+    updateAccountRepositoryStub
+  )
 
   return {
     sut,
     loadAccountByEmailRepositoryStub,
-    loadConfirmationCodeByEmailRepositoryStub
+    loadConfirmationCodeByEmailRepositoryStub,
+    updateAccountRepositoryStub
   }
 }
 
@@ -207,5 +227,20 @@ describe('DbActivateAccount Usecase', () => {
     const promise = sut.activate(accountInfo)
 
     await expect(promise).rejects.toThrow(new InvalidConfirmationCodeError('Invalid Confirmation Code'))
+  })
+
+  it('Should call UpdateAccountRepository with correct values', async () => {
+    const { sut, updateAccountRepositoryStub } = makeSut()
+    const updateSpy = jest.spyOn(updateAccountRepositoryStub, 'update')
+
+    const accountInfo = {
+      email: 'any_email@email.com',
+      confirmationCode: 'any_code'
+    }
+    await sut.activate(accountInfo)
+
+    expect(updateSpy).toHaveBeenCalledWith('any_id', {
+      status: 'active'
+    })
   })
 })
