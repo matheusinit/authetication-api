@@ -137,4 +137,17 @@ describe('DbActivateAccount Usecase', () => {
 
     await expect(promise).rejects.toThrow(new ConfirmationCodeNotFoundError())
   })
+
+  it('Should throws if LoadConfirmationCodeByEmailRepository throws', async () => {
+    const { sut, loadConfirmationCodeByEmailRepositoryStub } = makeSut()
+    jest.spyOn(loadConfirmationCodeByEmailRepositoryStub, 'loadByEmail').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+
+    const accountInfo = {
+      email: 'any_email@email.com',
+      confirmationCode: 'any_code'
+    }
+    const promise = sut.activate(accountInfo)
+
+    await expect(promise).rejects.toThrow()
+  })
 })
