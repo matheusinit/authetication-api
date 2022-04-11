@@ -52,7 +52,7 @@ const makeUpdateAccountRepositoryStub = (): UpdateAccountRepository => {
         username: 'any_username',
         email: 'any_email@email.com',
         password: 'hashed_password',
-        status: 'any_status'
+        status: 'active'
       }
     }
   }
@@ -258,5 +258,23 @@ describe('DbActivateAccount Usecase', () => {
     const promise = sut.activate(accountInfo)
 
     await expect(promise).rejects.toThrow()
+  })
+
+  it('Should return an active account on success', async () => {
+    const { sut } = makeSut()
+
+    const accountInfo = {
+      email: 'any_email@email.com',
+      confirmationCode: 'any_code'
+    }
+    const account = await sut.activate(accountInfo)
+
+    expect(account).toEqual({
+      id: 'any_id',
+      username: 'any_username',
+      email: 'any_email@email.com',
+      password: 'hashed_password',
+      status: 'active'
+    })
   })
 })
