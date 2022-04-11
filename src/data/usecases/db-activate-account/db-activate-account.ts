@@ -53,8 +53,8 @@ export class DbActivateAccount implements ActivateAccount {
       throw new InvalidConfirmationCodeError('Invalid Confirmation Code')
     }
 
-    await this.updateAccountRepository.update(account.id, { status: 'active' })
+    const activeAccount = await this.updateAccountRepository.update(account.id, { status: 'active' })
 
-    return null
+    return activeAccount
   }
 }
