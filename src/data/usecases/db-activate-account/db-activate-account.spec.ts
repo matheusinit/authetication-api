@@ -2,6 +2,7 @@ import { ConfirmationCode } from '../../../domain/models/confirmation-code'
 import { AccountIsActiveError } from '../../errors/account-is-active-error'
 import { ConfirmationCodeNotFoundError } from '../../errors/confirmation-code-not-found-error'
 import { EmailNotRegisteredError } from '../../errors/email-not-registered-error'
+import { InvalidConfirmationCodeError } from '../../errors/invalid-confirmation-code-error'
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
 import { LoadConfirmationCodeByEmailRepository } from '../../protocols/load-confirmation-code-by-email-repository'
 import { AccountModel } from '../db-add-account/db-add-account-protocols'
@@ -149,5 +150,26 @@ describe('DbActivateAccount Usecase', () => {
     const promise = sut.activate(accountInfo)
 
     await expect(promise).rejects.toThrow()
+  })
+
+  it('Should throw an error if code has more than 6 hours of lifetime', async () => {
+    const { sut, loadConfirmationCodeByEmailRepositoryStub } = makeSut()
+    jest.spyOn(loadConfirmationCodeByEmailRepositoryStub, 'loadByEmail').mockReturnValueOnce(new Promise(resolve => {
+      const now = new Date()
+
+      resolve({
+        id: 'any_id',
+        code: 'any_code',
+        createdAt: new Date(now.setHours(now.getHours() - 6, now.getMinutes() - 1))
+      })
+    }))
+
+    const accountInfo = {
+      email: 'any_email@email.com',
+      confirmationCode: 'any_code'
+    }
+    const promise = sut.activate(accountInfo)
+
+    await expect(promise).rejects.toThrow(new InvalidConfirmationCodeError('Confirmation Code has passed of its lifetime'))
   })
 })
