@@ -196,4 +196,16 @@ describe('DbActivateAccount Usecase', () => {
 
     await expect(promise).rejects.toThrow(new InvalidConfirmationCodeError('Confirmation Code has passed of its lifetime'))
   })
+
+  it('Should throw an error if confirmation code does not match', async () => {
+    const { sut } = makeSut()
+
+    const accountInfo = {
+      email: 'any_email@email.com',
+      confirmationCode: 'invalid_code'
+    }
+    const promise = sut.activate(accountInfo)
+
+    await expect(promise).rejects.toThrow(new InvalidConfirmationCodeError('Invalid Confirmation Code'))
+  })
 })
