@@ -1,3 +1,4 @@
+import { AccountIsActiveError } from '../../errors/account-is-active-error'
 import { EmailNotRegisteredError } from '../../errors/email-not-registered-error'
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
 import { AccountModel } from '../db-add-account/db-add-account-protocols'
@@ -71,5 +72,24 @@ describe('DbActivateAccount Usecase', () => {
     const promise = sut.activate(accountInfo)
 
     await expect(promise).rejects.toThrow()
+  })
+
+  it('Should throw an error if account is already active', async () => {
+    const { sut, loadAccountByEmailRepositoryStub } = makeSut()
+    jest.spyOn(loadAccountByEmailRepositoryStub, 'loadByEmail').mockReturnValueOnce(new Promise(resolve => resolve({
+      id: 'any_id',
+      username: 'any_username',
+      email: 'any_email@email.com',
+      password: 'hashed_password',
+      status: 'active'
+    })))
+
+    const accountInfo = {
+      email: 'any_email@mail.com',
+      confirmationCode: 'any_code'
+    }
+    const promise = sut.activate(accountInfo)
+
+    await expect(promise).rejects.toThrow(new AccountIsActiveError())
   })
 })
