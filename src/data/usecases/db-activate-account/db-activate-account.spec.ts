@@ -1,3 +1,4 @@
+import { EmailNotRegisteredError } from '../../errors/email-not-registered-error'
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
 import { AccountModel } from '../db-add-account/db-add-account-protocols'
 import { DbActivateAccount } from './db-activate-account'
@@ -44,5 +45,18 @@ describe('DbActivateAccount Usecase', () => {
     await sut.activate(accountInfo)
 
     expect(loadByEmailSpy).toHaveBeenCalledWith('any_email@mail.com')
+  })
+
+  it('Should throw an error if LoadAccountByEmailRepository returns null', async () => {
+    const { sut, loadAccountByEmailRepositoryStub } = makeSut()
+    jest.spyOn(loadAccountByEmailRepositoryStub, 'loadByEmail').mockReturnValueOnce(new Promise(resolve => resolve(null)))
+
+    const accountInfo = {
+      email: 'unregistered_email@mail.com',
+      confirmationCode: 'any_code'
+    }
+    const promise = sut.activate(accountInfo)
+
+    await expect(promise).rejects.toThrow(new EmailNotRegisteredError())
   })
 })
