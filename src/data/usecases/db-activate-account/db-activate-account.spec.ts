@@ -172,4 +172,28 @@ describe('DbActivateAccount Usecase', () => {
 
     await expect(promise).rejects.toThrow(new InvalidConfirmationCodeError('Confirmation Code has passed of its lifetime'))
   })
+
+  it('Should throw an error if code has exactly 6 hours of lifetime', async () => {
+    const { sut, loadConfirmationCodeByEmailRepositoryStub } = makeSut()
+    jest.spyOn(loadConfirmationCodeByEmailRepositoryStub, 'loadByEmail').mockReturnValueOnce(new Promise(resolve => {
+      const now = new Date()
+      now.setMilliseconds(0)
+
+      now.setHours(now.getHours() - 6)
+
+      resolve({
+        id: 'any_id',
+        code: 'any_code',
+        createdAt: now
+      })
+    }))
+
+    const accountInfo = {
+      email: 'any_email@email.com',
+      confirmationCode: 'any_code'
+    }
+    const promise = sut.activate(accountInfo)
+
+    await expect(promise).rejects.toThrow(new InvalidConfirmationCodeError('Confirmation Code has passed of its lifetime'))
+  })
 })
