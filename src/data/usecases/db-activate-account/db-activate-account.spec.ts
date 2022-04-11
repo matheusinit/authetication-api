@@ -7,7 +7,7 @@ interface SutTypes {
   loadAccountByEmailRepositoryStub: LoadAccountByEmailRepository
 }
 
-const makeSut = (): SutTypes => {
+const makeLoadAccountByEmailRepositoryStub = (): LoadAccountByEmailRepository => {
   class LoadAccountByEmailRepositoryStub implements LoadAccountByEmailRepository {
     async loadByEmail (email: string): Promise<AccountModel> {
       return {
@@ -19,8 +19,11 @@ const makeSut = (): SutTypes => {
       }
     }
   }
+  return new LoadAccountByEmailRepositoryStub()
+}
 
-  const loadAccountByEmailRepositoryStub = new LoadAccountByEmailRepositoryStub()
+const makeSut = (): SutTypes => {
+  const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepositoryStub()
   const sut = new DbActivateAccount(loadAccountByEmailRepositoryStub)
 
   return {
