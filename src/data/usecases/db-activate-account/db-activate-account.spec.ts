@@ -44,7 +44,7 @@ const makeLoadConfirmationCodeByEmailRepositoryStub = (): LoadConfirmationCodeBy
   return new LoadConfirmationCodeByEmailRepositoryStub()
 }
 
-const makeSut = (): SutTypes => {
+const makeUpdateAccountRepositoryStub = (): UpdateAccountRepository => {
   class UpdateAccountRepositoryStub implements UpdateAccountRepository {
     async update (id: string, update: any): Promise<AccountModel> {
       return {
@@ -56,8 +56,11 @@ const makeSut = (): SutTypes => {
       }
     }
   }
+  return new UpdateAccountRepositoryStub()
+}
 
-  const updateAccountRepositoryStub = new UpdateAccountRepositoryStub()
+const makeSut = (): SutTypes => {
+  const updateAccountRepositoryStub = makeUpdateAccountRepositoryStub()
   const loadConfirmationCodeByEmailRepositoryStub = makeLoadConfirmationCodeByEmailRepositoryStub()
   const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepositoryStub()
   const sut = new DbActivateAccount(
