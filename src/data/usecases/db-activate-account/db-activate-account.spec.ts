@@ -246,4 +246,17 @@ describe('DbActivateAccount Usecase', () => {
       status: 'active'
     })
   })
+
+  it('Should throw if UpdateAccountRepoitory throws', async () => {
+    const { sut, updateAccountRepositoryStub } = makeSut()
+    jest.spyOn(updateAccountRepositoryStub, 'update').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+
+    const accountInfo = {
+      email: 'any_email@email.com',
+      confirmationCode: 'any_code'
+    }
+    const promise = sut.activate(accountInfo)
+
+    await expect(promise).rejects.toThrow()
+  })
 })
