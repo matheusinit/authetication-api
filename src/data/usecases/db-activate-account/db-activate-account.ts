@@ -45,6 +45,10 @@ export class DbActivateAccount implements ActivateAccount {
       throw new InvalidConfirmationCodeError('Confirmation Code has passed of its lifetime')
     }
 
+    if (confirmationCode.code !== accountInfo.confirmationCode) {
+      throw new InvalidConfirmationCodeError('Invalid Confirmation Code')
+    }
+
     return null
   }
 }
