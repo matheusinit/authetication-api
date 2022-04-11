@@ -1,4 +1,5 @@
 import { AccountInfo, ActivateAccount } from '../../../domain/usecases/activate-account'
+import { EmailNotRegisteredError } from '../../errors/email-not-registered-error'
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
 import { AccountModel } from '../db-add-account/db-add-account-protocols'
 
@@ -10,7 +11,12 @@ export class DbActivateAccount implements ActivateAccount {
   }
 
   async activate (accountInfo: AccountInfo): Promise<AccountModel> {
-    await this.loadAccountByEmailRepository.loadByEmail(accountInfo.email)
+    const account = await this.loadAccountByEmailRepository.loadByEmail(accountInfo.email)
+
+    if (!account) {
+      throw new EmailNotRegisteredError()
+    }
+
     return null
   }
 }
