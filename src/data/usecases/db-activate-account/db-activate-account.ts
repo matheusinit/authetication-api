@@ -2,6 +2,7 @@ import { AccountInfo, ActivateAccount } from '../../../domain/usecases/activate-
 import { AccountIsActiveError } from '../../errors/account-is-active-error'
 import { ConfirmationCodeNotFoundError } from '../../errors/confirmation-code-not-found-error'
 import { EmailNotRegisteredError } from '../../errors/email-not-registered-error'
+import { InvalidConfirmationCodeError } from '../../errors/invalid-confirmation-code-error'
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
 import { LoadConfirmationCodeByEmailRepository } from '../../protocols/load-confirmation-code-by-email-repository'
 import { AccountModel } from '../db-add-account/db-add-account-protocols'
@@ -33,6 +34,13 @@ export class DbActivateAccount implements ActivateAccount {
 
     if (!confirmationCode) {
       throw new ConfirmationCodeNotFoundError()
+    }
+
+    const limitTime = new Date()
+    limitTime.setHours(limitTime.getHours() - 6)
+
+    if (confirmationCode.createdAt < limitTime) {
+      throw new InvalidConfirmationCodeError('Confirmation Code has passed of its lifetime')
     }
 
     return null
