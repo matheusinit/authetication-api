@@ -37,9 +37,11 @@ export class DbActivateAccount implements ActivateAccount {
     }
 
     const limitTime = new Date()
+    limitTime.setMilliseconds(0)
+
     limitTime.setHours(limitTime.getHours() - 6)
 
-    if (confirmationCode.createdAt < limitTime) {
+    if (confirmationCode.createdAt <= limitTime) {
       throw new InvalidConfirmationCodeError('Confirmation Code has passed of its lifetime')
     }
 
