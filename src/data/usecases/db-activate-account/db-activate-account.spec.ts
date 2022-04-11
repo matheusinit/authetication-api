@@ -1,5 +1,6 @@
 import { ConfirmationCode } from '../../../domain/models/confirmation-code'
 import { AccountIsActiveError } from '../../errors/account-is-active-error'
+import { ConfirmationCodeNotFoundError } from '../../errors/confirmation-code-not-found-error'
 import { EmailNotRegisteredError } from '../../errors/email-not-registered-error'
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
 import { LoadConfirmationCodeByEmailRepository } from '../../protocols/load-confirmation-code-by-email-repository'
@@ -118,5 +119,18 @@ describe('DbActivateAccount Usecase', () => {
     await sut.activate(accountInfo)
 
     expect(loadByEmailSpy).toHaveBeenCalledWith('any_email@email.com')
+  })
+
+  it('Should throw an error if LoadConfirmationCodeByEmailRepository returns null', async () => {
+    const { sut, loadConfirmationCodeByEmailRepositoryStub } = makeSut()
+    jest.spyOn(loadConfirmationCodeByEmailRepositoryStub, 'loadByEmail').mockReturnValueOnce(new Promise(resolve => resolve(null)))
+
+    const accountInfo = {
+      email: 'any_email@email.com',
+      confirmationCode: 'inexistent_code'
+    }
+    const promise = sut.activate(accountInfo)
+
+    await expect(promise).rejects.toThrow(new ConfirmationCodeNotFoundError())
   })
 })
