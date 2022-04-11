@@ -1,12 +1,15 @@
+import { ConfirmationCode } from '../../../domain/models/confirmation-code'
 import { AccountIsActiveError } from '../../errors/account-is-active-error'
 import { EmailNotRegisteredError } from '../../errors/email-not-registered-error'
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
+import { LoadConfirmationCodeByEmailRepository } from '../../protocols/load-confirmation-code-by-email-repository'
 import { AccountModel } from '../db-add-account/db-add-account-protocols'
 import { DbActivateAccount } from './db-activate-account'
 
 interface SutTypes {
   sut: DbActivateAccount
   loadAccountByEmailRepositoryStub: LoadAccountByEmailRepository
+  loadConfirmationCodeByEmailRepositoryStub: LoadConfirmationCodeByEmailRepository
 }
 
 const makeLoadAccountByEmailRepositoryStub = (): LoadAccountByEmailRepository => {
@@ -25,12 +28,23 @@ const makeLoadAccountByEmailRepositoryStub = (): LoadAccountByEmailRepository =>
 }
 
 const makeSut = (): SutTypes => {
+  class LoadConfirmationCodeByEmailRepositoryStub implements LoadConfirmationCodeByEmailRepository {
+    async loadByEmail (email: string): Promise<ConfirmationCode> {
+      return {
+        id: 'any_id',
+        code: 'any_code',
+        createdAt: new Date()
+      }
+    }
+  }
+  const loadConfirmationCodeByEmailRepositoryStub = new LoadConfirmationCodeByEmailRepositoryStub()
   const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepositoryStub()
-  const sut = new DbActivateAccount(loadAccountByEmailRepositoryStub)
+  const sut = new DbActivateAccount(loadAccountByEmailRepositoryStub, loadConfirmationCodeByEmailRepositoryStub)
 
   return {
     sut,
-    loadAccountByEmailRepositoryStub
+    loadAccountByEmailRepositoryStub,
+    loadConfirmationCodeByEmailRepositoryStub
   }
 }
 
@@ -91,5 +105,18 @@ describe('DbActivateAccount Usecase', () => {
     const promise = sut.activate(accountInfo)
 
     await expect(promise).rejects.toThrow(new AccountIsActiveError())
+  })
+
+  it('Should call LoadConfirmationCodeByEmailRepository with correct email', async () => {
+    const { sut, loadConfirmationCodeByEmailRepositoryStub } = makeSut()
+    const loadByEmailSpy = jest.spyOn(loadConfirmationCodeByEmailRepositoryStub, 'loadByEmail')
+
+    const accountInfo = {
+      email: 'any_email@email.com',
+      confirmationCode: 'any_code'
+    }
+    await sut.activate(accountInfo)
+
+    expect(loadByEmailSpy).toHaveBeenCalledWith('any_email@email.com')
   })
 })
