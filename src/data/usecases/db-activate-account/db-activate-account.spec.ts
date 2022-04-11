@@ -2,23 +2,37 @@ import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-em
 import { AccountModel } from '../db-add-account/db-add-account-protocols'
 import { DbActivateAccount } from './db-activate-account'
 
-class LoadAccountByEmailRepositoryStub implements LoadAccountByEmailRepository {
-  async loadByEmail (email: string): Promise<AccountModel> {
-    return {
-      id: 'any_id',
-      username: 'any_username',
-      email: 'any_email@email.com',
-      password: 'hashed_password',
-      status: 'any_status'
+interface SutTypes {
+  sut: DbActivateAccount
+  loadAccountByEmailRepositoryStub: LoadAccountByEmailRepository
+}
+
+const makeSut = (): SutTypes => {
+  class LoadAccountByEmailRepositoryStub implements LoadAccountByEmailRepository {
+    async loadByEmail (email: string): Promise<AccountModel> {
+      return {
+        id: 'any_id',
+        username: 'any_username',
+        email: 'any_email@email.com',
+        password: 'hashed_password',
+        status: 'any_status'
+      }
     }
+  }
+
+  const loadAccountByEmailRepositoryStub = new LoadAccountByEmailRepositoryStub()
+  const sut = new DbActivateAccount(loadAccountByEmailRepositoryStub)
+
+  return {
+    sut,
+    loadAccountByEmailRepositoryStub
   }
 }
 
 describe('DbActivateAccount Usecase', () => {
   it('Should call LoadAccountByEmailRepository with correct email', async () => {
-    const loadAccountByEmailRepositoryStub = new LoadAccountByEmailRepositoryStub()
+    const { sut, loadAccountByEmailRepositoryStub } = makeSut()
     const loadByEmailSpy = jest.spyOn(loadAccountByEmailRepositoryStub, 'loadByEmail')
-    const sut = new DbActivateAccount(loadAccountByEmailRepositoryStub)
 
     const accountInfo = {
       email: 'any_email@mail.com',
