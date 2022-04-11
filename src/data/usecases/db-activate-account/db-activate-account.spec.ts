@@ -160,7 +160,7 @@ describe('DbActivateAccount Usecase', () => {
       resolve({
         id: 'any_id',
         code: 'any_code',
-        createdAt: new Date(now.setHours(now.getHours() - 6, now.getMinutes() - 1))
+        createdAt: new Date(now.setHours(now.getHours() - 6, now.getMinutes() - 1, now.getSeconds() - 1))
       })
     }))
 
