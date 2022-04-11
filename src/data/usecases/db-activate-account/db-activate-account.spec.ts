@@ -28,7 +28,7 @@ const makeLoadAccountByEmailRepositoryStub = (): LoadAccountByEmailRepository =>
   return new LoadAccountByEmailRepositoryStub()
 }
 
-const makeSut = (): SutTypes => {
+const makeLoadConfirmationCodeByEmailRepositoryStub = (): LoadConfirmationCodeByEmailRepository => {
   class LoadConfirmationCodeByEmailRepositoryStub implements LoadConfirmationCodeByEmailRepository {
     async loadByEmail (email: string): Promise<ConfirmationCode> {
       return {
@@ -38,7 +38,11 @@ const makeSut = (): SutTypes => {
       }
     }
   }
-  const loadConfirmationCodeByEmailRepositoryStub = new LoadConfirmationCodeByEmailRepositoryStub()
+  return new LoadConfirmationCodeByEmailRepositoryStub()
+}
+
+const makeSut = (): SutTypes => {
+  const loadConfirmationCodeByEmailRepositoryStub = makeLoadConfirmationCodeByEmailRepositoryStub()
   const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepositoryStub()
   const sut = new DbActivateAccount(loadAccountByEmailRepositoryStub, loadConfirmationCodeByEmailRepositoryStub)
 
