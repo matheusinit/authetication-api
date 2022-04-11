@@ -5,18 +5,22 @@ import { EmailNotRegisteredError } from '../../errors/email-not-registered-error
 import { InvalidConfirmationCodeError } from '../../errors/invalid-confirmation-code-error'
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
 import { LoadConfirmationCodeByEmailRepository } from '../../protocols/load-confirmation-code-by-email-repository'
+import { UpdateAccountRepository } from '../../protocols/update-account-repository'
 import { AccountModel } from '../db-add-account/db-add-account-protocols'
 
 export class DbActivateAccount implements ActivateAccount {
   private readonly loadAccountByEmailRepository: LoadAccountByEmailRepository
   private readonly loadConfirmationCodeByEmailRepository: LoadConfirmationCodeByEmailRepository
+  private readonly updateAccountRepository: UpdateAccountRepository
 
   constructor (
     loadAccountByEmailRepository: LoadAccountByEmailRepository,
-    loadConfirmationCodeByEmailRepository: LoadConfirmationCodeByEmailRepository
+    loadConfirmationCodeByEmailRepository: LoadConfirmationCodeByEmailRepository,
+    updateAccountRepository: UpdateAccountRepository
   ) {
     this.loadAccountByEmailRepository = loadAccountByEmailRepository
     this.loadConfirmationCodeByEmailRepository = loadConfirmationCodeByEmailRepository
+    this.updateAccountRepository = updateAccountRepository
   }
 
   async activate (accountInfo: AccountInfo): Promise<AccountModel> {
@@ -48,6 +52,8 @@ export class DbActivateAccount implements ActivateAccount {
     if (confirmationCode.code !== accountInfo.confirmationCode) {
       throw new InvalidConfirmationCodeError('Invalid Confirmation Code')
     }
+
+    await this.updateAccountRepository.update(account.id, { status: 'active' })
 
     return null
   }
