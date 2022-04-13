@@ -123,5 +123,13 @@ describe('Account Mongo Repository', () => {
       expect(updatedAccount).toBeTruthy()
       expect(updatedAccount.username).toBe('new_username')
     })
+
+    it('Should return null if account is not found', async () => {
+      const sut = makeSut()
+
+      const account = await sut.update('invalid_id', { username: 'new_username' })
+
+      expect(account).toBeFalsy()
+    })
   })
 })
