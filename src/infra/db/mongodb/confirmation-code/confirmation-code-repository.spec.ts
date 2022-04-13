@@ -2,6 +2,10 @@ import { Collection } from 'mongodb'
 import { MongoHelper } from '../helpers/mongo-helper'
 import { ConfirmationCodeRepository } from './confirmation-code-repository'
 
+const makeSut = (): ConfirmationCodeRepository => {
+  return new ConfirmationCodeRepository()
+}
+
 let collection: Collection
 
 describe('ConfirmationCode Mongo Repository', () => {
@@ -20,7 +24,7 @@ describe('ConfirmationCode Mongo Repository', () => {
 
   describe('storeConfirmationCode()', () => {
     it('Should return undefined on save confirmation code', async () => {
-      const sut = new ConfirmationCodeRepository()
+      const sut = makeSut()
       const result = await sut.storeConfirmationCode('any_confirmation_code', 'any_email@mail.com')
 
       expect(result).toBe(undefined)
@@ -29,7 +33,7 @@ describe('ConfirmationCode Mongo Repository', () => {
 
   describe('loadByEmail', () => {
     it('Should return a confirmation code on success', async () => {
-      const sut = new ConfirmationCodeRepository()
+      const sut = makeSut()
 
       // Insert fake account
       const fakeAccount = {
