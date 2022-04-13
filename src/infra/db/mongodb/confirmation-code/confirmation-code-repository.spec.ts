@@ -65,5 +65,13 @@ describe('ConfirmationCode Mongo Repository', () => {
       expect(confirmationCode).toBeTruthy()
       expect(confirmationCode.code).toBe('any_code')
     })
+
+    it('Should return null if email is not registered in system', async () => {
+      const sut = makeSut()
+
+      const confirmationCode = await sut.loadByEmail('invalid_email@mail.com')
+
+      expect(confirmationCode).toBeFalsy()
+    })
   })
 })
