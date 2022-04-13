@@ -40,6 +40,6 @@ export class AccountMongoRepository implements AddAccountRepository,
   async update (id: string, update: any): Promise<AccountModel> {
     const accountCollection = MongoHelper.getCollection('accounts')
     const { value: account } = await accountCollection.findOneAndUpdate({ _id: id }, { $set: update }, { returnDocument: 'after' })
-    return MongoHelper.map(account)
+    return account === null ? account : MongoHelper.map(account)
   }
 }
