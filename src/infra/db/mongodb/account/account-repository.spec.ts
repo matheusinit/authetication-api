@@ -105,4 +105,23 @@ describe('Account Mongo Repository', () => {
       expect(account).toBeFalsy()
     })
   })
+
+  describe('update()', () => {
+    it('Should update an account on success', async () => {
+      const sut = makeSut()
+      const fakeAccount = {
+        username: 'any_username',
+        email: 'any_email@mail.com',
+        password: 'hashed_password',
+        status: 'any_status'
+      }
+      const { insertedId } = await collection.insertOne(fakeAccount)
+      const id = insertedId as unknown as string
+
+      const updatedAccount = await sut.update(id, { username: 'new_username' })
+
+      expect(updatedAccount).toBeTruthy()
+      expect(updatedAccount.username).toBe('new_username')
+    })
+  })
 })
