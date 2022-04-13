@@ -22,9 +22,12 @@ export class ConfirmationCodeRepository implements StoreConfirmationCodeReposito
     const collection = MongoHelper.getCollection('confirmation-code')
 
     const resultAccount = await accountCollection.findOne({ email })
-    const account = MongoHelper.map(resultAccount) as AccountModel
-    const confirmationCode = await collection.findOne({ _id: account.code_id })
 
-    return MongoHelper.map(confirmationCode)
+    if (resultAccount) {
+      const account = MongoHelper.map(resultAccount) as AccountModel
+      const confirmationCode = await collection.findOne({ _id: account.code_id })
+
+      return confirmationCode === null ? confirmationCode : MongoHelper.map(confirmationCode)
+    }
   }
 }
