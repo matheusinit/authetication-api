@@ -11,7 +11,6 @@ describe('ActivateAccount Controller', () => {
     const sut = makeSut()
     const httpRequest = {
       body: {
-        email: 'any_email@email.com',
         code: 'any_code'
       }
     }
@@ -20,5 +19,19 @@ describe('ActivateAccount Controller', () => {
 
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(appError(new MissingParamError('email')))
+  })
+
+  it('Should return 400 if confirmation code is not provided', async () => {
+    const sut = makeSut()
+    const httpRequest = {
+      body: {
+        email: 'any_email@email.com'
+      }
+    }
+
+    const httpResponse = await sut.handle(httpRequest)
+
+    expect(httpResponse.statusCode).toBe(400)
+    expect(httpResponse.body).toEqual(appError(new MissingParamError('confirmation code')))
   })
 })
