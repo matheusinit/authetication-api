@@ -1,6 +1,7 @@
+import { EmailNotRegisteredError } from '../../../data/errors/email-not-registered-error'
 import { ActivateAccount } from '../../../domain/usecases/activate-account'
 import { InvalidParamError, MissingParamError } from '../../errors'
-import { badRequest, ok, serverError } from '../../helpers/http-helper'
+import { badRequest, notFound, ok, serverError } from '../../helpers/http-helper'
 import { Controller, HttpRequest, HttpResponse } from '../../protocols'
 import { EmailValidator } from '../signup/signup-protocols'
 
@@ -34,6 +35,10 @@ export class ActivateAccountController implements Controller {
 
       return ok(account)
     } catch (error) {
+      if (error instanceof EmailNotRegisteredError) {
+        return notFound(error)
+      }
+
       return serverError()
     }
   }
