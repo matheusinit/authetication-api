@@ -213,6 +213,23 @@ describe('ActivateAccount Controller', () => {
     expect(httpResponse.body).toEqual(appError(new InvalidConfirmationCodeError('Confirmation Code has passed of its lifetime')))
   })
 
+  it('Should return 400 if confirmation code does not match', async () => {
+    const { sut, activateAccountStub } = makeSut()
+    jest.spyOn(activateAccountStub, 'activate').mockReturnValueOnce(new Promise((resolve, reject) =>
+      reject(new InvalidConfirmationCodeError('Invalid Confirmation Code'))))
+    const httpRequest = {
+      body: {
+        email: 'any_email@email.com',
+        code: 'any_code'
+      }
+    }
+
+    const httpResponse = await sut.handle(httpRequest)
+
+    expect(httpResponse.statusCode).toBe(400)
+    expect(httpResponse.body).toEqual(appError(new InvalidConfirmationCodeError('Invalid Confirmation Code')))
+  })
+
   it('Should return 500 if ActivateAccount throws', async () => {
     const { sut, activateAccountStub } = makeSut()
     jest.spyOn(activateAccountStub, 'activate').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
