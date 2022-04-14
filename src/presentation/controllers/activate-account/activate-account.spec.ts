@@ -1,4 +1,5 @@
 import { AccountIsActiveError } from '../../../data/errors/account-is-active-error'
+import { ConfirmationCodeNotFoundError } from '../../../data/errors/confirmation-code-not-found-error'
 import { EmailNotRegisteredError } from '../../../data/errors/email-not-registered-error'
 import { AccountInfo, ActivateAccount } from '../../../domain/usecases/activate-account'
 import { InvalidParamError, MissingParamError, ServerError } from '../../errors'
@@ -176,6 +177,22 @@ describe('ActivateAccount Controller', () => {
 
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(appError(new AccountIsActiveError()))
+  })
+
+  it('Should return 404 if confirmation code is not found', async () => {
+    const { sut, activateAccountStub } = makeSut()
+    jest.spyOn(activateAccountStub, 'activate').mockReturnValueOnce(new Promise((resolve, reject) => reject(new ConfirmationCodeNotFoundError())))
+    const httpRequest = {
+      body: {
+        email: 'any_email@email.com',
+        code: 'any_code'
+      }
+    }
+
+    const httpResponse = await sut.handle(httpRequest)
+
+    expect(httpResponse.statusCode).toBe(404)
+    expect(httpResponse.body).toEqual(appError(new ConfirmationCodeNotFoundError()))
   })
 
   it('Should return 500 if ActivateAccount throws', async () => {
