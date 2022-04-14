@@ -1,3 +1,4 @@
+import { EmailNotRegisteredError } from '../../../data/errors/email-not-registered-error'
 import { AccountInfo, ActivateAccount } from '../../../domain/usecases/activate-account'
 import { InvalidParamError, MissingParamError, ServerError } from '../../errors'
 import { appError } from '../../helpers/error-helper'
@@ -142,6 +143,22 @@ describe('ActivateAccount Controller', () => {
       email: 'any_email@email.com',
       confirmationCode: 'any_code'
     })
+  })
+
+  it('Should return 404 if email is not registered in system', async () => {
+    const { sut, activateAccountStub } = makeSut()
+    jest.spyOn(activateAccountStub, 'activate').mockReturnValueOnce(new Promise((resolve, reject) => reject(new EmailNotRegisteredError())))
+    const httpRequest = {
+      body: {
+        email: 'any_email@email.com',
+        code: 'any_code'
+      }
+    }
+
+    const httpResponse = await sut.handle(httpRequest)
+
+    expect(httpResponse.statusCode).toBe(404)
+    expect(httpResponse.body).toEqual(appError(new EmailNotRegisteredError()))
   })
 
   it('Should return 500 if ActivateAccount throws', async () => {
