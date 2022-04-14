@@ -140,4 +140,20 @@ describe('ActivateAccount Controller', () => {
       confirmationCode: 'any_code'
     })
   })
+
+  it('Should return 500 if ActivateAccount throws', async () => {
+    const { sut, activateAccountStub } = makeSut()
+    jest.spyOn(activateAccountStub, 'activate').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+    const httpRequest = {
+      body: {
+        email: 'any_email@email.com',
+        code: 'any_code'
+      }
+    }
+
+    const httpResponse = await sut.handle(httpRequest)
+
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(appError(new ServerError()))
+  })
 })
