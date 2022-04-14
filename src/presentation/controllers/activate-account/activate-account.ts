@@ -1,6 +1,7 @@
 import { AccountIsActiveError } from '../../../data/errors/account-is-active-error'
 import { ConfirmationCodeNotFoundError } from '../../../data/errors/confirmation-code-not-found-error'
 import { EmailNotRegisteredError } from '../../../data/errors/email-not-registered-error'
+import { InvalidConfirmationCodeError } from '../../../data/errors/invalid-confirmation-code-error'
 import { ActivateAccount } from '../../../domain/usecases/activate-account'
 import { InvalidParamError, MissingParamError } from '../../errors'
 import { badRequest, notFound, ok, serverError } from '../../helpers/http-helper'
@@ -43,6 +44,9 @@ export class ActivateAccountController implements Controller {
         return badRequest(error)
       } else if (error instanceof ConfirmationCodeNotFoundError) {
         return notFound(error)
+      } else if (error instanceof InvalidConfirmationCodeError &&
+        error.message === 'Confirmation Code has passed of its lifetime') {
+        return badRequest(error)
       }
 
       return serverError()
