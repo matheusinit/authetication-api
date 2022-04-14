@@ -19,7 +19,7 @@ const makeEmailValidatorStub = (): EmailValidator => {
   return new EmailValidatorStub()
 }
 
-const makeSut = (): SutTypes => {
+const makeActivateAccountStub = (): ActivateAccount => {
   class ActivateAccountStub implements ActivateAccount {
     async activate (accountInfo: AccountInfo): Promise<AccountModel> {
       const fakeAccount = {
@@ -33,9 +33,12 @@ const makeSut = (): SutTypes => {
       return await new Promise(resolve => resolve(fakeAccount))
     }
   }
+  return new ActivateAccountStub()
+}
 
+const makeSut = (): SutTypes => {
   const emailValidatorStub = makeEmailValidatorStub()
-  const activateAccountStub = new ActivateAccountStub()
+  const activateAccountStub = makeActivateAccountStub()
   const sut = new ActivateAccountController(emailValidatorStub, activateAccountStub)
 
   return {
