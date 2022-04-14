@@ -1,4 +1,4 @@
-import { MissingParamError } from '../../errors'
+import { InvalidParamError, MissingParamError } from '../../errors'
 import { badRequest } from '../../helpers/http-helper'
 import { Controller, HttpRequest, HttpResponse } from '../../protocols'
 
@@ -12,5 +12,7 @@ export class ActivateAccountController implements Controller {
     if (!code) {
       return badRequest(new MissingParamError('confirmation code'))
     }
+
+    return badRequest(new InvalidParamError('email'))
   }
 }
