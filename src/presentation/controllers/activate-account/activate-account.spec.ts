@@ -1,4 +1,4 @@
-import { MissingParamError } from '../../errors'
+import { InvalidParamError, MissingParamError } from '../../errors'
 import { appError } from '../../helpers/error-helper'
 import { ActivateAccountController } from './activate-account'
 
@@ -33,5 +33,20 @@ describe('ActivateAccount Controller', () => {
 
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(appError(new MissingParamError('confirmation code')))
+  })
+
+  it('Should return 400 if provided email is invalid', async () => {
+    const sut = makeSut()
+    const httpRequest = {
+      body: {
+        email: 'invalid_email@email.com',
+        code: 'any_code'
+      }
+    }
+
+    const httpResponse = await sut.handle(httpRequest)
+
+    expect(httpResponse.statusCode).toBe(400)
+    expect(httpResponse.body).toEqual(appError(new InvalidParamError('email')))
   })
 })
