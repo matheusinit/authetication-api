@@ -1,3 +1,4 @@
+import { AccountIsActiveError } from '../../../data/errors/account-is-active-error'
 import { EmailNotRegisteredError } from '../../../data/errors/email-not-registered-error'
 import { ActivateAccount } from '../../../domain/usecases/activate-account'
 import { InvalidParamError, MissingParamError } from '../../errors'
@@ -37,6 +38,8 @@ export class ActivateAccountController implements Controller {
     } catch (error) {
       if (error instanceof EmailNotRegisteredError) {
         return notFound(error)
+      } else if (error instanceof AccountIsActiveError) {
+        return badRequest(error)
       }
 
       return serverError()
