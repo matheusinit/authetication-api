@@ -1,3 +1,4 @@
+import { ActivateAccount } from '../../../domain/usecases/activate-account'
 import { InvalidParamError, MissingParamError } from '../../errors'
 import { badRequest, serverError } from '../../helpers/http-helper'
 import { Controller, HttpRequest, HttpResponse } from '../../protocols'
@@ -5,9 +6,11 @@ import { EmailValidator } from '../signup/signup-protocols'
 
 export class ActivateAccountController implements Controller {
   private readonly emailValidator: EmailValidator
+  private readonly activateAccount: ActivateAccount
 
-  constructor (emailValidator: EmailValidator) {
+  constructor (emailValidator: EmailValidator, activateAccount: ActivateAccount) {
     this.emailValidator = emailValidator
+    this.activateAccount = activateAccount
   }
 
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
@@ -26,6 +29,8 @@ export class ActivateAccountController implements Controller {
       if (!isValid) {
         return badRequest(new InvalidParamError('email'))
       }
+
+      await this.activateAccount.activate({ email, confirmationCode: code })
 
       return null
     } catch (error) {
