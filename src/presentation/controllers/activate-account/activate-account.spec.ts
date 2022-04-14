@@ -1,11 +1,13 @@
+import { AccountInfo, ActivateAccount } from '../../../domain/usecases/activate-account'
 import { InvalidParamError, MissingParamError, ServerError } from '../../errors'
 import { appError } from '../../helpers/error-helper'
-import { EmailValidator } from '../signup/signup-protocols'
+import { AccountModel, EmailValidator } from '../signup/signup-protocols'
 import { ActivateAccountController } from './activate-account'
 
 interface SutTypes {
   sut: ActivateAccountController
   emailValidatorStub: EmailValidator
+  activateAccountStub: ActivateAccount
 }
 
 const makeEmailValidatorStub = (): EmailValidator => {
@@ -18,12 +20,28 @@ const makeEmailValidatorStub = (): EmailValidator => {
 }
 
 const makeSut = (): SutTypes => {
+  class ActivateAccountStub implements ActivateAccount {
+    async activate (accountInfo: AccountInfo): Promise<AccountModel> {
+      const fakeAccount = {
+        id: 'valid_id',
+        username: 'valid_username',
+        email: 'valid_email@email.com',
+        password: 'valid_password',
+        status: 'inactive'
+      }
+
+      return await new Promise(resolve => resolve(fakeAccount))
+    }
+  }
+
   const emailValidatorStub = makeEmailValidatorStub()
-  const sut = new ActivateAccountController(emailValidatorStub)
+  const activateAccountStub = new ActivateAccountStub()
+  const sut = new ActivateAccountController(emailValidatorStub, activateAccountStub)
 
   return {
     sut,
-    emailValidatorStub
+    emailValidatorStub,
+    activateAccountStub
   }
 }
 
@@ -103,5 +121,23 @@ describe('ActivateAccount Controller', () => {
 
     expect(httpResponse.statusCode).toBe(500)
     expect(httpResponse.body).toEqual(appError(new ServerError()))
+  })
+
+  it('Should call DbActivateAccount with correct values', async () => {
+    const { sut, activateAccountStub } = makeSut()
+    const activateSpy = jest.spyOn(activateAccountStub, 'activate')
+    const httpRequest = {
+      body: {
+        email: 'any_email@email.com',
+        code: 'any_code'
+      }
+    }
+
+    await sut.handle(httpRequest)
+
+    expect(activateSpy).toHaveBeenCalledWith({
+      email: 'any_email@email.com',
+      confirmationCode: 'any_code'
+    })
   })
 })
