@@ -116,5 +116,31 @@ describe('ConfirmationCode Routes', () => {
         code: '765D6E85'
       }).expect(200)
     })
+
+    it('Should return 404 if email is not registered', async () => {
+      const fakeAccount = {
+        username: 'Matheus Oliveira',
+        email: 'matheus.oliveira@gmail.com',
+        password: await bcrypt.hash('senha123', 12),
+        status: 'inactive'
+      }
+      const { insertedId: id } = await accountCollection.insertOne(fakeAccount)
+
+      const fakeConfirmationCode = {
+        code: '765D6E85',
+        createdAt: new Date()
+      }
+
+      const { insertedId: codeId } = await confirmationCodeCollection.insertOne(fakeConfirmationCode)
+
+      await accountCollection.findOneAndUpdate({ email: 'matheus.oliveira@gmail.com' }, { $set: { code_id: codeId } })
+
+      const token = jwt.sign({ id, email: 'matheus.oliveira@gmail.com' }, env.secret)
+
+      await request(app).post('/api/account/activate').set('Authorization', `Bearer: ${token}`).send({
+        email: 'matheus.oliveira1@gmail.com',
+        code: '765D6E85'
+      }).expect(404)
+    })
   })
 })
