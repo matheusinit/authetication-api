@@ -212,5 +212,35 @@ describe('ConfirmationCode Routes', () => {
         code: '765D6E85'
       }).expect(404)
     })
+
+    it('Should return 400 if confirmation code has passed of its lifetime', async () => {
+      const fakeAccount = {
+        username: 'Matheus Oliveira',
+        email: 'matheus.oliveira@gmail.com',
+        password: await bcrypt.hash('senha123', 12),
+        status: 'inactive'
+      }
+      const { insertedId: id } = await accountCollection.insertOne(fakeAccount)
+
+      const confirmationCodeCreatedAt = new Date()
+      confirmationCodeCreatedAt.setHours(confirmationCodeCreatedAt.getHours() - 6)
+      confirmationCodeCreatedAt.setMinutes(confirmationCodeCreatedAt.getMinutes() - 1)
+
+      const fakeConfirmationCode = {
+        code: '765D6E85',
+        createdAt: confirmationCodeCreatedAt
+      }
+
+      const { insertedId: codeId } = await confirmationCodeCollection.insertOne(fakeConfirmationCode)
+
+      await accountCollection.findOneAndUpdate({ email: 'matheus.oliveira@gmail.com' }, { $set: { code_id: codeId } })
+
+      const token = jwt.sign({ id, email: 'matheus.oliveira@gmail.com' }, env.secret)
+
+      await request(app).post('/api/account/activate').set('Authorization', `Bearer: ${token}`).send({
+        email: 'matheus.oliveira@gmail.com',
+        code: '765D6E85'
+      }).expect(400)
+    })
   })
 })
