@@ -125,6 +125,14 @@ describe('ConfirmationCode Routes', () => {
       }).expect(400)
     })
 
+    it('Should return 400 if confirmation code is not provided', async () => {
+      const token = jwt.sign({ id: '6258ca0f7a2ba94a00fa0e0c', email: 'matheus.oliveira@gmail.com' }, env.secret)
+
+      await request(app).post('/api/account/activate').set('Authorization', `Bearer: ${token}`).send({
+        email: 'matheus.oliveira@gmail.com'
+      }).expect(400)
+    })
+
     it('Should return 404 if email is not registered', async () => {
       const fakeAccount = {
         username: 'Matheus Oliveira',
