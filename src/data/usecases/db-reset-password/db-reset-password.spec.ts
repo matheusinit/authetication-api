@@ -46,7 +46,7 @@ describe('DbResetPassword Usecase', () => {
     const { sut, loadAccountByEmailRepositoryStub } = makeSut()
     jest.spyOn(loadAccountByEmailRepositoryStub, 'loadByEmail').mockReturnValueOnce(new Promise(resolve => resolve(null)))
 
-    const promise = sut.reset('any_email@email.com', 'any_password')
+    const promise = sut.reset('email_not_registered@email.com', 'any_password')
 
     await expect(promise).rejects.toThrow()
   })
