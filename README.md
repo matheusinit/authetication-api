@@ -13,7 +13,7 @@
  - [x] Autenticação
  - [ ] Recuperação de senha
  - [x] Enviar código de confirmação
- - [ ] Ativar conta
+ - [x] Ativar conta
  - [ ] Editar informações do usuário
 
 Para mais detalhes de requisitos e regras de negócio, veja a [documentação](documentation/README.md).
