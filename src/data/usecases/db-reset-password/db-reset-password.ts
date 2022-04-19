@@ -1,4 +1,5 @@
 import { ResetPassword } from '../../../domain/usecases/reset-password'
+import { EmailNotRegisteredError } from '../../errors/email-not-registered-error'
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
 import { AccountModel } from '../db-add-account/db-add-account-protocols'
 
@@ -10,7 +11,11 @@ export class DbResetPassword implements ResetPassword {
   }
 
   async reset (email: string, password: string): Promise<AccountModel> {
-    await this.loadAccountByEmailRepository.loadByEmail(email)
+    const isEmailRegistered = await this.loadAccountByEmailRepository.loadByEmail(email)
+
+    if (!isEmailRegistered) {
+      throw new EmailNotRegisteredError()
+    }
 
     return null
   }
