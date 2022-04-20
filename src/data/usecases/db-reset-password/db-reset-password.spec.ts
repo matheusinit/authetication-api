@@ -112,6 +112,15 @@ describe('DbResetPassword Usecase', () => {
     expect(encryptSpy).toHaveBeenCalledWith('any_password')
   })
 
+  it('Should throw if Encrypter throws', async () => {
+    const { sut, encrypterStub } = makeSut()
+    jest.spyOn(encrypterStub, 'encrypt').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+
+    const promise = sut.reset('any_email@email.com', 'any_password')
+
+    await expect(promise).rejects.toThrow()
+  })
+
   it('Should call UpdateAccountRepository with correct values', async () => {
     const { sut, updateAccountRepositoryStub } = makeSut()
     const updateSpy = jest.spyOn(updateAccountRepositoryStub, 'update')
