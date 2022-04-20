@@ -18,7 +18,7 @@ const makeLoadAccountByEmailRepositoryStub = (): LoadAccountByEmailRepository =>
         username: 'any_username',
         email: 'any_email',
         password: 'hashed_password',
-        status: 'any_status'
+        status: 'active'
       }
     }
   }
@@ -33,8 +33,7 @@ const makeSut = (): SutTypes => {
         username: 'any_username',
         email: 'any_email',
         password: 'new_hashed_password',
-        status: 'any_status'
-
+        status: 'active'
       }
     }
   }
@@ -137,5 +136,19 @@ describe('DbResetPassword Usecase', () => {
     const promise = sut.reset('any_email@email.com', 'any_password')
 
     await expect(promise).rejects.toThrow()
+  })
+
+  it('Should return updated account on success', async () => {
+    const { sut } = makeSut()
+
+    const account = await sut.reset('any_email@email.com', 'any_password')
+
+    expect(account).toEqual({
+      id: 'any_id',
+      username: 'any_username',
+      email: 'any_email',
+      password: 'new_hashed_password',
+      status: 'active'
+    })
   })
 })
