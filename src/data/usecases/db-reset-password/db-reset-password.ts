@@ -32,8 +32,8 @@ export class DbResetPassword implements ResetPassword {
 
     const newPassword = await this.encrypter.encrypt(password)
 
-    await this.updateAccountRepository.update(account.id, { password: newPassword })
+    const updatedAccount = await this.updateAccountRepository.update(account.id, { password: newPassword })
 
-    return null
+    return updatedAccount
   }
 }
