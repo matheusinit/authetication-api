@@ -59,4 +59,21 @@ describe('DbResetPassword Usecase', () => {
 
     await expect(promise).rejects.toThrow()
   })
+
+  it('Should throw an error if account is inactive', async () => {
+    const { sut, loadAccountByEmailRepositoryStub } = makeSut()
+    jest.spyOn(loadAccountByEmailRepositoryStub, 'loadByEmail').mockReturnValueOnce(new Promise(resolve => {
+      return resolve({
+        id: 'any_id',
+        username: 'any_username',
+        email: 'any_email',
+        password: 'hashed_password',
+        status: 'inactive'
+      })
+    }))
+
+    const promise = sut.reset('any_email@email.com', 'any_password')
+
+    await expect(promise).rejects.toThrow()
+  })
 })
