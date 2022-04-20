@@ -1,5 +1,5 @@
 import { SendConfirmationCode } from '../../../domain/usecases/send-confirmation-code'
-import { AccountIsActiveError } from '../../errors/account-is-active-error'
+import { AccountError } from '../../errors/account-error'
 import { EmailNotRegisteredError } from '../../errors/email-not-registered-error'
 import { CheckEmailRepository } from '../../protocols/check-email-repository'
 import { CodeGenerator } from '../../protocols/code-generator'
@@ -38,7 +38,7 @@ export class DbSendConfirmationCode implements SendConfirmationCode {
     const account = await this.loadAccountByEmailRepository.loadByEmail(email)
 
     if (account.status === 'active') {
-      throw new AccountIsActiveError()
+      throw new AccountError('Account is already active', 'AccountIsActiveError')
     }
 
     const confirmationCode = this.codeGenerator.generateCode()

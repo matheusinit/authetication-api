@@ -1,4 +1,4 @@
-import { AccountIsActiveError } from '../../../data/errors/account-is-active-error'
+import { AccountError } from '../../../data/errors/account-error'
 import { ConfirmationCodeNotFoundError } from '../../../data/errors/confirmation-code-not-found-error'
 import { EmailNotRegisteredError } from '../../../data/errors/email-not-registered-error'
 import { InvalidConfirmationCodeError } from '../../../data/errors/invalid-confirmation-code-error'
@@ -166,7 +166,7 @@ describe('ActivateAccount Controller', () => {
 
   it('Should return 400 if account is already active', async () => {
     const { sut, activateAccountStub } = makeSut()
-    jest.spyOn(activateAccountStub, 'activate').mockReturnValueOnce(new Promise((resolve, reject) => reject(new AccountIsActiveError())))
+    jest.spyOn(activateAccountStub, 'activate').mockReturnValueOnce(new Promise((resolve, reject) => reject(new AccountError('Account is already active', 'AccountIsActiveError'))))
     const httpRequest = {
       body: {
         email: 'any_email@email.com',
@@ -177,7 +177,7 @@ describe('ActivateAccount Controller', () => {
     const httpResponse = await sut.handle(httpRequest)
 
     expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual(appError(new AccountIsActiveError()))
+    expect(httpResponse.body).toEqual(appError(new AccountError('Account is already active', 'AccountIsActiveError')))
   })
 
   it('Should return 404 if confirmation code is not found', async () => {

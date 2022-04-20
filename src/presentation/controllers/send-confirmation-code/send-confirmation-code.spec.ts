@@ -1,4 +1,4 @@
-import { AccountIsActiveError } from '../../../data/errors/account-is-active-error'
+import { AccountError } from '../../../data/errors/account-error'
 import { EmailNotRegisteredError } from '../../../data/errors/email-not-registered-error'
 import { SendConfirmationCode } from '../../../domain/usecases/send-confirmation-code'
 import { InvalidParamError, MissingParamError, ServerError } from '../../errors'
@@ -95,7 +95,7 @@ describe('SendConfirmationCode Controller', () => {
 
   it('Should return 400 if account is already active', async () => {
     const { sut, sendConfirmationCodeStub } = makeSut()
-    jest.spyOn(sendConfirmationCodeStub, 'send').mockReturnValueOnce(new Promise((resolve, reject) => reject(new AccountIsActiveError())))
+    jest.spyOn(sendConfirmationCodeStub, 'send').mockReturnValueOnce(new Promise((resolve, reject) => reject(new AccountError('Account is already active', 'AccountIsActiveError'))))
     const httpRequest = {
       body: {
         email: 'any_email@mail.com'
@@ -103,7 +103,7 @@ describe('SendConfirmationCode Controller', () => {
     }
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual(appError(new AccountIsActiveError()))
+    expect(httpResponse.body).toEqual(appError(new AccountError('Account is already active', 'AccountIsActiveError')))
   })
 
   it('Should return 500 if SendConfirmationCode throws', async () => {

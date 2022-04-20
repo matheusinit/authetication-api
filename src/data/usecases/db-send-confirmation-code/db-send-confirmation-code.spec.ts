@@ -3,7 +3,7 @@ import { CheckEmailRepository } from '../../protocols/check-email-repository'
 import { DbSendConfirmationCode } from './db-send-confirmation-code'
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
 import { AccountModel } from '../db-add-account/db-add-account-protocols'
-import { AccountIsActiveError } from '../../errors/account-is-active-error'
+import { AccountError } from '../../errors/account-error'
 import { CodeGenerator } from '../../protocols/code-generator'
 import { StoreConfirmationCodeRepository } from '../../protocols/store-confirmation-code-repository'
 import { EmailContent, EmailSender } from '../../protocols/email-sender'
@@ -132,7 +132,7 @@ describe('DbSendConfirmationCode', () => {
       })
     }))
     const promise = sut.send('any_email@mail.com')
-    await expect(promise).rejects.toThrow(new AccountIsActiveError())
+    await expect(promise).rejects.toThrow(new AccountError('Account is already active', 'AccountIsActiveError'))
   })
 
   it('Should call CodeGenerator', async () => {

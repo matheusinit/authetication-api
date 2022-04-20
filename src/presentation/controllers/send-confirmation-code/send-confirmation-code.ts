@@ -1,4 +1,4 @@
-import { AccountIsActiveError } from '../../../data/errors/account-is-active-error'
+import { AccountError } from '../../../data/errors/account-error'
 import { EmailNotRegisteredError } from '../../../data/errors/email-not-registered-error'
 import { SendConfirmationCode } from '../../../domain/usecases/send-confirmation-code'
 import { InvalidParamError, MissingParamError } from '../../errors'
@@ -35,7 +35,7 @@ export class SendConfirmationCodeController implements Controller {
     } catch (error) {
       if (error instanceof EmailNotRegisteredError) {
         return badRequest(error)
-      } else if (error instanceof AccountIsActiveError) {
+      } else if (error instanceof AccountError) {
         return badRequest(error)
       }
 

@@ -1,4 +1,4 @@
-import { AccountIsActiveError } from '../../../data/errors/account-is-active-error'
+import { AccountError } from '../../../data/errors/account-error'
 import { ConfirmationCodeNotFoundError } from '../../../data/errors/confirmation-code-not-found-error'
 import { EmailNotRegisteredError } from '../../../data/errors/email-not-registered-error'
 import { InvalidConfirmationCodeError } from '../../../data/errors/invalid-confirmation-code-error'
@@ -40,7 +40,7 @@ export class ActivateAccountController implements Controller {
     } catch (error) {
       if (error instanceof EmailNotRegisteredError) {
         return notFound(error)
-      } else if (error instanceof AccountIsActiveError) {
+      } else if (error instanceof AccountError) {
         return badRequest(error)
       } else if (error instanceof ConfirmationCodeNotFoundError) {
         return notFound(error)

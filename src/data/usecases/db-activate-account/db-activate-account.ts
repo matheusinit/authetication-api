@@ -1,5 +1,5 @@
 import { AccountInfo, ActivateAccount } from '../../../domain/usecases/activate-account'
-import { AccountIsActiveError } from '../../errors/account-is-active-error'
+import { AccountError } from '../../errors/account-error'
 import { ConfirmationCodeNotFoundError } from '../../errors/confirmation-code-not-found-error'
 import { EmailNotRegisteredError } from '../../errors/email-not-registered-error'
 import { InvalidConfirmationCodeError } from '../../errors/invalid-confirmation-code-error'
@@ -31,7 +31,7 @@ export class DbActivateAccount implements ActivateAccount {
     }
 
     if (account.status === 'active') {
-      throw new AccountIsActiveError()
+      throw new AccountError('Account is already active', 'AccountIsActiveError')
     }
 
     const confirmationCode = await this.loadConfirmationCodeByEmailRepository.loadByEmail(accountInfo.email)
