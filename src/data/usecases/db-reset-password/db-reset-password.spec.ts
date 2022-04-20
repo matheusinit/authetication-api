@@ -25,7 +25,7 @@ const makeLoadAccountByEmailRepositoryStub = (): LoadAccountByEmailRepository =>
   return new LoadAccountByEmailRepositoryStub()
 }
 
-const makeSut = (): SutTypes => {
+const makeUpdateAccountRepositoryStub = (): UpdateAccountRepository => {
   class UpdateAccountRepositoryStub implements UpdateAccountRepository {
     async update (id: string, update: any): Promise<AccountModel> {
       return {
@@ -38,6 +38,10 @@ const makeSut = (): SutTypes => {
     }
   }
 
+  return new UpdateAccountRepositoryStub()
+}
+
+const makeSut = (): SutTypes => {
   class EncrypterStub implements Encrypter {
     async encrypt (value: string): Promise<string> {
       return 'new_hashed_password'
@@ -45,7 +49,7 @@ const makeSut = (): SutTypes => {
   }
 
   const encrypterStub = new EncrypterStub()
-  const updateAccountRepositoryStub = new UpdateAccountRepositoryStub()
+  const updateAccountRepositoryStub = makeUpdateAccountRepositoryStub()
   const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepositoryStub()
   const sut = new DbResetPassword(loadAccountByEmailRepositoryStub, updateAccountRepositoryStub, encrypterStub)
 
