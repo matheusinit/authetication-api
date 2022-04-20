@@ -5,7 +5,7 @@ import { HttpRequest, HttpResponse } from '../../protocols/http'
 
 export class ResetPasswordController implements Controller {
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
-    const { email, password } = httpRequest.body
+    const { email, password, passwordConfirmation } = httpRequest.body
 
     if (!email) {
       return badRequest(new MissingParamError('email'))
@@ -13,6 +13,10 @@ export class ResetPasswordController implements Controller {
 
     if (!password) {
       return badRequest(new MissingParamError('password'))
+    }
+
+    if (!passwordConfirmation) {
+      return badRequest(new MissingParamError('passwordConfirmation'))
     }
   }
 }
