@@ -17,4 +17,19 @@ describe('ResetPassword Controller', () => {
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(appError(new MissingParamError('email')))
   })
+
+  it('Should return 400 if no password is provided', async () => {
+    const sut = new ResetPasswordController()
+    const httpRequest = {
+      body: {
+        email: 'any_email@email.com',
+        passwordConfirmation: 'any_password'
+      }
+    }
+
+    const httpResponse = await sut.handle(httpRequest)
+
+    expect(httpResponse.statusCode).toBe(400)
+    expect(httpResponse.body).toEqual(appError(new MissingParamError('password')))
+  })
 })
