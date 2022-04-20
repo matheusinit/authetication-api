@@ -1,12 +1,13 @@
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
 import { UpdateAccountRepository } from '../../protocols/update-account-repository'
-import { AccountModel } from '../db-add-account/db-add-account-protocols'
+import { AccountModel, Encrypter } from '../db-add-account/db-add-account-protocols'
 import { DbResetPassword } from './db-reset-password'
 
 interface SutTypes {
   sut: DbResetPassword
   loadAccountByEmailRepositoryStub: LoadAccountByEmailRepository
   updateAccountRepositoryStub: UpdateAccountRepository
+  encrypterStub: Encrypter
 }
 
 const makeLoadAccountByEmailRepositoryStub = (): LoadAccountByEmailRepository => {
@@ -37,14 +38,23 @@ const makeSut = (): SutTypes => {
       }
     }
   }
+
+  class EncrypterStub implements Encrypter {
+    async encrypt (value: string): Promise<string> {
+      return 'new_hashed_password'
+    }
+  }
+
+  const encrypterStub = new EncrypterStub()
   const updateAccountRepositoryStub = new UpdateAccountRepositoryStub()
   const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepositoryStub()
-  const sut = new DbResetPassword(loadAccountByEmailRepositoryStub, updateAccountRepositoryStub)
+  const sut = new DbResetPassword(loadAccountByEmailRepositoryStub, updateAccountRepositoryStub, encrypterStub)
 
   return {
     sut,
     loadAccountByEmailRepositoryStub,
-    updateAccountRepositoryStub
+    updateAccountRepositoryStub,
+    encrypterStub
   }
 }
 
@@ -91,6 +101,15 @@ describe('DbResetPassword Usecase', () => {
     const promise = sut.reset('any_email@email.com', 'any_password')
 
     await expect(promise).rejects.toThrow()
+  })
+
+  it('Should call Encrypter with correct password', async () => {
+    const { sut, encrypterStub } = makeSut()
+    const encryptSpy = jest.spyOn(encrypterStub, 'encrypt')
+
+    await sut.reset('any_email@email.com', 'any_password')
+
+    expect(encryptSpy).toHaveBeenCalledWith('any_password')
   })
 
   it('Should call UpdateAccountRepository with correct values', async () => {
