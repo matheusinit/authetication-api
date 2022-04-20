@@ -1,10 +1,12 @@
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
+import { UpdateAccountRepository } from '../../protocols/update-account-repository'
 import { AccountModel } from '../db-add-account/db-add-account-protocols'
 import { DbResetPassword } from './db-reset-password'
 
 interface SutTypes {
   sut: DbResetPassword
   loadAccountByEmailRepositoryStub: LoadAccountByEmailRepository
+  updateAccountRepositoryStub: UpdateAccountRepository
 }
 
 const makeLoadAccountByEmailRepositoryStub = (): LoadAccountByEmailRepository => {
@@ -23,12 +25,26 @@ const makeLoadAccountByEmailRepositoryStub = (): LoadAccountByEmailRepository =>
 }
 
 const makeSut = (): SutTypes => {
+  class UpdateAccountRepositoryStub implements UpdateAccountRepository {
+    async update (id: string, update: any): Promise<AccountModel> {
+      return {
+        id: 'any_id',
+        username: 'any_username',
+        email: 'any_email',
+        password: 'new_hashed_password',
+        status: 'any_status'
+
+      }
+    }
+  }
+  const updateAccountRepositoryStub = new UpdateAccountRepositoryStub()
   const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepositoryStub()
-  const sut = new DbResetPassword(loadAccountByEmailRepositoryStub)
+  const sut = new DbResetPassword(loadAccountByEmailRepositoryStub, updateAccountRepositoryStub)
 
   return {
     sut,
-    loadAccountByEmailRepositoryStub
+    loadAccountByEmailRepositoryStub,
+    updateAccountRepositoryStub
   }
 }
 
@@ -75,5 +91,14 @@ describe('DbResetPassword Usecase', () => {
     const promise = sut.reset('any_email@email.com', 'any_password')
 
     await expect(promise).rejects.toThrow()
+  })
+
+  it('Should call UpdateAccountRepository with correct values', async () => {
+    const { sut, updateAccountRepositoryStub } = makeSut()
+    const updateSpy = jest.spyOn(updateAccountRepositoryStub, 'update')
+
+    await sut.reset('any_email@email.com', 'any_password')
+
+    expect(updateSpy).toHaveBeenCalledWith('any_id', { password: 'new_hashed_password' })
   })
 })
