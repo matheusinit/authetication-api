@@ -2,6 +2,8 @@ import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-em
 import { UpdateAccountRepository } from '../../protocols/update-account-repository'
 import { AccountModel, Encrypter } from '../db-add-account/db-add-account-protocols'
 import { DbResetPassword } from './db-reset-password'
+import { AccountError } from '../../errors/account-error'
+import { EmailNotRegisteredError } from '../../errors/email-not-registered-error'
 
 interface SutTypes {
   sut: DbResetPassword
@@ -81,7 +83,7 @@ describe('DbResetPassword Usecase', () => {
 
     const promise = sut.reset('email_not_registered@email.com', 'any_password')
 
-    await expect(promise).rejects.toThrow()
+    await expect(promise).rejects.toThrow(new EmailNotRegisteredError())
   })
 
   it('Should throw if LoadAccountByEmailRepository throws', async () => {
@@ -107,7 +109,7 @@ describe('DbResetPassword Usecase', () => {
 
     const promise = sut.reset('any_email@email.com', 'any_password')
 
-    await expect(promise).rejects.toThrow()
+    await expect(promise).rejects.toThrow(new AccountError('Account is inactive', 'AccountIsInactiveError'))
   })
 
   it('Should call Encrypter with correct password', async () => {
