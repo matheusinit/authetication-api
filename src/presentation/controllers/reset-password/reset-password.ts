@@ -1,4 +1,4 @@
-import { MissingParamError } from '../../errors'
+import { MissingParamError, InvalidParamError } from '../../errors'
 import { badRequest } from '../../helpers/http-helper'
 import { Controller } from '../../protocols/controller'
 import { HttpRequest, HttpResponse } from '../../protocols/http'
@@ -17,6 +17,10 @@ export class ResetPasswordController implements Controller {
 
     if (!passwordConfirmation) {
       return badRequest(new MissingParamError('passwordConfirmation'))
+    }
+
+    if (password !== passwordConfirmation) {
+      return badRequest(new InvalidParamError('passwordConfirmation'))
     }
   }
 }
