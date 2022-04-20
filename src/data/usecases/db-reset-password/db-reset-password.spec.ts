@@ -101,4 +101,13 @@ describe('DbResetPassword Usecase', () => {
 
     expect(updateSpy).toHaveBeenCalledWith('any_id', { password: 'new_hashed_password' })
   })
+
+  it('Should throw if UpdateAccountRepository throws', async () => {
+    const { sut, updateAccountRepositoryStub } = makeSut()
+    jest.spyOn(updateAccountRepositoryStub, 'update').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+
+    const promise = sut.reset('any_email@email.com', 'any_password')
+
+    await expect(promise).rejects.toThrow()
+  })
 })
