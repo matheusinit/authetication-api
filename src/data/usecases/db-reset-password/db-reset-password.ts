@@ -1,4 +1,5 @@
 import { ResetPassword } from '../../../domain/usecases/reset-password'
+import { AccountError } from '../../errors/account-error'
 import { EmailNotRegisteredError } from '../../errors/email-not-registered-error'
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
 import { UpdateAccountRepository } from '../../protocols/update-account-repository'
@@ -27,7 +28,7 @@ export class DbResetPassword implements ResetPassword {
     }
 
     if (account.status === 'inactive') {
-      throw new Error('Account is inactive')
+      throw new AccountError('Account is inactive', 'AccountIsInactiveError')
     }
 
     const newPassword = await this.encrypter.encrypt(password)
