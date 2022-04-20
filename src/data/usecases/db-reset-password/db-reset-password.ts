@@ -11,10 +11,14 @@ export class DbResetPassword implements ResetPassword {
   }
 
   async reset (email: string, password: string): Promise<AccountModel> {
-    const isEmailRegistered = await this.loadAccountByEmailRepository.loadByEmail(email)
+    const account = await this.loadAccountByEmailRepository.loadByEmail(email)
 
-    if (!isEmailRegistered) {
+    if (!account) {
       throw new EmailNotRegisteredError()
+    }
+
+    if (account.status === 'inactive') {
+      throw new Error('Account is inactive')
     }
 
     return null
