@@ -30,9 +30,9 @@ export class DbResetPassword implements ResetPassword {
       throw new Error('Account is inactive')
     }
 
-    await this.encrypter.encrypt(password)
+    const newPassword = await this.encrypter.encrypt(password)
 
-    await this.updateAccountRepository.update(account.id, { password: 'new_hashed_password' })
+    await this.updateAccountRepository.update(account.id, { password: newPassword })
 
     return null
   }
