@@ -3,11 +3,13 @@ import { MissingParamError } from '../../errors/missing-param-error'
 import { appError } from '../../helpers/error-helper'
 import { ResetPasswordController } from './reset-password'
 import { EmailValidator } from '../../protocols/email-validator'
+import { PasswordValidator } from '../../protocols/password-validator'
 import { InvalidPasswordError } from '../../errors/invalid-password-error'
 
 interface SutTypes {
   sut: ResetPasswordController
   emailValidatorStub: EmailValidator
+  passwordValidatorStub: PasswordValidator
 }
 
 const makeEmailValidatorStub = (): EmailValidator => {
@@ -20,12 +22,20 @@ const makeEmailValidatorStub = (): EmailValidator => {
 }
 
 const makeSut = (): SutTypes => {
+  class PasswordValidatorStub implements PasswordValidator {
+    isValid (password: string): boolean {
+      return true
+    }
+  }
+
+  const passwordValidatorStub = new PasswordValidatorStub()
   const emailValidatorStub = makeEmailValidatorStub()
-  const sut = new ResetPasswordController(emailValidatorStub)
+  const sut = new ResetPasswordController(emailValidatorStub, passwordValidatorStub)
 
   return {
     sut,
-    emailValidatorStub
+    emailValidatorStub,
+    passwordValidatorStub
   }
 }
 
@@ -141,5 +151,21 @@ describe('ResetPassword Controller', () => {
 
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(appError(new InvalidPasswordError()))
+  })
+
+  it('Should call PasswordValidator with correct password', async () => {
+    const { sut, passwordValidatorStub } = makeSut()
+    const isValidSpy = jest.spyOn(passwordValidatorStub, 'isValid')
+    const httpRequest = {
+      body: {
+        email: 'any_email@email.com',
+        password: 'any_password',
+        passwordConfirmation: 'any_password'
+      }
+    }
+
+    await sut.handle(httpRequest)
+
+    expect(isValidSpy).toHaveBeenCalledWith('any_password')
   })
 })
