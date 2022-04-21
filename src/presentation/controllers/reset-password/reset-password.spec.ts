@@ -260,4 +260,26 @@ describe('ResetPassword Controller', () => {
     expect(httpResponse.statusCode).toBe(500)
     expect(httpResponse.body).toEqual(appError(new ServerError()))
   })
+
+  it('Should return an account on success', async () => {
+    const { sut } = makeSut()
+    const httpRequest = {
+      body: {
+        email: 'any_email@email.com',
+        password: 'any_password',
+        passwordConfirmation: 'any_password'
+      }
+    }
+
+    const httpResponse = await sut.handle(httpRequest)
+
+    expect(httpResponse.statusCode).toBe(200)
+    expect(httpResponse.body).toEqual({
+      id: 'any_id',
+      username: 'any_username',
+      email: 'any_email',
+      password: 'hashed_password',
+      status: 'active'
+    })
+  })
 })
