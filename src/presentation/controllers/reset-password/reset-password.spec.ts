@@ -168,4 +168,23 @@ describe('ResetPassword Controller', () => {
 
     expect(isValidSpy).toHaveBeenCalledWith('any_password')
   })
+
+  it('Should return 500 if PasswordValidator throws', async () => {
+    const { sut, passwordValidatorStub } = makeSut()
+    jest.spyOn(passwordValidatorStub, 'isValid').mockImplementationOnce(() => {
+      throw new Error()
+    })
+    const httpRequest = {
+      body: {
+        email: 'any_email@email.com',
+        password: 'any_password',
+        passwordConfirmation: 'any_password'
+      }
+    }
+
+    const httpResponse = await sut.handle(httpRequest)
+
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(appError(new ServerError()))
+  })
 })
