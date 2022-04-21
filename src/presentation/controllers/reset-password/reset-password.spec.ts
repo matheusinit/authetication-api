@@ -243,4 +243,21 @@ describe('ResetPassword Controller', () => {
 
     expect(resetSpy).toHaveBeenCalledWith('any_email@email.com', 'any_password')
   })
+
+  it('Should return 500 if ResetPassword throws', async () => {
+    const { sut, resetPasswordStub } = makeSut()
+    jest.spyOn(resetPasswordStub, 'reset').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+    const httpRequest = {
+      body: {
+        email: 'any_email@email.com',
+        password: 'any_password',
+        passwordConfirmation: 'any_password'
+      }
+    }
+
+    const httpResponse = await sut.handle(httpRequest)
+
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(appError(new ServerError()))
+  })
 })
