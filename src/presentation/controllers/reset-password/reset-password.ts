@@ -1,7 +1,7 @@
 import { ResetPassword } from '../../../domain/usecases/reset-password'
 import { MissingParamError, InvalidParamError } from '../../errors'
 import { InvalidPasswordError } from '../../errors/invalid-password-error'
-import { badRequest, serverError } from '../../helpers/http-helper'
+import { badRequest, serverError, ok } from '../../helpers/http-helper'
 import { Controller } from '../../protocols/controller'
 import { HttpRequest, HttpResponse } from '../../protocols/http'
 import { PasswordValidator } from '../../protocols/password-validator'
@@ -50,7 +50,9 @@ export class ResetPasswordController implements Controller {
         return badRequest(new InvalidPasswordError())
       }
 
-      await this.resetPassword.reset(email, password)
+      const account = await this.resetPassword.reset(email, password)
+
+      return ok(account)
     } catch (error) {
       return serverError()
     }
