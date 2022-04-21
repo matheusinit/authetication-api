@@ -8,6 +8,7 @@ import { InvalidPasswordError } from '../../errors/invalid-password-error'
 import { ResetPassword } from '../../../domain/usecases/reset-password'
 import { AccountModel } from '../signup/signup-protocols'
 import { EmailNotRegisteredError } from '../../../data/errors/email-not-registered-error'
+import { AccountError } from '../../../data/errors/account-error'
 
 interface SutTypes {
   sut: ResetPasswordController
@@ -277,6 +278,23 @@ describe('ResetPassword Controller', () => {
 
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(appError(new EmailNotRegisteredError()))
+  })
+
+  it('Should return 400 if account is inactive', async () => {
+    const { sut, resetPasswordStub } = makeSut()
+    jest.spyOn(resetPasswordStub, 'reset').mockReturnValueOnce(new Promise((resolve, reject) => reject(new AccountError('Account is inactive', 'AccountIsInactiveError'))))
+    const httpRequest = {
+      body: {
+        email: 'any_email@email.com',
+        password: 'any_password',
+        passwordConfirmation: 'any_password'
+      }
+    }
+
+    const httpResponse = await sut.handle(httpRequest)
+
+    expect(httpResponse.statusCode).toBe(400)
+    expect(httpResponse.body).toEqual(appError(new AccountError('Account is inactive', 'AccountIsInactiveError')))
   })
 
   it('Should return an account on success', async () => {
