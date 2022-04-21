@@ -2,8 +2,15 @@ import { MissingParamError, InvalidParamError } from '../../errors'
 import { badRequest } from '../../helpers/http-helper'
 import { Controller } from '../../protocols/controller'
 import { HttpRequest, HttpResponse } from '../../protocols/http'
+import { EmailValidator } from '../signup/signup-protocols'
 
 export class ResetPasswordController implements Controller {
+  private readonly emailValidator: EmailValidator
+
+  constructor (emailValidator: EmailValidator) {
+    this.emailValidator = emailValidator
+  }
+
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
     const { email, password, passwordConfirmation } = httpRequest.body
 
@@ -22,5 +29,7 @@ export class ResetPasswordController implements Controller {
     if (password !== passwordConfirmation) {
       return badRequest(new InvalidParamError('passwordConfirmation'))
     }
+
+    this.emailValidator.isValid(email)
   }
 }
