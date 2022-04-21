@@ -1,5 +1,5 @@
 import { MissingParamError, InvalidParamError } from '../../errors'
-import { badRequest } from '../../helpers/http-helper'
+import { badRequest, serverError } from '../../helpers/http-helper'
 import { Controller } from '../../protocols/controller'
 import { HttpRequest, HttpResponse } from '../../protocols/http'
 import { EmailValidator } from '../signup/signup-protocols'
@@ -12,24 +12,28 @@ export class ResetPasswordController implements Controller {
   }
 
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
-    const { email, password, passwordConfirmation } = httpRequest.body
+    try {
+      const { email, password, passwordConfirmation } = httpRequest.body
 
-    if (!email) {
-      return badRequest(new MissingParamError('email'))
+      if (!email) {
+        return badRequest(new MissingParamError('email'))
+      }
+
+      if (!password) {
+        return badRequest(new MissingParamError('password'))
+      }
+
+      if (!passwordConfirmation) {
+        return badRequest(new MissingParamError('passwordConfirmation'))
+      }
+
+      if (password !== passwordConfirmation) {
+        return badRequest(new InvalidParamError('passwordConfirmation'))
+      }
+
+      this.emailValidator.isValid(email)
+    } catch (error) {
+      return serverError()
     }
-
-    if (!password) {
-      return badRequest(new MissingParamError('password'))
-    }
-
-    if (!passwordConfirmation) {
-      return badRequest(new MissingParamError('passwordConfirmation'))
-    }
-
-    if (password !== passwordConfirmation) {
-      return badRequest(new InvalidParamError('passwordConfirmation'))
-    }
-
-    this.emailValidator.isValid(email)
   }
 }
