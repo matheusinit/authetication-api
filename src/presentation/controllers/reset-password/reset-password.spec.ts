@@ -4,6 +4,7 @@ import { appError } from '../../helpers/error-helper'
 import { ResetPasswordController } from './reset-password'
 import { EmailValidator } from '../../protocols/email-validator'
 import { PasswordValidator } from '../../protocols/password-validator'
+import { InvalidPasswordError } from '../../errors/invalid-password-error'
 
 interface SutTypes {
   sut: ResetPasswordController
@@ -185,5 +186,22 @@ describe('ResetPassword Controller', () => {
 
     expect(httpResponse.statusCode).toBe(500)
     expect(httpResponse.body).toEqual(appError(new ServerError()))
+  })
+
+  it('Should return 400 if PasswordValidator returns false', async () => {
+    const { sut, passwordValidatorStub } = makeSut()
+    jest.spyOn(passwordValidatorStub, 'isValid').mockReturnValueOnce(false)
+    const httpRequest = {
+      body: {
+        email: 'any_email@email.com',
+        password: 'invalid_password',
+        passwordConfirmation: 'invalid_password'
+      }
+    }
+
+    const httpResponse = await sut.handle(httpRequest)
+
+    expect(httpResponse.statusCode).toBe(400)
+    expect(httpResponse.body).toEqual(appError(new InvalidPasswordError()))
   })
 })
