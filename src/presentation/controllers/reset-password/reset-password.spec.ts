@@ -12,6 +12,15 @@ interface SutTypes {
   passwordValidatorStub: PasswordValidator
 }
 
+const makePasswordValidatorStub = (): PasswordValidator => {
+  class PasswordValidatorStub implements PasswordValidator {
+    isValid (password: string): boolean {
+      return true
+    }
+  }
+  return new PasswordValidatorStub()
+}
+
 const makeEmailValidatorStub = (): EmailValidator => {
   class EmailValidatorStub implements EmailValidator {
     isValid (email: string): boolean {
@@ -22,13 +31,7 @@ const makeEmailValidatorStub = (): EmailValidator => {
 }
 
 const makeSut = (): SutTypes => {
-  class PasswordValidatorStub implements PasswordValidator {
-    isValid (password: string): boolean {
-      return true
-    }
-  }
-
-  const passwordValidatorStub = new PasswordValidatorStub()
+  const passwordValidatorStub = makePasswordValidatorStub()
   const emailValidatorStub = makeEmailValidatorStub()
   const sut = new ResetPasswordController(emailValidatorStub, passwordValidatorStub)
 
