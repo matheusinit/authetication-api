@@ -1,3 +1,4 @@
+import { ResetPassword } from '../../../domain/usecases/reset-password'
 import { MissingParamError, InvalidParamError } from '../../errors'
 import { InvalidPasswordError } from '../../errors/invalid-password-error'
 import { badRequest, serverError } from '../../helpers/http-helper'
@@ -9,10 +10,12 @@ import { EmailValidator } from '../signup/signup-protocols'
 export class ResetPasswordController implements Controller {
   private readonly emailValidator: EmailValidator
   private readonly passwordValidator: PasswordValidator
+  private readonly resetPassword: ResetPassword
 
-  constructor (emailValidator: EmailValidator, passwordValidator: PasswordValidator) {
+  constructor (emailValidator: EmailValidator, passwordValidator: PasswordValidator, resetPassword: ResetPassword) {
     this.emailValidator = emailValidator
     this.passwordValidator = passwordValidator
+    this.resetPassword = resetPassword
   }
 
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
@@ -46,6 +49,8 @@ export class ResetPasswordController implements Controller {
       if (!isPasswordValid) {
         return badRequest(new InvalidPasswordError())
       }
+
+      await this.resetPassword.reset(email, password)
     } catch (error) {
       return serverError()
     }
