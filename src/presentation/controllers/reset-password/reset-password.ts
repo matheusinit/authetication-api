@@ -22,16 +22,12 @@ export class ResetPasswordController implements Controller {
     try {
       const { email, password, passwordConfirmation } = httpRequest.body
 
-      if (!email) {
-        return badRequest(new MissingParamError('email'))
-      }
+      const params = ['email', 'password', 'passwordConfirmation']
 
-      if (!password) {
-        return badRequest(new MissingParamError('password'))
-      }
-
-      if (!passwordConfirmation) {
-        return badRequest(new MissingParamError('passwordConfirmation'))
+      for (const param of params) {
+        if (!httpRequest.body[param]) {
+          return badRequest(new MissingParamError(param))
+        }
       }
 
       if (password !== passwordConfirmation) {
