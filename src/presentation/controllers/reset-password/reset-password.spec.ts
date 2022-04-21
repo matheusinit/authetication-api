@@ -15,6 +15,21 @@ interface SutTypes {
   resetPasswordStub: ResetPassword
 }
 
+const makeResetPasswordStub = (): ResetPassword => {
+  class ResetPasswordStub implements ResetPassword {
+    async reset (email: string, password: string): Promise<AccountModel> {
+      return {
+        id: 'any_id',
+        username: 'any_username',
+        email: 'any_email',
+        password: 'hashed_password',
+        status: 'active'
+      }
+    }
+  }
+  return new ResetPasswordStub()
+}
+
 const makePasswordValidatorStub = (): PasswordValidator => {
   class PasswordValidatorStub implements PasswordValidator {
     isValid (password: string): boolean {
@@ -34,19 +49,7 @@ const makeEmailValidatorStub = (): EmailValidator => {
 }
 
 const makeSut = (): SutTypes => {
-  class ResetPasswordStub implements ResetPassword {
-    async reset (email: string, password: string): Promise<AccountModel> {
-      return {
-        id: 'any_id',
-        username: 'any_username',
-        email: 'any_email',
-        password: 'hashed_password',
-        status: 'active'
-      }
-    }
-  }
-
-  const resetPasswordStub = new ResetPasswordStub()
+  const resetPasswordStub = makeResetPasswordStub()
   const passwordValidatorStub = makePasswordValidatorStub()
   const emailValidatorStub = makeEmailValidatorStub()
   const sut = new ResetPasswordController(emailValidatorStub, passwordValidatorStub, resetPasswordStub)
