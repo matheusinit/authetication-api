@@ -14,7 +14,6 @@
  - [ ] Recuperação de senha
  - [x] Enviar código de confirmação
  - [x] Ativar conta
- - [ ] Editar informações do usuário
 
 Para mais detalhes de requisitos e regras de negócio, veja a [documentação](documentation/README.md).
 
@@ -47,6 +46,13 @@ Recomendado utilização de Docker:
  + [Docker-compose](https://www.docker.com/).
 
 Para instalação do Docker: https://docs.docker.com/get-docker/
+
+### Construindo Containers
+
++ Construir containers com Docker-compose
+```bash
+docker-compose up -d
+```
 
 ### Rodando API (passa-a-passo)
 
