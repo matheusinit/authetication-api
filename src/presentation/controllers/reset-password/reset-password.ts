@@ -1,3 +1,4 @@
+import { AccountError } from '../../../data/errors/account-error'
 import { EmailNotRegisteredError } from '../../../data/errors/email-not-registered-error'
 import { ResetPassword } from '../../../domain/usecases/reset-password'
 import { MissingParamError, InvalidParamError } from '../../errors'
@@ -53,6 +54,10 @@ export class ResetPasswordController implements Controller {
     } catch (error) {
       if (error instanceof EmailNotRegisteredError) {
         return badRequest(new EmailNotRegisteredError())
+      }
+
+      if (error instanceof AccountError) {
+        return badRequest(new AccountError('Account is inactive', 'AccountIsInactiveError'))
       }
 
       return serverError()
