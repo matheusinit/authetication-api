@@ -1,5 +1,4 @@
 import { MissingParamError, InvalidParamError } from '../../errors'
-import { InvalidPasswordError } from '../../errors/invalid-password-error'
 import { badRequest, serverError } from '../../helpers/http-helper'
 import { Controller } from '../../protocols/controller'
 import { HttpRequest, HttpResponse } from '../../protocols/http'
@@ -38,7 +37,7 @@ export class ResetPasswordController implements Controller {
       const isEmailValid = this.emailValidator.isValid(email)
 
       if (!isEmailValid) {
-        return badRequest(new InvalidPasswordError())
+        return badRequest(new InvalidParamError('email'))
       }
 
       this.passwordValidator.isValid(password)

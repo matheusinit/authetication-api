@@ -4,7 +4,6 @@ import { appError } from '../../helpers/error-helper'
 import { ResetPasswordController } from './reset-password'
 import { EmailValidator } from '../../protocols/email-validator'
 import { PasswordValidator } from '../../protocols/password-validator'
-import { InvalidPasswordError } from '../../errors/invalid-password-error'
 
 interface SutTypes {
   sut: ResetPasswordController
@@ -150,7 +149,7 @@ describe('ResetPassword Controller', () => {
     const httpResponse = await sut.handle(httpRequest)
 
     expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual(appError(new InvalidPasswordError()))
+    expect(httpResponse.body).toEqual(appError(new InvalidParamError('email')))
   })
 
   it('Should call PasswordValidator with correct password', async () => {
