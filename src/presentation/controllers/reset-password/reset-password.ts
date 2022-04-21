@@ -1,3 +1,4 @@
+import { EmailNotRegisteredError } from '../../../data/errors/email-not-registered-error'
 import { ResetPassword } from '../../../domain/usecases/reset-password'
 import { MissingParamError, InvalidParamError } from '../../errors'
 import { InvalidPasswordError } from '../../errors/invalid-password-error'
@@ -50,6 +51,10 @@ export class ResetPasswordController implements Controller {
 
       return ok(account)
     } catch (error) {
+      if (error instanceof EmailNotRegisteredError) {
+        return badRequest(new EmailNotRegisteredError())
+      }
+
       return serverError()
     }
   }
