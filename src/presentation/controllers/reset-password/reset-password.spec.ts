@@ -5,11 +5,14 @@ import { ResetPasswordController } from './reset-password'
 import { EmailValidator } from '../../protocols/email-validator'
 import { PasswordValidator } from '../../protocols/password-validator'
 import { InvalidPasswordError } from '../../errors/invalid-password-error'
+import { ResetPassword } from '../../../domain/usecases/reset-password'
+import { AccountModel } from '../signup/signup-protocols'
 
 interface SutTypes {
   sut: ResetPasswordController
   emailValidatorStub: EmailValidator
   passwordValidatorStub: PasswordValidator
+  resetPasswordStub: ResetPassword
 }
 
 const makePasswordValidatorStub = (): PasswordValidator => {
@@ -31,14 +34,28 @@ const makeEmailValidatorStub = (): EmailValidator => {
 }
 
 const makeSut = (): SutTypes => {
+  class ResetPasswordStub implements ResetPassword {
+    async reset (email: string, password: string): Promise<AccountModel> {
+      return {
+        id: 'any_id',
+        username: 'any_username',
+        email: 'any_email',
+        password: 'hashed_password',
+        status: 'active'
+      }
+    }
+  }
+
+  const resetPasswordStub = new ResetPasswordStub()
   const passwordValidatorStub = makePasswordValidatorStub()
   const emailValidatorStub = makeEmailValidatorStub()
-  const sut = new ResetPasswordController(emailValidatorStub, passwordValidatorStub)
+  const sut = new ResetPasswordController(emailValidatorStub, passwordValidatorStub, resetPasswordStub)
 
   return {
     sut,
     emailValidatorStub,
-    passwordValidatorStub
+    passwordValidatorStub,
+    resetPasswordStub
   }
 }
 
@@ -206,5 +223,21 @@ describe('ResetPassword Controller', () => {
 
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(appError(new InvalidPasswordError()))
+  })
+
+  it('Should call ResetPassword with correct values', async () => {
+    const { sut, resetPasswordStub } = makeSut()
+    const resetSpy = jest.spyOn(resetPasswordStub, 'reset')
+    const httpRequest = {
+      body: {
+        email: 'any_email@email.com',
+        password: 'any_password',
+        passwordConfirmation: 'any_password'
+      }
+    }
+
+    await sut.handle(httpRequest)
+
+    expect(resetSpy).toHaveBeenCalledWith('any_email@email.com', 'any_password')
   })
 })
