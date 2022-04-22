@@ -1,3 +1,5 @@
+import { AccountError } from '../../errors/account-error'
+import { EmailNotRegisteredError } from '../../errors/email-not-registered-error'
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
 import { AccountModel } from '../db-add-account/db-add-account-protocols'
 import { DbSendResetPasswordEmail } from './db-send-reset-password-email'
@@ -50,5 +52,31 @@ describe('SendResetPasswordEmail Usecase', () => {
     const promise = sut.send('any_email@email.com')
 
     await expect(promise).rejects.toThrow()
+  })
+
+  it('Should throw an error if LoadAccountByEmailRepository return false', async () => {
+    const { sut, loadAccountByEmailRepositoryStub } = makeSut()
+    jest.spyOn(loadAccountByEmailRepositoryStub, 'loadByEmail').mockReturnValueOnce(new Promise(resolve => resolve(null)))
+
+    const promise = sut.send('any_email@email.com')
+
+    await expect(promise).rejects.toThrow(new EmailNotRegisteredError())
+  })
+
+  it('Should throw an error if account is inactive', async () => {
+    const { sut, loadAccountByEmailRepositoryStub } = makeSut()
+    jest.spyOn(loadAccountByEmailRepositoryStub, 'loadByEmail').mockReturnValueOnce(new Promise(resolve => {
+      return resolve({
+        id: 'any_id',
+        username: 'any_username',
+        email: 'any_email',
+        password: 'hashed_password',
+        status: 'inactive'
+      })
+    }))
+
+    const promise = sut.send('any_email@email.com')
+
+    await expect(promise).rejects.toThrow(new AccountError('Account is inactive', 'AccountIsInactiveError'))
   })
 })
