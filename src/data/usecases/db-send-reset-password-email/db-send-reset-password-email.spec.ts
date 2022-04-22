@@ -2,22 +2,36 @@ import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-em
 import { AccountModel } from '../db-add-account/db-add-account-protocols'
 import { DbSendResetPasswordEmail } from './db-send-reset-password-email'
 
-class LoadAccountByEmailRepositoryStub implements LoadAccountByEmailRepository {
-  async loadByEmail (email: string): Promise<AccountModel> {
-    return {
-      id: 'any_id',
-      username: 'any_username',
-      email: 'any_email',
-      password: 'hashed_password',
-      status: 'active'
+interface SutTypes {
+  sut: DbSendResetPasswordEmail
+  loadAccountByEmailRepositoryStub: LoadAccountByEmailRepository
+}
+
+const makeSut = (): SutTypes => {
+  class LoadAccountByEmailRepositoryStub implements LoadAccountByEmailRepository {
+    async loadByEmail (email: string): Promise<AccountModel> {
+      return {
+        id: 'any_id',
+        username: 'any_username',
+        email: 'any_email',
+        password: 'hashed_password',
+        status: 'active'
+      }
     }
+  }
+
+  const loadAccountByEmailRepositoryStub = new LoadAccountByEmailRepositoryStub()
+  const sut = new DbSendResetPasswordEmail(loadAccountByEmailRepositoryStub)
+
+  return {
+    sut,
+    loadAccountByEmailRepositoryStub
   }
 }
 
 describe('SendResetPasswordEmail Usecase', () => {
   it('Should call LoadAccountByEmailRepository with correct email', async () => {
-    const loadAccountByEmailRepositoryStub = new LoadAccountByEmailRepositoryStub()
-    const sut = new DbSendResetPasswordEmail(loadAccountByEmailRepositoryStub)
+    const { sut, loadAccountByEmailRepositoryStub } = makeSut()
     const loadByEmailSpy = jest.spyOn(loadAccountByEmailRepositoryStub, 'loadByEmail')
 
     await sut.send('any_email@email.com')
