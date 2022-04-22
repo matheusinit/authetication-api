@@ -1,3 +1,4 @@
+import { AccountError } from '../../../data/errors/account-error'
 import { EmailNotRegisteredError } from '../../../data/errors/email-not-registered-error'
 import { SendResetPasswordEmail } from '../../../domain/usecases/send-reset-password-email'
 import { InvalidParamError, MissingParamError, ServerError } from '../../errors'
@@ -144,6 +145,21 @@ describe('SendResetPasswordEmail Controller', () => {
 
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(appError(new EmailNotRegisteredError()))
+  })
+
+  it('Should return bad request if account is inactive', async () => {
+    const { sut, sendResetPasswordEmailStub } = makeSut()
+    jest.spyOn(sendResetPasswordEmailStub, 'send').mockReturnValueOnce(new Promise((resolve, reject) => reject(new AccountError('Account is inactive', 'AccountIsInactiveError'))))
+    const httpRequest = {
+      body: {
+        email: 'email_not_registered@email.com'
+      }
+    }
+
+    const httpResponse = await sut.handle(httpRequest)
+
+    expect(httpResponse.statusCode).toBe(400)
+    expect(httpResponse.body).toEqual(appError(new AccountError('Account is inactive', 'AccountIsInactiveError')))
   })
 
   it('Should return a message on success', async () => {
