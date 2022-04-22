@@ -6,5 +6,5 @@ export interface EmailContent {
 }
 
 export interface EmailSender {
-  sendEmail: (content: EmailContent) => Promise<void>
+  sendEmail: (template: string, content: EmailContent) => Promise<void>
 }

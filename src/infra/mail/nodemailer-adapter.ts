@@ -10,7 +10,7 @@ export class NodemailerAdapter implements EmailSender {
     this.templateRenderer = templateRenderer
   }
 
-  async sendEmail (content: EmailContent): Promise<void> {
+  async sendEmail (template: string, content: EmailContent): Promise<void> {
     const transport = nodemailer.createTransport({
       host: env.smtpHost,
       port: env.smtpPort,
@@ -22,7 +22,7 @@ export class NodemailerAdapter implements EmailSender {
 
     const { to, from, subject, data } = content
 
-    const html = this.templateRenderer.render('confirmation-email', data)
+    const html = this.templateRenderer.render(template, data)
 
     await transport.sendMail({ to, from, subject, html })
   }

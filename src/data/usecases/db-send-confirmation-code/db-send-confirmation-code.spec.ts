@@ -61,7 +61,7 @@ const makeStoreConfirmationCodeRepositoryStub = (): StoreConfirmationCodeReposit
 
 const makeEmailSenderStub = (): EmailSender => {
   class EmailSenderStub implements EmailSender {
-    async sendEmail (content: EmailContent): Promise<void> {
+    async sendEmail (template: string, content: EmailContent): Promise<void> {
       return null
     }
   }
@@ -169,7 +169,7 @@ describe('DbSendConfirmationCode', () => {
     const { sut, emailSenderStub } = makeSut()
     const sendEmailSpy = jest.spyOn(emailSenderStub, 'sendEmail')
     await sut.send('any_email@mail.com')
-    expect(sendEmailSpy).toHaveBeenCalledWith({
+    expect(sendEmailSpy).toHaveBeenCalledWith('confirmation-email', {
       to: 'any_email@mail.com',
       from: 'Auth API <confirm@authapi.com>',
       subject: 'Authentication API - Código de confirmação',

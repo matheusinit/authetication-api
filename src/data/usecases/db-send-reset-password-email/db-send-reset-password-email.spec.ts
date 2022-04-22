@@ -15,7 +15,7 @@ interface SutTypes {
 
 const makeEmailSenderStub = (): EmailSender => {
   class EmailSenderStub implements EmailSender {
-    async sendEmail (content: EmailContent): Promise<void> {
+    async sendEmail (template: string, content: EmailContent): Promise<void> {
       return null
     }
   }
@@ -133,7 +133,7 @@ describe('SendResetPasswordEmail Usecase', () => {
 
     await sut.send('any_email@email.com')
 
-    expect(sendEmailSpy).toHaveBeenCalledWith({
+    expect(sendEmailSpy).toHaveBeenCalledWith('reset-password', {
       to: 'any_email@email.com',
       from: 'Auth API <reset-password@authapi.com>',
       subject: 'Authentication API - Defina a sua nova senha',

@@ -45,7 +45,7 @@ export class DbSendConfirmationCode implements SendConfirmationCode {
 
     await this.storeConfirmationCodeRepository.storeConfirmationCode(confirmationCode, email)
 
-    await this.emailSender.sendEmail({
+    await this.emailSender.sendEmail('confirmation-email', {
       to: email,
       from: 'Auth API <confirm@authapi.com>',
       subject: 'Authentication API - Código de confirmação',

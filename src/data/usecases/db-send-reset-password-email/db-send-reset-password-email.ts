@@ -33,7 +33,7 @@ export class DbSendResetPasswordEmail implements SendResetPasswordEmail {
 
     const token = this.hashGenerator.generate()
 
-    await this.emailSender.sendEmail({
+    await this.emailSender.sendEmail('reset-password', {
       to: email,
       from: 'Auth API <reset-password@authapi.com>',
       subject: 'Authentication API - Defina a sua nova senha',
