@@ -11,6 +11,16 @@ interface SutTypes {
   hashGeneratorStub: HashGenerator
 }
 
+const makeHashGeneratorStub = (): HashGenerator => {
+  class HashGeneratorStub implements HashGenerator {
+    generate (): string {
+      return 'any_hash'
+    }
+  }
+
+  return new HashGeneratorStub()
+}
+
 const makeLoadAccountByEmailRepositoryStub = (): LoadAccountByEmailRepository => {
   class LoadAccountByEmailRepositoryStub implements LoadAccountByEmailRepository {
     async loadByEmail (email: string): Promise<AccountModel> {
@@ -28,12 +38,7 @@ const makeLoadAccountByEmailRepositoryStub = (): LoadAccountByEmailRepository =>
 }
 
 const makeSut = (): SutTypes => {
-  class HashGeneratorStub implements HashGenerator {
-    generate (): string {
-      return 'any_hash'
-    }
-  }
-  const hashGeneratorStub = new HashGeneratorStub()
+  const hashGeneratorStub = makeHashGeneratorStub()
   const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepositoryStub()
   const sut = new DbSendResetPasswordEmail(loadAccountByEmailRepositoryStub, hashGeneratorStub)
 
