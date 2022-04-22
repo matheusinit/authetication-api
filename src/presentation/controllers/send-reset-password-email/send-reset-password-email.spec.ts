@@ -1,4 +1,4 @@
-import { InvalidParamError, MissingParamError } from '../../errors'
+import { InvalidParamError, MissingParamError, ServerError } from '../../errors'
 import { appError } from '../../helpers/error-helper'
 import { EmailValidator } from '../signup/signup-protocols'
 import { SendResetPasswordEmailController } from './send-reset-password-email'
@@ -68,5 +68,22 @@ describe('SendResetPasswordEmail Controller', () => {
 
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(appError(new InvalidParamError('email')))
+  })
+
+  it('Should return server error if Email Validator throws', async () => {
+    const { sut, emailValidatorStub } = makeSut()
+    jest.spyOn(emailValidatorStub, 'isValid').mockImplementationOnce(() => {
+      throw new Error()
+    })
+    const httpRequest = {
+      body: {
+        email: 'any_email@email.com'
+      }
+    }
+
+    const httpResponse = await sut.handle(httpRequest)
+
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(appError(new ServerError()))
   })
 })
