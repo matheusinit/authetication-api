@@ -142,4 +142,13 @@ describe('SendResetPasswordEmail Usecase', () => {
       }
     })
   })
+
+  it('Should throw if EmailSender throws', async () => {
+    const { sut, emailSenderStub } = makeSut()
+    jest.spyOn(emailSenderStub, 'sendEmail').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+
+    const promise = sut.send('any_email@email.com')
+
+    await expect(promise).rejects.toThrow()
+  })
 })
