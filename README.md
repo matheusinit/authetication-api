@@ -31,6 +31,7 @@ Para mais detalhes de requisitos e regras de negócio, veja a [documentação](d
  + validator
  + fast-glob
  + Nodemailer
+ + Handlebars Template
 
 ## Como rodar
 
@@ -43,7 +44,7 @@ Antes de tudo, vai precisar ter instalado em sua máquina as ferramentas:
 
 Recomendado utilização de Docker:
  + [Docker](https://www.docker.com/)
- + [Docker-compose](https://www.docker.com/).
+ + [Docker-compose](https://www.docker.com/)
 
 Para instalação do Docker: https://docs.docker.com/get-docker/
 
