@@ -60,7 +60,7 @@ describe('SendResetPasswordEmail Controller', () => {
     jest.spyOn(emailValidatorStub, 'isValid').mockReturnValueOnce(false)
     const httpRequest = {
       body: {
-        email: 'any_email@email.com'
+        email: 'invalid_email@email.com'
       }
     }
 
