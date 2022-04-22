@@ -1,3 +1,4 @@
+import { SendResetPasswordEmail } from '../../../domain/usecases/send-reset-password-email'
 import { InvalidParamError, MissingParamError, ServerError } from '../../errors'
 import { appError } from '../../helpers/error-helper'
 import { EmailValidator } from '../signup/signup-protocols'
@@ -6,6 +7,7 @@ import { SendResetPasswordEmailController } from './send-reset-password-email'
 interface SutTypes {
   sut: SendResetPasswordEmailController
   emailValidatorStub: EmailValidator
+  sendResetPasswordEmailStub: SendResetPasswordEmail
 }
 
 const makeEmailValidatorStub = (): EmailValidator => {
@@ -19,12 +21,20 @@ const makeEmailValidatorStub = (): EmailValidator => {
 }
 
 const makeSut = (): SutTypes => {
+  class SendResetPasswordEmailStub implements SendResetPasswordEmail {
+    async send (email: string): Promise<void> {
+      return null
+    }
+  }
+
+  const sendResetPasswordEmailStub = new SendResetPasswordEmailStub()
   const emailValidatorStub = makeEmailValidatorStub()
-  const sut = new SendResetPasswordEmailController(emailValidatorStub)
+  const sut = new SendResetPasswordEmailController(emailValidatorStub, sendResetPasswordEmailStub)
 
   return {
     sut,
-    emailValidatorStub
+    emailValidatorStub,
+    sendResetPasswordEmailStub
   }
 }
 
@@ -85,5 +95,19 @@ describe('SendResetPasswordEmail Controller', () => {
 
     expect(httpResponse.statusCode).toBe(500)
     expect(httpResponse.body).toEqual(appError(new ServerError()))
+  })
+
+  it('Should call SendResetPasswordEmail with correct email', async () => {
+    const { sut, sendResetPasswordEmailStub } = makeSut()
+    const sendSpy = jest.spyOn(sendResetPasswordEmailStub, 'send')
+    const httpRequest = {
+      body: {
+        email: 'any_email@email.com'
+      }
+    }
+
+    await sut.handle(httpRequest)
+
+    expect(sendSpy).toHaveBeenCalledWith('any_email@email.com')
   })
 })
