@@ -10,9 +10,7 @@ describe('SendResetPasswordEmail Controller', () => {
   it('Should return a bad request if email is not provided', async () => {
     const sut = makeSut()
     const httpRequest = {
-      body: {
-        email: 'any_email@email.com'
-      }
+      body: {}
     }
 
     const httpResponse = await sut.handle(httpRequest)
