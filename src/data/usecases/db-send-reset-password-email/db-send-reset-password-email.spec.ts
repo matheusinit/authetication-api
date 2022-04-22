@@ -42,4 +42,13 @@ describe('SendResetPasswordEmail Usecase', () => {
 
     expect(loadByEmailSpy).toHaveBeenCalledWith('any_email@email.com')
   })
+
+  it('Should throw if LoadAccountByEmailRepository throws', async () => {
+    const { sut, loadAccountByEmailRepositoryStub } = makeSut()
+    jest.spyOn(loadAccountByEmailRepositoryStub, 'loadByEmail').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+
+    const promise = sut.send('any_email@email.com')
+
+    await expect(promise).rejects.toThrow()
+  })
 })
