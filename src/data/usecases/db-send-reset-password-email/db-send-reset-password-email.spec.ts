@@ -97,4 +97,15 @@ describe('SendResetPasswordEmail Usecase', () => {
 
     expect(generateSpy).toHaveBeenCalled()
   })
+
+  it('Should throw if HashGenerator throws', async () => {
+    const { sut, hashGeneratorStub } = makeSut()
+    jest.spyOn(hashGeneratorStub, 'generate').mockImplementationOnce(() => {
+      throw new Error()
+    })
+
+    const promise = sut.send('any_email@email.com')
+
+    await expect(promise).rejects.toThrow()
+  })
 })
