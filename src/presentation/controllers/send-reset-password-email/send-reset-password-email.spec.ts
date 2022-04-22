@@ -41,6 +41,20 @@ describe('SendResetPasswordEmail Controller', () => {
     expect(httpResponse.body).toEqual(appError(new MissingParamError('email')))
   })
 
+  it('Should call Email Validator with correct email', async () => {
+    const { sut, emailValidatorStub } = makeSut()
+    const isValidSpy = jest.spyOn(emailValidatorStub, 'isValid')
+    const httpRequest = {
+      body: {
+        email: 'any_email@email.com'
+      }
+    }
+
+    await sut.handle(httpRequest)
+
+    expect(isValidSpy).toHaveBeenCalledWith('any_email@email.com')
+  })
+
   it('Should return a bad request if email is invalid', async () => {
     const { sut, emailValidatorStub } = makeSut()
     jest.spyOn(emailValidatorStub, 'isValid').mockReturnValueOnce(false)
