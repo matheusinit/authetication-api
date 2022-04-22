@@ -114,4 +114,19 @@ describe('SendResetPasswordEmail Controller', () => {
 
     expect(sendSpy).toHaveBeenCalledWith('any_email@email.com')
   })
+
+  it('Should return server error if SendResetPasswordEmail throws', async () => {
+    const { sut, sendResetPasswordEmailStub } = makeSut()
+    jest.spyOn(sendResetPasswordEmailStub, 'send').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+    const httpRequest = {
+      body: {
+        email: 'any_email@email.com'
+      }
+    }
+
+    const httpResponse = await sut.handle(httpRequest)
+
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(appError(new ServerError()))
+  })
 })
