@@ -1,3 +1,4 @@
+import { EmailNotRegisteredError } from '../../../data/errors/email-not-registered-error'
 import { SendResetPasswordEmail } from '../../../domain/usecases/send-reset-password-email'
 import { InvalidParamError, MissingParamError, ServerError } from '../../errors'
 import { appError } from '../../helpers/error-helper'
@@ -128,6 +129,21 @@ describe('SendResetPasswordEmail Controller', () => {
 
     expect(httpResponse.statusCode).toBe(500)
     expect(httpResponse.body).toEqual(appError(new ServerError()))
+  })
+
+  it('Should return bad request if email is not registered', async () => {
+    const { sut, sendResetPasswordEmailStub } = makeSut()
+    jest.spyOn(sendResetPasswordEmailStub, 'send').mockReturnValueOnce(new Promise((resolve, reject) => reject(new EmailNotRegisteredError())))
+    const httpRequest = {
+      body: {
+        email: 'email_not_registered@email.com'
+      }
+    }
+
+    const httpResponse = await sut.handle(httpRequest)
+
+    expect(httpResponse.statusCode).toBe(400)
+    expect(httpResponse.body).toEqual(appError(new EmailNotRegisteredError()))
   })
 
   it('Should return a message on success', async () => {
