@@ -10,6 +10,16 @@ interface SutTypes {
   sendResetPasswordEmailStub: SendResetPasswordEmail
 }
 
+const makeSendResetPasswordEmailStub = (): SendResetPasswordEmail => {
+  class SendResetPasswordEmailStub implements SendResetPasswordEmail {
+    async send (email: string): Promise<void> {
+      return null
+    }
+  }
+
+  return new SendResetPasswordEmailStub()
+}
+
 const makeEmailValidatorStub = (): EmailValidator => {
   class EmailValidatorStub implements EmailValidator {
     isValid (email: string): boolean {
@@ -21,13 +31,7 @@ const makeEmailValidatorStub = (): EmailValidator => {
 }
 
 const makeSut = (): SutTypes => {
-  class SendResetPasswordEmailStub implements SendResetPasswordEmail {
-    async send (email: string): Promise<void> {
-      return null
-    }
-  }
-
-  const sendResetPasswordEmailStub = new SendResetPasswordEmailStub()
+  const sendResetPasswordEmailStub = makeSendResetPasswordEmailStub()
   const emailValidatorStub = makeEmailValidatorStub()
   const sut = new SendResetPasswordEmailController(emailValidatorStub, sendResetPasswordEmailStub)
 
