@@ -1,9 +1,22 @@
-import { MissingParamError } from '../../errors'
+import { InvalidParamError, MissingParamError } from '../../errors'
 import { badRequest } from '../../helpers/http-helper'
 import { Controller, HttpRequest, HttpResponse } from '../../protocols'
+import { EmailValidator } from '../signup/signup-protocols'
 
 export class SendResetPasswordEmailController implements Controller {
+  private readonly emailValidator: EmailValidator
+
+  constructor (emailValidator: EmailValidator) {
+    this.emailValidator = emailValidator
+  }
+
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
-    return badRequest(new MissingParamError('email'))
+    const { email } = httpRequest.body
+
+    if (!email) {
+      return badRequest(new MissingParamError('email'))
+    }
+
+    return badRequest(new InvalidParamError('email'))
   }
 }
