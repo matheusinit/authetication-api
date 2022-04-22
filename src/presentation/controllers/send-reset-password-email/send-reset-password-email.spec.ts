@@ -42,7 +42,8 @@ describe('SendResetPasswordEmail Controller', () => {
   })
 
   it('Should return a bad request if email is invalid', async () => {
-    const { sut } = makeSut()
+    const { sut, emailValidatorStub } = makeSut()
+    jest.spyOn(emailValidatorStub, 'isValid').mockReturnValueOnce(false)
     const httpRequest = {
       body: {
         email: 'any_email@email.com'
