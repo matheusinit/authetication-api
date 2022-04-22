@@ -13,6 +13,15 @@ interface SutTypes {
   emailSenderStub: EmailSender
 }
 
+const makeEmailSenderStub = (): EmailSender => {
+  class EmailSenderStub implements EmailSender {
+    async sendEmail (content: EmailContent): Promise<void> {
+      return null
+    }
+  }
+  return new EmailSenderStub()
+}
+
 const makeHashGeneratorStub = (): HashGenerator => {
   class HashGeneratorStub implements HashGenerator {
     generate (): string {
@@ -40,12 +49,7 @@ const makeLoadAccountByEmailRepositoryStub = (): LoadAccountByEmailRepository =>
 }
 
 const makeSut = (): SutTypes => {
-  class EmailSenderStub implements EmailSender {
-    async sendEmail (content: EmailContent): Promise<void> {
-      return null
-    }
-  }
-  const emailSenderStub = new EmailSenderStub()
+  const emailSenderStub = makeEmailSenderStub()
   const hashGeneratorStub = makeHashGeneratorStub()
   const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepositoryStub()
   const sut = new DbSendResetPasswordEmail(loadAccountByEmailRepositoryStub, hashGeneratorStub, emailSenderStub)
