@@ -1,5 +1,6 @@
 import { AccountError } from '../../errors/account-error'
 import { EmailNotRegisteredError } from '../../errors/email-not-registered-error'
+import { HashGenerator } from '../../protocols/hash-generator'
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
 import { AccountModel } from '../db-add-account/db-add-account-protocols'
 import { DbSendResetPasswordEmail } from './db-send-reset-password-email'
@@ -7,6 +8,7 @@ import { DbSendResetPasswordEmail } from './db-send-reset-password-email'
 interface SutTypes {
   sut: DbSendResetPasswordEmail
   loadAccountByEmailRepositoryStub: LoadAccountByEmailRepository
+  hashGeneratorStub: HashGenerator
 }
 
 const makeLoadAccountByEmailRepositoryStub = (): LoadAccountByEmailRepository => {
@@ -26,12 +28,19 @@ const makeLoadAccountByEmailRepositoryStub = (): LoadAccountByEmailRepository =>
 }
 
 const makeSut = (): SutTypes => {
+  class HashGeneratorStub implements HashGenerator {
+    generate (): string {
+      return 'any_hash'
+    }
+  }
+  const hashGeneratorStub = new HashGeneratorStub()
   const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepositoryStub()
-  const sut = new DbSendResetPasswordEmail(loadAccountByEmailRepositoryStub)
+  const sut = new DbSendResetPasswordEmail(loadAccountByEmailRepositoryStub, hashGeneratorStub)
 
   return {
     sut,
-    loadAccountByEmailRepositoryStub
+    loadAccountByEmailRepositoryStub,
+    hashGeneratorStub
   }
 }
 
@@ -78,5 +87,14 @@ describe('SendResetPasswordEmail Usecase', () => {
     const promise = sut.send('any_email@email.com')
 
     await expect(promise).rejects.toThrow(new AccountError('Account is inactive', 'AccountIsInactiveError'))
+  })
+
+  it('Should call HashGenerator', async () => {
+    const { sut, hashGeneratorStub } = makeSut()
+    const generateSpy = jest.spyOn(hashGeneratorStub, 'generate')
+
+    await sut.send('any_email@email.com')
+
+    expect(generateSpy).toHaveBeenCalled()
   })
 })
