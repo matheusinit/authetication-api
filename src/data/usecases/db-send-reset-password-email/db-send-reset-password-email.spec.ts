@@ -7,7 +7,7 @@ interface SutTypes {
   loadAccountByEmailRepositoryStub: LoadAccountByEmailRepository
 }
 
-const makeSut = (): SutTypes => {
+const makeLoadAccountByEmailRepositoryStub = (): LoadAccountByEmailRepository => {
   class LoadAccountByEmailRepositoryStub implements LoadAccountByEmailRepository {
     async loadByEmail (email: string): Promise<AccountModel> {
       return {
@@ -20,7 +20,11 @@ const makeSut = (): SutTypes => {
     }
   }
 
-  const loadAccountByEmailRepositoryStub = new LoadAccountByEmailRepositoryStub()
+  return new LoadAccountByEmailRepositoryStub()
+}
+
+const makeSut = (): SutTypes => {
+  const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepositoryStub()
   const sut = new DbSendResetPasswordEmail(loadAccountByEmailRepositoryStub)
 
   return {
