@@ -1,5 +1,6 @@
 import { AccountError } from '../../errors/account-error'
 import { EmailNotRegisteredError } from '../../errors/email-not-registered-error'
+import { EmailContent, EmailSender } from '../../protocols/email-sender'
 import { HashGenerator } from '../../protocols/hash-generator'
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
 import { AccountModel } from '../db-add-account/db-add-account-protocols'
@@ -9,6 +10,7 @@ interface SutTypes {
   sut: DbSendResetPasswordEmail
   loadAccountByEmailRepositoryStub: LoadAccountByEmailRepository
   hashGeneratorStub: HashGenerator
+  emailSenderStub: EmailSender
 }
 
 const makeHashGeneratorStub = (): HashGenerator => {
@@ -38,14 +40,21 @@ const makeLoadAccountByEmailRepositoryStub = (): LoadAccountByEmailRepository =>
 }
 
 const makeSut = (): SutTypes => {
+  class EmailSenderStub implements EmailSender {
+    async sendEmail (content: EmailContent): Promise<void> {
+      return null
+    }
+  }
+  const emailSenderStub = new EmailSenderStub()
   const hashGeneratorStub = makeHashGeneratorStub()
   const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepositoryStub()
-  const sut = new DbSendResetPasswordEmail(loadAccountByEmailRepositoryStub, hashGeneratorStub)
+  const sut = new DbSendResetPasswordEmail(loadAccountByEmailRepositoryStub, hashGeneratorStub, emailSenderStub)
 
   return {
     sut,
     loadAccountByEmailRepositoryStub,
-    hashGeneratorStub
+    hashGeneratorStub,
+    emailSenderStub
   }
 }
 
@@ -112,5 +121,21 @@ describe('SendResetPasswordEmail Usecase', () => {
     const promise = sut.send('any_email@email.com')
 
     await expect(promise).rejects.toThrow()
+  })
+
+  it('Should call EmailSender with correct values', async () => {
+    const { sut, emailSenderStub } = makeSut()
+    const sendEmailSpy = jest.spyOn(emailSenderStub, 'sendEmail')
+
+    await sut.send('any_email@email.com')
+
+    expect(sendEmailSpy).toHaveBeenCalledWith({
+      to: 'any_email@email.com',
+      from: 'Auth API <reset-password@authapi.com>',
+      subject: 'Authentication API - Defina a sua nova senha',
+      data: {
+        token: 'any_hash'
+      }
+    })
   })
 })
