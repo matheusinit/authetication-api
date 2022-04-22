@@ -1,6 +1,6 @@
 import { SendResetPasswordEmail } from '../../../domain/usecases/send-reset-password-email'
 import { InvalidParamError, MissingParamError } from '../../errors'
-import { badRequest, serverError } from '../../helpers/http-helper'
+import { badRequest, serverError, ok } from '../../helpers/http-helper'
 import { Controller, HttpRequest, HttpResponse } from '../../protocols'
 import { EmailValidator } from '../signup/signup-protocols'
 
@@ -28,6 +28,8 @@ export class SendResetPasswordEmailController implements Controller {
       }
 
       await this.sendResetPasswordEmail.send(email)
+
+      return ok({ message: 'Email sent' })
     } catch (error) {
       return serverError()
     }
