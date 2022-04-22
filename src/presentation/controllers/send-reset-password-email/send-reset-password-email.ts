@@ -17,6 +17,10 @@ export class SendResetPasswordEmailController implements Controller {
       return badRequest(new MissingParamError('email'))
     }
 
-    return badRequest(new InvalidParamError('email'))
+    const isEmailValid = this.emailValidator.isValid(email)
+
+    if (!isEmailValid) {
+      return badRequest(new InvalidParamError('email'))
+    }
   }
 }
