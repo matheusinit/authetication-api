@@ -129,4 +129,19 @@ describe('SendResetPasswordEmail Controller', () => {
     expect(httpResponse.statusCode).toBe(500)
     expect(httpResponse.body).toEqual(appError(new ServerError()))
   })
+
+  it('Should return a message on success', async () => {
+    const { sut } = makeSut()
+
+    const httpRequest = {
+      body: {
+        email: 'any_email@email.com'
+      }
+    }
+
+    const httpResponse = await sut.handle(httpRequest)
+
+    expect(httpResponse.statusCode).toBe(200)
+    expect(httpResponse.body).toEqual({ message: 'Email sent' })
+  })
 })
