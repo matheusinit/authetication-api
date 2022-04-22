@@ -43,4 +43,12 @@ describe('ResetPassword Routes', () => {
       passwordConfirmation: 'Senhaa.123'
     }).expect(400)
   })
+
+  it('Should return a bad request if password is invalid', async () => {
+    await request(app).put('/api/account/reset-password').send({
+      email: 'matheus.oliveira@gmail.com',
+      password: 'Senha',
+      passwordConfirmation: 'Senha'
+    }).expect(400)
+  })
 })
