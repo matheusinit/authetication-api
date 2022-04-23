@@ -5,12 +5,14 @@ import { HashGenerator } from '../../protocols/hash-generator'
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
 import { AccountModel } from '../db-add-account/db-add-account-protocols'
 import { DbSendResetPasswordEmail } from './db-send-reset-password-email'
+import { UpdateAccountRepository } from '../../protocols/update-account-repository'
 
 interface SutTypes {
   sut: DbSendResetPasswordEmail
   loadAccountByEmailRepositoryStub: LoadAccountByEmailRepository
   hashGeneratorStub: HashGenerator
   emailSenderStub: EmailSender
+  updateAccountRepositoryStub: UpdateAccountRepository
 }
 
 const makeEmailSenderStub = (): EmailSender => {
@@ -49,16 +51,30 @@ const makeLoadAccountByEmailRepositoryStub = (): LoadAccountByEmailRepository =>
 }
 
 const makeSut = (): SutTypes => {
+  class UpdateAccountRepositoryStub implements UpdateAccountRepository {
+    async update (id: string, update: any): Promise<AccountModel> {
+      return {
+        id: 'any_id',
+        username: 'any_username',
+        email: 'any_email',
+        password: 'hashed_password',
+        status: 'active'
+      }
+    }
+  }
+
+  const updateAccountRepositoryStub = new UpdateAccountRepositoryStub()
   const emailSenderStub = makeEmailSenderStub()
   const hashGeneratorStub = makeHashGeneratorStub()
   const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepositoryStub()
-  const sut = new DbSendResetPasswordEmail(loadAccountByEmailRepositoryStub, hashGeneratorStub, emailSenderStub)
+  const sut = new DbSendResetPasswordEmail(loadAccountByEmailRepositoryStub, hashGeneratorStub, emailSenderStub, updateAccountRepositoryStub)
 
   return {
     sut,
     loadAccountByEmailRepositoryStub,
     hashGeneratorStub,
-    emailSenderStub
+    emailSenderStub,
+    updateAccountRepositoryStub
   }
 }
 
@@ -125,6 +141,15 @@ describe('SendResetPasswordEmail Usecase', () => {
     const promise = sut.send('any_email@email.com')
 
     await expect(promise).rejects.toThrow()
+  })
+
+  it('Should call UpdateAccountRepository with correct values', async () => {
+    const { sut, updateAccountRepositoryStub } = makeSut()
+    const updateSpy = jest.spyOn(updateAccountRepositoryStub, 'update')
+
+    await sut.send('any_email@email.com')
+
+    expect(updateSpy).toHaveBeenCalledWith('any_id', { token: 'any_hash' })
   })
 
   it('Should call EmailSender with correct values', async () => {
