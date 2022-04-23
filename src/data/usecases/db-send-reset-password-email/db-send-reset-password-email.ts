@@ -4,20 +4,24 @@ import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-em
 import { AccountError } from '../../errors/account-error'
 import { HashGenerator } from '../../protocols/hash-generator'
 import { EmailSender } from '../../protocols/email-sender'
+import { UpdateAccountRepository } from '../../protocols/update-account-repository'
 
 export class DbSendResetPasswordEmail implements SendResetPasswordEmail {
   private readonly loadAccountByEmailRepository: LoadAccountByEmailRepository
   private readonly hashGenerator: HashGenerator
   private readonly emailSender: EmailSender
+  private readonly updateAccountRepository: UpdateAccountRepository
 
   constructor (
     loadAccountByEmailRepository: LoadAccountByEmailRepository,
     hashGenerator: HashGenerator,
-    emailSender: EmailSender
+    emailSender: EmailSender,
+    updateAccountRepository: UpdateAccountRepository
   ) {
     this.loadAccountByEmailRepository = loadAccountByEmailRepository
     this.hashGenerator = hashGenerator
     this.emailSender = emailSender
+    this.updateAccountRepository = updateAccountRepository
   }
 
   async send (email: string): Promise<void> {
@@ -32,6 +36,8 @@ export class DbSendResetPasswordEmail implements SendResetPasswordEmail {
     }
 
     const token = this.hashGenerator.generate()
+
+    await this.updateAccountRepository.update(account.id, { token })
 
     await this.emailSender.sendEmail('reset-password', {
       to: email,
