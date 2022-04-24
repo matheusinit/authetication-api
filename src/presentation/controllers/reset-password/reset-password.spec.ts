@@ -232,6 +232,23 @@ describe('ResetPassword Controller', () => {
     expect(httpResponse.body).toEqual(appError(new AccountError('Account is inactive', 'AccountIsInactiveError')))
   })
 
+  it('Should return 400 if token is invalid', async () => {
+    const { sut, resetPasswordStub } = makeSut()
+    jest.spyOn(resetPasswordStub, 'reset').mockReturnValueOnce(new Promise((resolve, reject) => reject(new InvalidParamError('token'))))
+    const httpRequest = {
+      body: {
+        token: 'any_hash',
+        password: 'any_password',
+        passwordConfirmation: 'any_password'
+      }
+    }
+
+    const httpResponse = await sut.handle(httpRequest)
+
+    expect(httpResponse.statusCode).toBe(400)
+    expect(httpResponse.body).toEqual(appError(new InvalidParamError('token')))
+  })
+
   it('Should return an account on success', async () => {
     const { sut } = makeSut()
     const httpRequest = {
