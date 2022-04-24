@@ -1,5 +1,5 @@
 import { AccountError } from '../../../data/errors/account-error'
-import { EmailNotRegisteredError } from '../../../data/errors/email-not-registered-error'
+import { NotFoundError } from '../../../data/errors/not-found-error'
 import { ResetPassword } from '../../../domain/usecases/reset-password'
 import { MissingParamError, InvalidParamError } from '../../errors'
 import { InvalidPasswordError } from '../../errors/invalid-password-error'
@@ -7,24 +7,21 @@ import { badRequest, serverError, ok } from '../../helpers/http-helper'
 import { Controller } from '../../protocols/controller'
 import { HttpRequest, HttpResponse } from '../../protocols/http'
 import { PasswordValidator } from '../../protocols/password-validator'
-import { EmailValidator } from '../signup/signup-protocols'
 
 export class ResetPasswordController implements Controller {
-  private readonly emailValidator: EmailValidator
   private readonly passwordValidator: PasswordValidator
   private readonly resetPassword: ResetPassword
 
-  constructor (emailValidator: EmailValidator, passwordValidator: PasswordValidator, resetPassword: ResetPassword) {
-    this.emailValidator = emailValidator
+  constructor (passwordValidator: PasswordValidator, resetPassword: ResetPassword) {
     this.passwordValidator = passwordValidator
     this.resetPassword = resetPassword
   }
 
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
     try {
-      const { email, password, passwordConfirmation } = httpRequest.body
+      const { token, password, passwordConfirmation } = httpRequest.body
 
-      const params = ['email', 'password', 'passwordConfirmation']
+      const params = ['token', 'password', 'passwordConfirmation']
 
       for (const param of params) {
         if (!httpRequest.body[param]) {
@@ -36,24 +33,18 @@ export class ResetPasswordController implements Controller {
         return badRequest(new InvalidParamError('passwordConfirmation'))
       }
 
-      const isEmailValid = this.emailValidator.isValid(email)
-
-      if (!isEmailValid) {
-        return badRequest(new InvalidParamError('email'))
-      }
-
       const isPasswordValid = this.passwordValidator.isValid(password)
 
       if (!isPasswordValid) {
         return badRequest(new InvalidPasswordError())
       }
 
-      const account = await this.resetPassword.reset(email, password)
+      const account = await this.resetPassword.reset(token, password)
 
       return ok(account)
     } catch (error) {
-      if (error instanceof EmailNotRegisteredError) {
-        return badRequest(new EmailNotRegisteredError())
+      if (error instanceof NotFoundError) {
+        return badRequest(error)
       }
 
       if (error instanceof AccountError) {

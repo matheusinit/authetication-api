@@ -1,30 +1,30 @@
 import { ResetPassword } from '../../../domain/usecases/reset-password'
 import { AccountError } from '../../errors/account-error'
-import { EmailNotRegisteredError } from '../../errors/email-not-registered-error'
-import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
+import { NotFoundError } from '../../errors/not-found-error'
+import { LoadAccountByTokenRepository } from '../../protocols/load-account-by-token-repository'
 import { UpdateAccountRepository } from '../../protocols/update-account-repository'
 import { AccountModel, Encrypter } from '../db-add-account/db-add-account-protocols'
 
 export class DbResetPassword implements ResetPassword {
-  private readonly loadAccountByEmailRepository: LoadAccountByEmailRepository
+  private readonly loadAccountByTokenRepository: LoadAccountByTokenRepository
   private readonly updateAccountRepository: UpdateAccountRepository
   private readonly encrypter: Encrypter
 
   constructor (
-    loadAccountByEmailRepository: LoadAccountByEmailRepository,
+    loadAccountByTokenRepository: LoadAccountByTokenRepository,
     updateAccountRepository: UpdateAccountRepository,
     encrypter: Encrypter
   ) {
-    this.loadAccountByEmailRepository = loadAccountByEmailRepository
+    this.loadAccountByTokenRepository = loadAccountByTokenRepository
     this.updateAccountRepository = updateAccountRepository
     this.encrypter = encrypter
   }
 
-  async reset (email: string, password: string): Promise<AccountModel> {
-    const account = await this.loadAccountByEmailRepository.loadByEmail(email)
+  async reset (token: string, password: string): Promise<AccountModel> {
+    const account = await this.loadAccountByTokenRepository.loadByToken(token)
 
     if (!account) {
-      throw new EmailNotRegisteredError()
+      throw new NotFoundError('token')
     }
 
     if (account.status === 'inactive') {

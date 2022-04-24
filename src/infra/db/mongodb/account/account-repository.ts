@@ -6,9 +6,10 @@ import { AddAccountModel } from '../../../../domain/usecases/add-account'
 import { MongoHelper } from '../helpers/mongo-helper'
 import { LoadAccountByEmailRepository } from '../../../../data/protocols/load-account-by-email-repository'
 import { UpdateAccountRepository } from '../../../../data/protocols/update-account-repository'
+import { LoadAccountByTokenRepository } from '../../../../data/protocols/load-account-by-token-repository'
 
 export class AccountMongoRepository implements AddAccountRepository,
- CheckUsernameRepository, CheckEmailRepository, LoadAccountByEmailRepository, UpdateAccountRepository {
+ CheckUsernameRepository, CheckEmailRepository, LoadAccountByEmailRepository, UpdateAccountRepository, LoadAccountByTokenRepository {
   async add (accountData: AddAccountModel): Promise<AccountModel> {
     const accountCollection = MongoHelper.getCollection('accounts')
     const result = await accountCollection.insertOne(accountData)
@@ -41,5 +42,14 @@ export class AccountMongoRepository implements AddAccountRepository,
     const accountCollection = MongoHelper.getCollection('accounts')
     const { value: account } = await accountCollection.findOneAndUpdate({ _id: id }, { $set: update }, { returnDocument: 'after' })
     return account === null ? account : MongoHelper.map(account)
+  }
+
+  async loadByToken (token: string): Promise<AccountModel> {
+    const accountCollection = MongoHelper.getCollection('accounts')
+    const account = await accountCollection.findOne({ token })
+    if (account) {
+      return MongoHelper.map(account)
+    }
+    return null
   }
 }

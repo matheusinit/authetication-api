@@ -1,20 +1,20 @@
-import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
 import { UpdateAccountRepository } from '../../protocols/update-account-repository'
 import { AccountModel, Encrypter } from '../db-add-account/db-add-account-protocols'
 import { DbResetPassword } from './db-reset-password'
 import { AccountError } from '../../errors/account-error'
-import { EmailNotRegisteredError } from '../../errors/email-not-registered-error'
+import { LoadAccountByTokenRepository } from '../../protocols/load-account-by-token-repository'
+import { NotFoundError } from '../../errors/not-found-error'
 
 interface SutTypes {
   sut: DbResetPassword
-  loadAccountByEmailRepositoryStub: LoadAccountByEmailRepository
+  loadAccountByTokenRepositoryStub: LoadAccountByTokenRepository
   updateAccountRepositoryStub: UpdateAccountRepository
   encrypterStub: Encrypter
 }
 
-const makeLoadAccountByEmailRepositoryStub = (): LoadAccountByEmailRepository => {
-  class LoadAccountByEmailRepositoryStub implements LoadAccountByEmailRepository {
-    async loadByEmail (email: string): Promise<AccountModel> {
+const makeLoadAccountByTokenRepositoryStub = (): LoadAccountByTokenRepository => {
+  class LoadAccountByTokenRepositoryStub implements LoadAccountByTokenRepository {
+    async loadByToken (token: string): Promise<AccountModel> {
       return {
         id: 'any_id',
         username: 'any_username',
@@ -24,7 +24,7 @@ const makeLoadAccountByEmailRepositoryStub = (): LoadAccountByEmailRepository =>
       }
     }
   }
-  return new LoadAccountByEmailRepositoryStub()
+  return new LoadAccountByTokenRepositoryStub()
 }
 
 const makeUpdateAccountRepositoryStub = (): UpdateAccountRepository => {
@@ -56,48 +56,48 @@ const makeEncrypterStub = (): Encrypter => {
 const makeSut = (): SutTypes => {
   const encrypterStub = makeEncrypterStub()
   const updateAccountRepositoryStub = makeUpdateAccountRepositoryStub()
-  const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepositoryStub()
-  const sut = new DbResetPassword(loadAccountByEmailRepositoryStub, updateAccountRepositoryStub, encrypterStub)
+  const loadAccountByTokenRepositoryStub = makeLoadAccountByTokenRepositoryStub()
+  const sut = new DbResetPassword(loadAccountByTokenRepositoryStub, updateAccountRepositoryStub, encrypterStub)
 
   return {
     sut,
-    loadAccountByEmailRepositoryStub,
+    loadAccountByTokenRepositoryStub,
     updateAccountRepositoryStub,
     encrypterStub
   }
 }
 
 describe('DbResetPassword Usecase', () => {
-  it('Should call LoadAccountByEmailRepository with correct email', async () => {
-    const { sut, loadAccountByEmailRepositoryStub } = makeSut()
-    const loadByEmailSpy = jest.spyOn(loadAccountByEmailRepositoryStub, 'loadByEmail')
+  it('Should call LoadAccountByTokenRepository with correct values', async () => {
+    const { sut, loadAccountByTokenRepositoryStub } = makeSut()
+    const loadByTokenSpy = jest.spyOn(loadAccountByTokenRepositoryStub, 'loadByToken')
 
-    await sut.reset('any_email@email.com', 'any_password')
+    await sut.reset('any_hash', 'any_password')
 
-    expect(loadByEmailSpy).toHaveBeenCalledWith('any_email@email.com')
+    expect(loadByTokenSpy).toHaveBeenCalledWith('any_hash')
   })
 
-  it('Should throw an error if LoadAccountByEmailRepository return null', async () => {
-    const { sut, loadAccountByEmailRepositoryStub } = makeSut()
-    jest.spyOn(loadAccountByEmailRepositoryStub, 'loadByEmail').mockReturnValueOnce(new Promise(resolve => resolve(null)))
+  it('Should throw an error if LoadAccountByTokenRepository return null', async () => {
+    const { sut, loadAccountByTokenRepositoryStub } = makeSut()
+    jest.spyOn(loadAccountByTokenRepositoryStub, 'loadByToken').mockReturnValueOnce(new Promise(resolve => resolve(null)))
 
-    const promise = sut.reset('email_not_registered@email.com', 'any_password')
+    const promise = sut.reset('any_hash', 'any_password')
 
-    await expect(promise).rejects.toThrow(new EmailNotRegisteredError())
+    await expect(promise).rejects.toThrow(new NotFoundError('token'))
   })
 
-  it('Should throw if LoadAccountByEmailRepository throws', async () => {
-    const { sut, loadAccountByEmailRepositoryStub } = makeSut()
-    jest.spyOn(loadAccountByEmailRepositoryStub, 'loadByEmail').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+  it('Should throw if LoadAccountByTokenRepository throws', async () => {
+    const { sut, loadAccountByTokenRepositoryStub } = makeSut()
+    jest.spyOn(loadAccountByTokenRepositoryStub, 'loadByToken').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
 
-    const promise = sut.reset('any_email@email.com', 'any_password')
+    const promise = sut.reset('any_hash', 'any_password')
 
     await expect(promise).rejects.toThrow()
   })
 
   it('Should throw an error if account is inactive', async () => {
-    const { sut, loadAccountByEmailRepositoryStub } = makeSut()
-    jest.spyOn(loadAccountByEmailRepositoryStub, 'loadByEmail').mockReturnValueOnce(new Promise(resolve => {
+    const { sut, loadAccountByTokenRepositoryStub } = makeSut()
+    jest.spyOn(loadAccountByTokenRepositoryStub, 'loadByToken').mockReturnValueOnce(new Promise(resolve => {
       return resolve({
         id: 'any_id',
         username: 'any_username',
@@ -107,7 +107,7 @@ describe('DbResetPassword Usecase', () => {
       })
     }))
 
-    const promise = sut.reset('any_email@email.com', 'any_password')
+    const promise = sut.reset('any_hash', 'any_password')
 
     await expect(promise).rejects.toThrow(new AccountError('Account is inactive', 'AccountIsInactiveError'))
   })
@@ -116,7 +116,7 @@ describe('DbResetPassword Usecase', () => {
     const { sut, encrypterStub } = makeSut()
     const encryptSpy = jest.spyOn(encrypterStub, 'encrypt')
 
-    await sut.reset('any_email@email.com', 'any_password')
+    await sut.reset('any_hash', 'any_password')
 
     expect(encryptSpy).toHaveBeenCalledWith('any_password')
   })
@@ -125,7 +125,7 @@ describe('DbResetPassword Usecase', () => {
     const { sut, encrypterStub } = makeSut()
     jest.spyOn(encrypterStub, 'encrypt').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
 
-    const promise = sut.reset('any_email@email.com', 'any_password')
+    const promise = sut.reset('any_hash', 'any_password')
 
     await expect(promise).rejects.toThrow()
   })
@@ -134,7 +134,7 @@ describe('DbResetPassword Usecase', () => {
     const { sut, updateAccountRepositoryStub } = makeSut()
     const updateSpy = jest.spyOn(updateAccountRepositoryStub, 'update')
 
-    await sut.reset('any_email@email.com', 'any_password')
+    await sut.reset('any_hash', 'any_password')
 
     expect(updateSpy).toHaveBeenCalledWith('any_id', { password: 'new_hashed_password' })
   })
@@ -143,7 +143,7 @@ describe('DbResetPassword Usecase', () => {
     const { sut, updateAccountRepositoryStub } = makeSut()
     jest.spyOn(updateAccountRepositoryStub, 'update').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
 
-    const promise = sut.reset('any_email@email.com', 'any_password')
+    const promise = sut.reset('any_hash', 'any_password')
 
     await expect(promise).rejects.toThrow()
   })
@@ -151,7 +151,7 @@ describe('DbResetPassword Usecase', () => {
   it('Should return updated account on success', async () => {
     const { sut } = makeSut()
 
-    const account = await sut.reset('any_email@email.com', 'any_password')
+    const account = await sut.reset('any_hash', 'any_password')
 
     expect(account).toEqual({
       id: 'any_id',

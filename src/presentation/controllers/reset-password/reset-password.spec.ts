@@ -2,24 +2,22 @@ import { InvalidParamError, ServerError } from '../../errors'
 import { MissingParamError } from '../../errors/missing-param-error'
 import { appError } from '../../helpers/error-helper'
 import { ResetPasswordController } from './reset-password'
-import { EmailValidator } from '../../protocols/email-validator'
 import { PasswordValidator } from '../../protocols/password-validator'
 import { InvalidPasswordError } from '../../errors/invalid-password-error'
 import { ResetPassword } from '../../../domain/usecases/reset-password'
 import { AccountModel } from '../signup/signup-protocols'
-import { EmailNotRegisteredError } from '../../../data/errors/email-not-registered-error'
 import { AccountError } from '../../../data/errors/account-error'
+import { NotFoundError } from '../../../data/errors/not-found-error'
 
 interface SutTypes {
   sut: ResetPasswordController
-  emailValidatorStub: EmailValidator
   passwordValidatorStub: PasswordValidator
   resetPasswordStub: ResetPassword
 }
 
 const makeResetPasswordStub = (): ResetPassword => {
   class ResetPasswordStub implements ResetPassword {
-    async reset (email: string, password: string): Promise<AccountModel> {
+    async reset (token: string, password: string): Promise<AccountModel> {
       return {
         id: 'any_id',
         username: 'any_username',
@@ -41,31 +39,20 @@ const makePasswordValidatorStub = (): PasswordValidator => {
   return new PasswordValidatorStub()
 }
 
-const makeEmailValidatorStub = (): EmailValidator => {
-  class EmailValidatorStub implements EmailValidator {
-    isValid (email: string): boolean {
-      return true
-    }
-  }
-  return new EmailValidatorStub()
-}
-
 const makeSut = (): SutTypes => {
   const resetPasswordStub = makeResetPasswordStub()
   const passwordValidatorStub = makePasswordValidatorStub()
-  const emailValidatorStub = makeEmailValidatorStub()
-  const sut = new ResetPasswordController(emailValidatorStub, passwordValidatorStub, resetPasswordStub)
+  const sut = new ResetPasswordController(passwordValidatorStub, resetPasswordStub)
 
   return {
     sut,
-    emailValidatorStub,
     passwordValidatorStub,
     resetPasswordStub
   }
 }
 
 describe('ResetPassword Controller', () => {
-  it('Should return 400 if no email is provided', async () => {
+  it('Should return 400 if no token is provided', async () => {
     const { sut } = makeSut()
     const httpRequest = {
       body: {
@@ -77,14 +64,14 @@ describe('ResetPassword Controller', () => {
     const httpResponse = await sut.handle(httpRequest)
 
     expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual(appError(new MissingParamError('email')))
+    expect(httpResponse.body).toEqual(appError(new MissingParamError('token')))
   })
 
   it('Should return 400 if no password is provided', async () => {
     const { sut } = makeSut()
     const httpRequest = {
       body: {
-        email: 'any_email@email.com',
+        token: 'any_hash',
         passwordConfirmation: 'any_password'
       }
     }
@@ -99,7 +86,7 @@ describe('ResetPassword Controller', () => {
     const { sut } = makeSut()
     const httpRequest = {
       body: {
-        email: 'any_email@email.com',
+        token: 'any_hash',
         password: 'any_password'
       }
     }
@@ -114,7 +101,7 @@ describe('ResetPassword Controller', () => {
     const { sut } = makeSut()
     const httpRequest = {
       body: {
-        email: 'any_email@email.com',
+        token: 'any_hash',
         password: 'any_password',
         passwordConfirmation: 'another_password'
       }
@@ -126,64 +113,12 @@ describe('ResetPassword Controller', () => {
     expect(httpResponse.body).toEqual(appError(new InvalidParamError('passwordConfirmation')))
   })
 
-  it('Should call EmailValidator with correct email', async () => {
-    const { sut, emailValidatorStub } = makeSut()
-    const isValidSpy = jest.spyOn(emailValidatorStub, 'isValid')
-    const httpRequest = {
-      body: {
-        email: 'any_email@email.com',
-        password: 'any_password',
-        passwordConfirmation: 'any_password'
-      }
-    }
-
-    await sut.handle(httpRequest)
-
-    expect(isValidSpy).toHaveBeenCalledWith('any_email@email.com')
-  })
-
-  it('Should return 500 if EmailValidator throws', async () => {
-    const { sut, emailValidatorStub } = makeSut()
-    jest.spyOn(emailValidatorStub, 'isValid').mockImplementationOnce(() => {
-      throw new Error()
-    })
-    const httpRequest = {
-      body: {
-        email: 'any_email@email.com',
-        password: 'any_password',
-        passwordConfirmation: 'any_password'
-      }
-    }
-
-    const httpResponse = await sut.handle(httpRequest)
-
-    expect(httpResponse.statusCode).toBe(500)
-    expect(httpResponse.body).toEqual(appError(new ServerError()))
-  })
-
-  it('Should return 400 if EmailValidator returns false', async () => {
-    const { sut, emailValidatorStub } = makeSut()
-    jest.spyOn(emailValidatorStub, 'isValid').mockReturnValueOnce(false)
-    const httpRequest = {
-      body: {
-        email: 'invalid_email@email.com',
-        password: 'any_password',
-        passwordConfirmation: 'any_password'
-      }
-    }
-
-    const httpResponse = await sut.handle(httpRequest)
-
-    expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual(appError(new InvalidParamError('email')))
-  })
-
   it('Should call PasswordValidator with correct password', async () => {
     const { sut, passwordValidatorStub } = makeSut()
     const isValidSpy = jest.spyOn(passwordValidatorStub, 'isValid')
     const httpRequest = {
       body: {
-        email: 'any_email@email.com',
+        token: 'any_hash',
         password: 'any_password',
         passwordConfirmation: 'any_password'
       }
@@ -201,7 +136,7 @@ describe('ResetPassword Controller', () => {
     })
     const httpRequest = {
       body: {
-        email: 'any_email@email.com',
+        token: 'any_hash',
         password: 'any_password',
         passwordConfirmation: 'any_password'
       }
@@ -218,7 +153,7 @@ describe('ResetPassword Controller', () => {
     jest.spyOn(passwordValidatorStub, 'isValid').mockReturnValueOnce(false)
     const httpRequest = {
       body: {
-        email: 'any_email@email.com',
+        token: 'any_hash',
         password: 'invalid_password',
         passwordConfirmation: 'invalid_password'
       }
@@ -235,7 +170,7 @@ describe('ResetPassword Controller', () => {
     const resetSpy = jest.spyOn(resetPasswordStub, 'reset')
     const httpRequest = {
       body: {
-        email: 'any_email@email.com',
+        token: 'any_hash',
         password: 'any_password',
         passwordConfirmation: 'any_password'
       }
@@ -243,7 +178,7 @@ describe('ResetPassword Controller', () => {
 
     await sut.handle(httpRequest)
 
-    expect(resetSpy).toHaveBeenCalledWith('any_email@email.com', 'any_password')
+    expect(resetSpy).toHaveBeenCalledWith('any_hash', 'any_password')
   })
 
   it('Should return 500 if ResetPassword throws', async () => {
@@ -251,7 +186,7 @@ describe('ResetPassword Controller', () => {
     jest.spyOn(resetPasswordStub, 'reset').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
     const httpRequest = {
       body: {
-        email: 'any_email@email.com',
+        token: 'any_hash',
         password: 'any_password',
         passwordConfirmation: 'any_password'
       }
@@ -265,10 +200,10 @@ describe('ResetPassword Controller', () => {
 
   it('Should return 400 if email provided is not registered', async () => {
     const { sut, resetPasswordStub } = makeSut()
-    jest.spyOn(resetPasswordStub, 'reset').mockReturnValueOnce(new Promise((resolve, reject) => reject(new EmailNotRegisteredError())))
+    jest.spyOn(resetPasswordStub, 'reset').mockReturnValueOnce(new Promise((resolve, reject) => reject(new NotFoundError('token'))))
     const httpRequest = {
       body: {
-        email: 'any_email@email.com',
+        token: 'any_hash',
         password: 'any_password',
         passwordConfirmation: 'any_password'
       }
@@ -277,7 +212,7 @@ describe('ResetPassword Controller', () => {
     const httpResponse = await sut.handle(httpRequest)
 
     expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual(appError(new EmailNotRegisteredError()))
+    expect(httpResponse.body).toEqual(appError(new NotFoundError('token')))
   })
 
   it('Should return 400 if account is inactive', async () => {
@@ -285,7 +220,7 @@ describe('ResetPassword Controller', () => {
     jest.spyOn(resetPasswordStub, 'reset').mockReturnValueOnce(new Promise((resolve, reject) => reject(new AccountError('Account is inactive', 'AccountIsInactiveError'))))
     const httpRequest = {
       body: {
-        email: 'any_email@email.com',
+        token: 'any_hash',
         password: 'any_password',
         passwordConfirmation: 'any_password'
       }
@@ -301,7 +236,7 @@ describe('ResetPassword Controller', () => {
     const { sut } = makeSut()
     const httpRequest = {
       body: {
-        email: 'any_email@email.com',
+        token: 'any_hash',
         password: 'any_password',
         passwordConfirmation: 'any_password'
       }
