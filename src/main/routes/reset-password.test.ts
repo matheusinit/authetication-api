@@ -107,5 +107,20 @@ describe('ResetPassword Routes', () => {
         email: 'matheus.oliveira'
       }).expect(400)
     })
+
+    it('Should return bad request if email is not registered', async () => {
+      const fakeAccount = {
+        username: 'Matheus Oliveira',
+        email: 'matheus.oliveira@gmail.com',
+        password: await bcrypt.hash('senha123', 12),
+        status: 'active'
+      }
+
+      await accountCollection.insertOne(fakeAccount)
+
+      await request(app).post('/api/account/reset-password-token').send({
+        email: 'matheus.oliveira1@gmail.com'
+      }).expect(400)
+    })
   })
 })
