@@ -150,10 +150,15 @@ describe('SendResetPasswordEmail Usecase', () => {
   it('Should call UpdateAccountRepository with correct values', async () => {
     const { sut, updateAccountRepositoryStub } = makeSut()
     const updateSpy = jest.spyOn(updateAccountRepositoryStub, 'update')
+    const now = new Date()
+    now.setMilliseconds(0)
 
     await sut.send('any_email@email.com')
 
-    expect(updateSpy).toHaveBeenCalledWith('any_id', { token: 'any_hash' })
+    expect(updateSpy).toHaveBeenCalledWith('any_id', {
+      token: 'any_hash',
+      tokenCreatedAt: now
+    })
   })
 
   it('Should throw if UpdateAccountRepository throws', async () => {
