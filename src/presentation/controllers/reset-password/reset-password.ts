@@ -51,6 +51,10 @@ export class ResetPasswordController implements Controller {
         return badRequest(new AccountError('Account is inactive', 'AccountIsInactiveError'))
       }
 
+      if (error instanceof InvalidParamError) {
+        return badRequest(error)
+      }
+
       return serverError()
     }
   }
