@@ -15,6 +15,22 @@ interface SutTypes {
   updateAccountRepositoryStub: UpdateAccountRepository
 }
 
+const makeUpdateAccountRepositoryStub = (): UpdateAccountRepository => {
+  class UpdateAccountRepositoryStub implements UpdateAccountRepository {
+    async update (id: string, update: any): Promise<AccountModel> {
+      return {
+        id: 'any_id',
+        username: 'any_username',
+        email: 'any_email',
+        password: 'hashed_password',
+        status: 'active'
+      }
+    }
+  }
+
+  return new UpdateAccountRepositoryStub()
+}
+
 const makeEmailSenderStub = (): EmailSender => {
   class EmailSenderStub implements EmailSender {
     async sendEmail (template: string, content: EmailContent): Promise<void> {
@@ -51,19 +67,7 @@ const makeLoadAccountByEmailRepositoryStub = (): LoadAccountByEmailRepository =>
 }
 
 const makeSut = (): SutTypes => {
-  class UpdateAccountRepositoryStub implements UpdateAccountRepository {
-    async update (id: string, update: any): Promise<AccountModel> {
-      return {
-        id: 'any_id',
-        username: 'any_username',
-        email: 'any_email',
-        password: 'hashed_password',
-        status: 'active'
-      }
-    }
-  }
-
-  const updateAccountRepositoryStub = new UpdateAccountRepositoryStub()
+  const updateAccountRepositoryStub = makeUpdateAccountRepositoryStub()
   const emailSenderStub = makeEmailSenderStub()
   const hashGeneratorStub = makeHashGeneratorStub()
   const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepositoryStub()
