@@ -69,7 +69,7 @@ describe('ResetPassword Routes', () => {
       }).expect(400)
     })
 
-    it('Should return an account on success', async () => {
+    it('Should return an bad request if account is inactive', async () => {
       const fakeAccount = {
         username: 'Matheus Oliveira',
         email: 'matheus.oliveira@gmail.com',
