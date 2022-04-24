@@ -11,7 +11,8 @@
 ## Features
  - [x] Cadastro do usuário
  - [x] Autenticação
- - [ ] Recuperação de senha
+ - [x] Enviar email de redefinição da senha 
+ - [x] Recuperação de senha
  - [x] Enviar código de confirmação
  - [x] Ativar conta
 
