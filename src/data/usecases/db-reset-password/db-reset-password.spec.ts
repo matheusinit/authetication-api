@@ -137,6 +137,31 @@ describe('DbResetPassword Usecase', () => {
     await expect(promise).rejects.toThrow(new InvalidParamError('token'))
   })
 
+  it('Should throw an error if token lifetime is greater than 24 hours', async () => {
+    const { sut, loadAccountByTokenRepositoryStub } = makeSut()
+    jest.spyOn(loadAccountByTokenRepositoryStub, 'loadByToken').mockReturnValueOnce(new Promise(resolve => {
+      const tokenCreatedAt = new Date()
+      tokenCreatedAt.setMilliseconds(0)
+
+      tokenCreatedAt.setHours(tokenCreatedAt.getHours() - 24)
+      tokenCreatedAt.setSeconds(tokenCreatedAt.getSeconds() - 1)
+
+      return resolve({
+        id: 'any_id',
+        username: 'any_username',
+        email: 'any_email',
+        password: 'hashed_password',
+        status: 'active',
+        token: 'any_hash',
+        tokenCreatedAt
+      })
+    }))
+
+    const promise = sut.reset('any_hash', 'any_password')
+
+    await expect(promise).rejects.toThrow(new InvalidParamError('token'))
+  })
+
   it('Should call Encrypter with correct password', async () => {
     const { sut, encrypterStub } = makeSut()
     const encryptSpy = jest.spyOn(encrypterStub, 'encrypt')
