@@ -126,7 +126,7 @@ describe('ResetPassword Routes', () => {
       await request(app).post('/api/account/reset-password-token').send({
         email: 'matheus.oliveira@gmail.com'
       }).expect(200)
-    })
+    }, 60000)
 
     it('Should return bad request if email is invalid', async () => {
       await request(app).post('/api/account/reset-password-token').send({
