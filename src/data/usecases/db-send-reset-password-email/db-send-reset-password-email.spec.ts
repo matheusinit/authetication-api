@@ -156,6 +156,15 @@ describe('SendResetPasswordEmail Usecase', () => {
     expect(updateSpy).toHaveBeenCalledWith('any_id', { token: 'any_hash' })
   })
 
+  it('Should throw if UpdateAccountRepository throws', async () => {
+    const { sut, updateAccountRepositoryStub } = makeSut()
+    jest.spyOn(updateAccountRepositoryStub, 'update').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+
+    const promise = sut.send('any_email@email.com')
+
+    await expect(promise).rejects.toThrow()
+  })
+
   it('Should call EmailSender with correct values', async () => {
     const { sut, emailSenderStub } = makeSut()
     const sendEmailSpy = jest.spyOn(emailSenderStub, 'sendEmail')
