@@ -37,7 +37,10 @@ export class DbSendResetPasswordEmail implements SendResetPasswordEmail {
 
     const token = this.hashGenerator.generate()
 
-    await this.updateAccountRepository.update(account.id, { token })
+    const now = new Date()
+    now.setMilliseconds(0)
+
+    await this.updateAccountRepository.update(account.id, { token, tokenCreatedAt: now })
 
     await this.emailSender.sendEmail('reset-password', {
       to: email,
