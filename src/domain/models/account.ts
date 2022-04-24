@@ -4,5 +4,7 @@ export interface AccountModel {
   email: string
   password: string
   status: string
+  token?: string
+  tokenCreatedAt?: Date
   code_id?: string
 }
