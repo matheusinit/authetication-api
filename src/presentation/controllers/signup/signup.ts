@@ -3,6 +3,8 @@ import { InvalidParamError, MissingParamError } from '../../errors'
 import { badRequest, ok, serverError } from '../../helpers/http-helper'
 import { PasswordValidator } from '../../protocols/password-validator'
 import { InvalidPasswordError } from '../../errors/invalid-password-error'
+import { UnavailableUsernameError } from '../../../data/errors/unavailable-username-error'
+import { UnavailableEmailError } from '../../../data/errors/unavailable-email-error'
 
 export class SignUpController implements Controller {
   private readonly emailValidator: EmailValidator
@@ -54,12 +56,12 @@ export class SignUpController implements Controller {
       })
 
       return ok(account)
-    } catch (err) {
-      const error = err as Error
-      if (error.name === 'UnavailableUsernameError') {
+    } catch (error) {
+      if (error instanceof UnavailableUsernameError) {
         return badRequest(error)
       }
-      if (error.name === 'UnavailableEmailError') {
+
+      if (error instanceof UnavailableEmailError) {
         return badRequest(error)
       }
       return serverError()
