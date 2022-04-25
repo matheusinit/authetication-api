@@ -1,0 +1,53 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Authentication API",
+    "description": "Uma API de autenticação e autorização utilizando Express para gerenciamento de usuários.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/login": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Request for an access token",
+        "description": "Make an authentication",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string" 
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "email": "matheus.oliveira@gmail.com",
+                  "password": "Minha.Senha1"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "A JWT token",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
