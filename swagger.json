@@ -6,9 +6,71 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/api/signup": {
+      "post": {
+        "tags": ["Account"],
+        "summary": "Create an account",
+        "description": "Save an inactive account on database",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  },
+                  "passwordConfirmation": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "username": "matheusinit",
+                  "email": "matheus.oliveira@gmail.com",
+                  "password": "Minha.Senha1",
+                  "passwordConfirmation": "Minha.Senha1"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returns the account saved on database",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "username": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/login": {
       "post": {
-        "tags": ["User"],
+        "tags": ["Account"],
         "summary": "Request for an access token",
         "description": "Make an authentication",
         "requestBody": {
@@ -19,7 +81,7 @@
                 "type": "object",
                 "properties": {
                   "email": {
-                    "type": "string" 
+                    "type": "string"
                   },
                   "password": {
                     "type": "string"
@@ -35,7 +97,7 @@
         },
         "responses": {
           "200": {
-            "description": "A JWT token",
+            "description": "Returns a JWT token to use as access token",
             "schema": {
               "type": "object",
               "properties": {
@@ -47,7 +109,194 @@
           }
         }
       }
+    },
+    "/api/account/confirmation": {
+      "post": {
+        "tags": ["Account"],
+        "summary": "Sends a confirmation email to registered user",
+        "description": "Sends an email to user saved in database to activate account",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "email": "matheus.oliveira@gmail.com"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returns a message saying that email was sent",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/account/confirm": {
+      "post": {
+        "tags": ["Account"],
+        "summary": "Confirm account using a code",
+        "description": "Activate account using a code to be able to use account",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "code": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "email": "matheus.oliveira@gmail.com",
+                  "code": "765D6E85"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Return the activated account",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "username": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/account/reset-password-token": {
+      "post": {
+        "tags": ["Account"],
+        "summary": "Receive a link to change password",
+        "description": "Sends a link to change password through email",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "email": "matheus.oliveira@gmail.com"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returns an message saying that the email was sent",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                } 
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/account/reset-password": {
+      "put": {
+        "tags": ["Account"],
+        "summary": "Set new password",
+        "description": "Change password stored in database",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  },
+                  "passwordConfirmation": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "token": "2956a3af7cd0745be89cc8b506d95215304143d9341275092b59cc49597f7545a488f1d0b7e21a7e8515be15aed1d3c6",
+                  "password": "Minha.Senha1",
+                  "passwordConfirmation": "Minha.Senha1"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returns an account with the updated password hashed",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "username": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                } 
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
-
