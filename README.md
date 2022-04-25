@@ -50,12 +50,67 @@ Recomendado utilização de Docker:
 
 Para instalação do Docker: https://docs.docker.com/get-docker/
 
-### Construindo Containers
+### Configurar ambiente
 
-+ Construir containers com Docker-compose
-```bash
-docker-compose up -d
+```env
+
+# Jwt
+SECRET = secret to use in jwt
+EXPIRES_IN = 1d # example
+
+# MongoDB
+
+MONGO_URL = mongodb://username:password@localhost:27017/?authMechanism=DEFAULT # example
+
+MONGO_USER = username # example
+MONGO_PASS = password # example
+
+# Mail Service
+
+SMTP_HOST =
+SMTP_PORT =
+SMTP_USER =
+SMTP_PASS =
+
 ```
+
++ Para gerar *SECRET* para JsonWebToken:
+  + Pega uma chave em [Random Keygen](https://randomkeygen.com/)
+  + Coloque em *SECRET*
+
++ *EXPIRES_IN* é o tempo em que o token JWT se expira
+  + 10h para 10 horas
+  + 20d para 20 dias
+  + 60s para 60 segundos
+
++ *MONGO_URL* é a URI do MongoDB
+  + Utilize os paramêtros usado em *MONGO_USER* e *MONGO_PASS*
+
++ *MONG0_USER* é nome do administrador do banco de dados
++ *MONGO_PASS* é a senha do administrador do banco de dados
+
++ *SMTP* é sobre o serviço de email
+  + Para desenvolvimento, eu recomendo utilizar (Ethereal)[https://ethereal.email/]
+
+### Gerenciamento de containers 
+
++ Para construir os containers:
+
+```bash
+npm run up
+```
+
++ Para destruir os containers
+
+```bash
+npm run down
+```
+
+*Obs.: A utilização de containers é opcional, mas recomendado*
+
+### Utilização sem containers
+
++ Para executar a aplicação sem os containers, configure o ambiente de desenvolvimento (arquivo *.env*) com o seu MongoDB. E prossiga seguindo a documentação.
 
 ### Rodando API (passa-a-passo)
 
