@@ -40,14 +40,22 @@ export class ActivateAccountController implements Controller {
     } catch (error) {
       if (error instanceof EmailNotRegisteredError) {
         return notFound(error)
-      } else if (error instanceof AccountError) {
+      }
+
+      if (error instanceof AccountError) {
         return badRequest(error)
-      } else if (error instanceof ConfirmationCodeNotFoundError) {
+      }
+
+      if (error instanceof ConfirmationCodeNotFoundError) {
         return notFound(error)
-      } else if (error instanceof InvalidConfirmationCodeError) {
+      }
+
+      if (error instanceof InvalidConfirmationCodeError) {
         if (error.message === 'Confirmation Code has passed of its lifetime') {
           return badRequest(error)
-        } else if (error.message === 'Invalid Confirmation Code') {
+        }
+
+        if (error.message === 'Invalid Confirmation Code') {
           return badRequest(error)
         }
       }

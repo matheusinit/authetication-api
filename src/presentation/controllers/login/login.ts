@@ -30,7 +30,9 @@ export class LoginController implements Controller {
     } catch (error) {
       if (error instanceof EmailNotRegisteredError) {
         return badRequest(error)
-      } else if (error instanceof PasswordNotMatchError) {
+      }
+
+      if (error instanceof PasswordNotMatchError) {
         return badRequest(error)
       }
 

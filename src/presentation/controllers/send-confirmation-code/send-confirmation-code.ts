@@ -35,7 +35,9 @@ export class SendConfirmationCodeController implements Controller {
     } catch (error) {
       if (error instanceof EmailNotRegisteredError) {
         return badRequest(error)
-      } else if (error instanceof AccountError) {
+      }
+
+      if (error instanceof AccountError) {
         return badRequest(error)
       }
 
