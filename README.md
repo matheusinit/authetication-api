@@ -1,6 +1,6 @@
 <h2 align="center">Authenticação API</h2>
 
-<p align="center">API Rest de autenticação de usuários desenvolvida em Node.js para aplicar conceitos de TDD e SOLID.</p>
+<p align="center">API Rest de autenticação de usuários desenvolvida em Node.js para aplicar conceitos de Test Driven Development (TDD) e SOLID. E aplicar os conceitos de autenticação utilizando tokens e praticar com algumas tecnologias, como: *MongoDB*, *Docker*, *Nodemailer*, *Swagger*</p>
 
 ## Status
 
