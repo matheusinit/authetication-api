@@ -33,6 +33,7 @@ Para mais detalhes de requisitos e regras de negócio, veja a [documentação](d
  + fast-glob
  + Nodemailer
  + Handlebars Template
+ + Swagger
 
 ## Como rodar
 
