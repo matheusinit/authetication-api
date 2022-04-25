@@ -1,6 +1,6 @@
 import { SendConfirmationCode } from '../../../domain/usecases/send-confirmation-code'
 import { AccountError } from '../../errors/account-error'
-import { EmailNotRegisteredError } from '../../errors/email-not-registered-error'
+import { NotFoundError } from '../../errors/not-found-error'
 import { CheckEmailRepository } from '../../protocols/check-email-repository'
 import { CodeGenerator } from '../../protocols/code-generator'
 import { EmailSender } from '../../protocols/email-sender'
@@ -32,7 +32,7 @@ export class DbSendConfirmationCode implements SendConfirmationCode {
     const isExistentEmail = await this.checkEmailRepository.checkEmail(email)
 
     if (isExistentEmail) {
-      throw new EmailNotRegisteredError()
+      throw new NotFoundError('email')
     }
 
     const account = await this.loadAccountByEmailRepository.loadByEmail(email)

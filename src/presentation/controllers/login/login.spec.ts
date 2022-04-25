@@ -1,5 +1,4 @@
-import { EmailNotRegisteredError } from '../../../data/errors/email-not-registered-error'
-import { PasswordNotMatchError } from '../../../data/errors/password-not-match-error'
+import { NotFoundError } from '../../../data/errors/not-found-error'
 import { AuthAccount, Credentials } from '../../../domain/usecases/auth-account'
 import { MissingParamError, ServerError } from '../../errors'
 import { appError } from '../../helpers/error-helper'
@@ -57,7 +56,7 @@ describe('Login Controller', () => {
 
   it('Should return 400 if email is not registered', async () => {
     const { sut, authAccountStub } = makeSut()
-    jest.spyOn(authAccountStub, 'auth').mockReturnValueOnce(new Promise((resolve, reject) => reject(new EmailNotRegisteredError())))
+    jest.spyOn(authAccountStub, 'auth').mockReturnValueOnce(new Promise((resolve, reject) => reject(new NotFoundError('email'))))
     const httpRequest = {
       body: {
         email: 'any_email@mail.com',
@@ -66,12 +65,12 @@ describe('Login Controller', () => {
     }
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual(appError(new EmailNotRegisteredError()))
+    expect(httpResponse.body).toEqual(appError(new NotFoundError('email')))
   })
 
   it('Should return 400 if password doest not match', async () => {
     const { sut, authAccountStub } = makeSut()
-    jest.spyOn(authAccountStub, 'auth').mockReturnValueOnce(new Promise((resolve, reject) => reject(new PasswordNotMatchError())))
+    jest.spyOn(authAccountStub, 'auth').mockReturnValueOnce(new Promise((resolve, reject) => reject(new NotFoundError('password'))))
     const httpRequest = {
       body: {
         email: 'any_email@mail.com',
@@ -80,7 +79,7 @@ describe('Login Controller', () => {
     }
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual(appError(new PasswordNotMatchError()))
+    expect(httpResponse.body).toEqual(appError(new NotFoundError('password')))
   })
 
   it('Should call AuthAccount with correct values', async () => {

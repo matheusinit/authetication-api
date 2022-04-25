@@ -1,7 +1,7 @@
 import { AccountError } from '../../../data/errors/account-error'
 import { ConfirmationCodeNotFoundError } from '../../../data/errors/confirmation-code-not-found-error'
-import { EmailNotRegisteredError } from '../../../data/errors/email-not-registered-error'
 import { InvalidConfirmationCodeError } from '../../../data/errors/invalid-confirmation-code-error'
+import { NotFoundError } from '../../../data/errors/not-found-error'
 import { AccountInfo, ActivateAccount } from '../../../domain/usecases/activate-account'
 import { InvalidParamError, MissingParamError, ServerError } from '../../errors'
 import { appError } from '../../helpers/error-helper'
@@ -150,7 +150,7 @@ describe('ActivateAccount Controller', () => {
 
   it('Should return 404 if email is not registered in system', async () => {
     const { sut, activateAccountStub } = makeSut()
-    jest.spyOn(activateAccountStub, 'activate').mockReturnValueOnce(new Promise((resolve, reject) => reject(new EmailNotRegisteredError())))
+    jest.spyOn(activateAccountStub, 'activate').mockReturnValueOnce(new Promise((resolve, reject) => reject(new NotFoundError('email'))))
     const httpRequest = {
       body: {
         email: 'any_email@email.com',
@@ -161,7 +161,7 @@ describe('ActivateAccount Controller', () => {
     const httpResponse = await sut.handle(httpRequest)
 
     expect(httpResponse.statusCode).toBe(404)
-    expect(httpResponse.body).toEqual(appError(new EmailNotRegisteredError()))
+    expect(httpResponse.body).toEqual(appError(new NotFoundError('email')))
   })
 
   it('Should return 400 if account is already active', async () => {

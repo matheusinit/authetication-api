@@ -1,6 +1,5 @@
 import { AuthAccount, Credentials } from '../../../domain/usecases/auth-account'
-import { EmailNotRegisteredError } from '../../errors/email-not-registered-error'
-import { PasswordNotMatchError } from '../../errors/password-not-match-error'
+import { NotFoundError } from '../../errors/not-found-error'
 import { HashComparator } from '../../protocols/hash-comparator'
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
 import { TokenGenerator } from '../../protocols/token-generator'
@@ -24,13 +23,13 @@ export class DbAuthAccount implements AuthAccount {
     const account = await this.loadAccountByEmailRepository.loadByEmail(credentials.email)
 
     if (!account) {
-      throw new EmailNotRegisteredError()
+      throw new NotFoundError('email')
     }
 
     const isValid = await this.hashComparator.compare(credentials.password, account.password)
 
     if (!isValid) {
-      throw new PasswordNotMatchError()
+      throw new NotFoundError('password')
     }
 
     const token = this.tokenGenerator.generate({

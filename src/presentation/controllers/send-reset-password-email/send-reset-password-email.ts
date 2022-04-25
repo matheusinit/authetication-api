@@ -1,5 +1,5 @@
 import { AccountError } from '../../../data/errors/account-error'
-import { EmailNotRegisteredError } from '../../../data/errors/email-not-registered-error'
+import { NotFoundError } from '../../../data/errors/not-found-error'
 import { SendResetPasswordEmail } from '../../../domain/usecases/send-reset-password-email'
 import { InvalidParamError, MissingParamError } from '../../errors'
 import { badRequest, serverError, ok } from '../../helpers/http-helper'
@@ -33,7 +33,7 @@ export class SendResetPasswordEmailController implements Controller {
 
       return ok({ message: 'Email sent' })
     } catch (error) {
-      if (error instanceof EmailNotRegisteredError) {
+      if (error instanceof NotFoundError) {
         return badRequest(error)
       }
 

@@ -1,5 +1,5 @@
 import { AccountError } from '../../../data/errors/account-error'
-import { EmailNotRegisteredError } from '../../../data/errors/email-not-registered-error'
+import { NotFoundError } from '../../../data/errors/not-found-error'
 import { SendConfirmationCode } from '../../../domain/usecases/send-confirmation-code'
 import { InvalidParamError, MissingParamError, ServerError } from '../../errors'
 import { appError } from '../../helpers/error-helper'
@@ -82,7 +82,7 @@ describe('SendConfirmationCode Controller', () => {
 
   it('Should return 400 if email is not registered', async () => {
     const { sut, sendConfirmationCodeStub } = makeSut()
-    jest.spyOn(sendConfirmationCodeStub, 'send').mockReturnValueOnce(new Promise((resolve, reject) => reject(new EmailNotRegisteredError())))
+    jest.spyOn(sendConfirmationCodeStub, 'send').mockReturnValueOnce(new Promise((resolve, reject) => reject(new NotFoundError('email'))))
     const httpRequest = {
       body: {
         email: 'any_email@mail.com'
@@ -90,7 +90,7 @@ describe('SendConfirmationCode Controller', () => {
     }
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual(appError(new EmailNotRegisteredError()))
+    expect(httpResponse.body).toEqual(appError(new NotFoundError('email')))
   })
 
   it('Should return 400 if account is already active', async () => {

@@ -1,11 +1,11 @@
 import { AccountError } from '../../errors/account-error'
-import { EmailNotRegisteredError } from '../../errors/email-not-registered-error'
 import { EmailContent, EmailSender } from '../../protocols/email-sender'
 import { HashGenerator } from '../../protocols/hash-generator'
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
 import { AccountModel } from '../db-add-account/db-add-account-protocols'
 import { DbSendResetPasswordEmail } from './db-send-reset-password-email'
 import { UpdateAccountRepository } from '../../protocols/update-account-repository'
+import { NotFoundError } from '../../errors/not-found-error'
 
 interface SutTypes {
   sut: DbSendResetPasswordEmail
@@ -107,7 +107,7 @@ describe('SendResetPasswordEmail Usecase', () => {
 
     const promise = sut.send('any_email@email.com')
 
-    await expect(promise).rejects.toThrow(new EmailNotRegisteredError())
+    await expect(promise).rejects.toThrow(new NotFoundError('email'))
   })
 
   it('Should throw an error if account is inactive', async () => {

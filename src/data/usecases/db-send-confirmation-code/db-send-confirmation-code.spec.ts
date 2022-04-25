@@ -1,4 +1,3 @@
-import { EmailNotRegisteredError } from '../../errors/email-not-registered-error'
 import { CheckEmailRepository } from '../../protocols/check-email-repository'
 import { DbSendConfirmationCode } from './db-send-confirmation-code'
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
@@ -7,6 +6,7 @@ import { AccountError } from '../../errors/account-error'
 import { CodeGenerator } from '../../protocols/code-generator'
 import { StoreConfirmationCodeRepository } from '../../protocols/store-confirmation-code-repository'
 import { EmailContent, EmailSender } from '../../protocols/email-sender'
+import { NotFoundError } from '../../errors/not-found-error'
 
 interface SutTypes {
   sut: DbSendConfirmationCode
@@ -110,7 +110,7 @@ describe('DbSendConfirmationCode', () => {
     const { sut, checkEmailRepositoryStub } = makeSut()
     jest.spyOn(checkEmailRepositoryStub, 'checkEmail').mockReturnValueOnce(new Promise(resolve => resolve(true)))
     const promise = sut.send('any_email@mail.com')
-    await expect(promise).rejects.toThrow(new EmailNotRegisteredError())
+    await expect(promise).rejects.toThrow(new NotFoundError('email'))
   })
 
   it('Should call LoadAccountByEmailRepository with correct email', async () => {

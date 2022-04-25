@@ -1,10 +1,10 @@
 import { SendResetPasswordEmail } from '../../../domain/usecases/send-reset-password-email'
-import { EmailNotRegisteredError } from '../../errors/email-not-registered-error'
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
 import { AccountError } from '../../errors/account-error'
 import { HashGenerator } from '../../protocols/hash-generator'
 import { EmailSender } from '../../protocols/email-sender'
 import { UpdateAccountRepository } from '../../protocols/update-account-repository'
+import { NotFoundError } from '../../errors/not-found-error'
 
 export class DbSendResetPasswordEmail implements SendResetPasswordEmail {
   private readonly loadAccountByEmailRepository: LoadAccountByEmailRepository
@@ -28,7 +28,7 @@ export class DbSendResetPasswordEmail implements SendResetPasswordEmail {
     const account = await this.loadAccountByEmailRepository.loadByEmail(email)
 
     if (!account) {
-      throw new EmailNotRegisteredError()
+      throw new NotFoundError('email')
     }
 
     if (account.status === 'inactive') {

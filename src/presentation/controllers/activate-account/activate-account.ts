@@ -1,7 +1,7 @@
 import { AccountError } from '../../../data/errors/account-error'
 import { ConfirmationCodeNotFoundError } from '../../../data/errors/confirmation-code-not-found-error'
-import { EmailNotRegisteredError } from '../../../data/errors/email-not-registered-error'
 import { InvalidConfirmationCodeError } from '../../../data/errors/invalid-confirmation-code-error'
+import { NotFoundError } from '../../../data/errors/not-found-error'
 import { ActivateAccount } from '../../../domain/usecases/activate-account'
 import { InvalidParamError, MissingParamError } from '../../errors'
 import { badRequest, notFound, ok, serverError } from '../../helpers/http-helper'
@@ -38,7 +38,7 @@ export class ActivateAccountController implements Controller {
 
       return ok(account)
     } catch (error) {
-      if (error instanceof EmailNotRegisteredError) {
+      if (error instanceof NotFoundError) {
         return notFound(error)
       }
 

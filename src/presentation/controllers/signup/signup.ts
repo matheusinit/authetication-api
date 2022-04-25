@@ -2,7 +2,6 @@ import { AddAccount, Controller, EmailValidator, HttpRequest, HttpResponse } fro
 import { InvalidParamError, MissingParamError } from '../../errors'
 import { badRequest, ok, serverError } from '../../helpers/http-helper'
 import { PasswordValidator } from '../../protocols/password-validator'
-import { InvalidPasswordError } from '../../errors/invalid-password-error'
 import { UnavailableUsernameError } from '../../../data/errors/unavailable-username-error'
 import { UnavailableEmailError } from '../../../data/errors/unavailable-email-error'
 
@@ -46,7 +45,7 @@ export class SignUpController implements Controller {
       const isPasswordValid = this.passwordValidator.isValid(password)
 
       if (!isPasswordValid) {
-        return badRequest(new InvalidPasswordError())
+        return badRequest(new InvalidParamError('password'))
       }
 
       const account = await this.addAccount.add({

@@ -1,8 +1,8 @@
 import { AccountInfo, ActivateAccount } from '../../../domain/usecases/activate-account'
 import { AccountError } from '../../errors/account-error'
 import { ConfirmationCodeNotFoundError } from '../../errors/confirmation-code-not-found-error'
-import { EmailNotRegisteredError } from '../../errors/email-not-registered-error'
 import { InvalidConfirmationCodeError } from '../../errors/invalid-confirmation-code-error'
+import { NotFoundError } from '../../errors/not-found-error'
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
 import { LoadConfirmationCodeByEmailRepository } from '../../protocols/load-confirmation-code-by-email-repository'
 import { UpdateAccountRepository } from '../../protocols/update-account-repository'
@@ -27,7 +27,7 @@ export class DbActivateAccount implements ActivateAccount {
     const account = await this.loadAccountByEmailRepository.loadByEmail(accountInfo.email)
 
     if (!account) {
-      throw new EmailNotRegisteredError()
+      throw new NotFoundError('email')
     }
 
     if (account.status === 'active') {
