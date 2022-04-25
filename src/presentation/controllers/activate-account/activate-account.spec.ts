@@ -1,5 +1,4 @@
 import { AccountError } from '../../../data/errors/account-error'
-import { ConfirmationCodeNotFoundError } from '../../../data/errors/confirmation-code-not-found-error'
 import { InvalidConfirmationCodeError } from '../../../data/errors/invalid-confirmation-code-error'
 import { NotFoundError } from '../../../data/errors/not-found-error'
 import { AccountInfo, ActivateAccount } from '../../../domain/usecases/activate-account'
@@ -182,7 +181,7 @@ describe('ActivateAccount Controller', () => {
 
   it('Should return 404 if confirmation code is not found', async () => {
     const { sut, activateAccountStub } = makeSut()
-    jest.spyOn(activateAccountStub, 'activate').mockReturnValueOnce(new Promise((resolve, reject) => reject(new ConfirmationCodeNotFoundError())))
+    jest.spyOn(activateAccountStub, 'activate').mockReturnValueOnce(new Promise((resolve, reject) => reject(new NotFoundError('confirmationCode'))))
     const httpRequest = {
       body: {
         email: 'any_email@email.com',
@@ -193,7 +192,7 @@ describe('ActivateAccount Controller', () => {
     const httpResponse = await sut.handle(httpRequest)
 
     expect(httpResponse.statusCode).toBe(404)
-    expect(httpResponse.body).toEqual(appError(new ConfirmationCodeNotFoundError()))
+    expect(httpResponse.body).toEqual(appError(new NotFoundError('confirmationCode')))
   })
 
   it('Should return 400 if confirmation code has passed of its lifetime', async () => {

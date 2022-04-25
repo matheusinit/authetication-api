@@ -1,6 +1,5 @@
 import { AccountInfo, ActivateAccount } from '../../../domain/usecases/activate-account'
 import { AccountError } from '../../errors/account-error'
-import { ConfirmationCodeNotFoundError } from '../../errors/confirmation-code-not-found-error'
 import { InvalidConfirmationCodeError } from '../../errors/invalid-confirmation-code-error'
 import { NotFoundError } from '../../errors/not-found-error'
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
@@ -37,7 +36,7 @@ export class DbActivateAccount implements ActivateAccount {
     const confirmationCode = await this.loadConfirmationCodeByEmailRepository.loadByEmail(accountInfo.email)
 
     if (!confirmationCode) {
-      throw new ConfirmationCodeNotFoundError()
+      throw new NotFoundError('confirmationCode')
     }
 
     const limitTime = new Date()

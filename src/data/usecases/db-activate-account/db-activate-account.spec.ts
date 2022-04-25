@@ -1,6 +1,5 @@
 import { ConfirmationCode } from '../../../domain/models/confirmation-code'
 import { AccountError } from '../../errors/account-error'
-import { ConfirmationCodeNotFoundError } from '../../errors/confirmation-code-not-found-error'
 import { InvalidConfirmationCodeError } from '../../errors/invalid-confirmation-code-error'
 import { NotFoundError } from '../../errors/not-found-error'
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
@@ -159,7 +158,7 @@ describe('DbActivateAccount Usecase', () => {
     }
     const promise = sut.activate(accountInfo)
 
-    await expect(promise).rejects.toThrow(new ConfirmationCodeNotFoundError())
+    await expect(promise).rejects.toThrow(new NotFoundError('confirmationCode'))
   })
 
   it('Should throws if LoadConfirmationCodeByEmailRepository throws', async () => {
