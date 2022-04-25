@@ -90,7 +90,7 @@ SMTP_PASS =
 + *MONGO_PASS* é a senha do administrador do banco de dados
 
 + *SMTP* é sobre o serviço de email
-  + Para desenvolvimento, eu recomendo utilizar (Ethereal)[https://ethereal.email/]
+  + Para desenvolvimento, eu recomendo utilizar [Ethereal](https://ethereal.email/)
 
 ### Gerenciamento de containers 
 
