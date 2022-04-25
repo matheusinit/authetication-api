@@ -35,6 +35,10 @@ Para mais detalhes de requisitos e regras de negócio, veja a [documentação](d
  + Handlebars Template
  + Swagger
 
+## Documentação
+
+Ao executar a aplicação, é possível visualizar a documentação das rotas em **localhost:3000/api-docs**.
+
 ## Como rodar
 
 ### Pré-requisitos
