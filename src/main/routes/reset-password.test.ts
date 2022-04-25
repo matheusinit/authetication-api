@@ -3,6 +3,10 @@ import request from 'supertest'
 import { MongoHelper } from '../../infra/db/mongodb/helpers/mongo-helper'
 import app from './../config/app'
 import bcrypt from 'bcrypt'
+import { appError } from '../../presentation/helpers/error-helper'
+import { InvalidParamError } from '../../presentation/errors'
+import { NotFoundError } from '../../data/errors/not-found-error'
+import { AccountError } from '../../data/errors/account-error'
 
 let accountCollection: Collection
 
@@ -39,19 +43,30 @@ describe('ResetPassword Routes', () => {
       }
       await accountCollection.insertOne(fakeAccount)
 
-      await request(app).put('/api/account/reset-password').send({
+      const response = await request(app).put('/api/account/reset-password').send({
         token,
         password: 'Senhaa.123',
         passwordConfirmation: 'Senhaa.123'
-      }).expect(200)
+      })
+
+      expect(response.status).toBe(200)
+
+      expect(response.body.id).toBeTruthy()
+      expect(response.body.username).toBe('Matheus Oliveira')
+      expect(response.body.email).toBe('matheus.oliveira@gmail.com')
+      expect(response.body.password).toBeTruthy()
+      expect(response.body.status).toBe('active')
     })
 
     it('Should return a bad request if password is invalid', async () => {
-      await request(app).put('/api/account/reset-password').send({
+      const response = await request(app).put('/api/account/reset-password').send({
         token,
         password: 'Senha',
         passwordConfirmation: 'Senha'
-      }).expect(400)
+      })
+
+      expect(response.status).toBe(400)
+      expect(response.body).toEqual(appError(new InvalidParamError('password')))
     })
 
     it('Should return a bad request if token is not registered', async () => {
@@ -64,11 +79,14 @@ describe('ResetPassword Routes', () => {
       }
       await accountCollection.insertOne(fakeAccount)
 
-      await request(app).put('/api/account/reset-password').send({
+      const response = await request(app).put('/api/account/reset-password').send({
         token: '2a8hab',
         password: 'Senhaa.123',
         passwordConfirmation: 'Senhaa.123'
-      }).expect(400)
+      })
+
+      expect(response.status).toBe(400)
+      expect(response.body).toEqual(appError(new NotFoundError('token')))
     })
 
     it('Should return an bad request if account is inactive', async () => {
@@ -79,13 +97,17 @@ describe('ResetPassword Routes', () => {
         password: await bcrypt.hash('senha123', 12),
         status: 'inactive'
       }
+
       await accountCollection.insertOne(fakeAccount)
 
-      await request(app).put('/api/account/reset-password').send({
+      const response = await request(app).put('/api/account/reset-password').send({
         token,
         password: 'Senhaa.123',
         passwordConfirmation: 'Senhaa.123'
-      }).expect(400)
+      })
+
+      expect(response.status).toBe(400)
+      expect(response.body).toEqual(appError(new AccountError('Account is inactive', 'AccountIsInactiveError')))
     })
 
     it('Should return a bad request if token is invalid', async () => {
@@ -104,11 +126,14 @@ describe('ResetPassword Routes', () => {
       }
       await accountCollection.insertOne(fakeAccount)
 
-      await request(app).put('/api/account/reset-password').send({
+      const response = await request(app).put('/api/account/reset-password').send({
         token,
         password: 'Senhaa.123',
         passwordConfirmation: 'Senhaa.123'
-      }).expect(400)
+      })
+
+      expect(response.status).toBe(400)
+      expect(response.body).toEqual(appError(new InvalidParamError('token')))
     })
   })
 
@@ -123,15 +148,21 @@ describe('ResetPassword Routes', () => {
 
       await accountCollection.insertOne(fakeAccount)
 
-      await request(app).post('/api/account/reset-password-token').send({
+      const response = await request(app).post('/api/account/reset-password-token').send({
         email: 'matheus.oliveira@gmail.com'
-      }).expect(200)
+      })
+
+      expect(response.status).toBe(200)
+      expect(response.body.message).toBeTruthy()
     }, 60000)
 
     it('Should return bad request if email is invalid', async () => {
-      await request(app).post('/api/account/reset-password-token').send({
+      const response = await request(app).post('/api/account/reset-password-token').send({
         email: 'matheus.oliveira'
-      }).expect(400)
+      })
+
+      expect(response.status).toBe(400)
+      expect(response.body).toEqual(appError(new InvalidParamError('email')))
     })
 
     it('Should return bad request if email is not registered', async () => {
@@ -144,9 +175,12 @@ describe('ResetPassword Routes', () => {
 
       await accountCollection.insertOne(fakeAccount)
 
-      await request(app).post('/api/account/reset-password-token').send({
+      const response = await request(app).post('/api/account/reset-password-token').send({
         email: 'matheus.oliveira1@gmail.com'
-      }).expect(400)
+      })
+
+      expect(response.status).toBe(400)
+      expect(response.body).toEqual(appError(new NotFoundError('email')))
     })
 
     it('Should return bad request if account is inactive', async () => {
@@ -159,9 +193,12 @@ describe('ResetPassword Routes', () => {
 
       await accountCollection.insertOne(fakeAccount)
 
-      await request(app).post('/api/account/reset-password-token').send({
+      const response = await request(app).post('/api/account/reset-password-token').send({
         email: 'matheus.oliveira@gmail.com'
-      }).expect(400)
+      })
+
+      expect(response.status).toBe(400)
+      expect(response.body).toEqual(appError(new AccountError('Account is inactive', 'AccountIsInactiveError')))
     })
   })
 })

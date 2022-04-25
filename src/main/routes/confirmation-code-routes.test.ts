@@ -5,6 +5,12 @@ import { Collection } from 'mongodb'
 import { MongoHelper } from '../../infra/db/mongodb/helpers/mongo-helper'
 import app from '../config/app'
 import env from '../config/env'
+import { appError } from '../../presentation/helpers/error-helper'
+import { NotFoundError } from '../../data/errors/not-found-error'
+import { AccountError } from '../../data/errors/account-error'
+import { UnauthenticatedError } from '../../presentation/errors/unauthenticated-error'
+import { InvalidParamError, MissingParamError } from '../../presentation/errors'
+import { InvalidConfirmationCodeError } from '../../data/errors/invalid-confirmation-code-error'
 
 let accountCollection: Collection
 let confirmationCodeCollection: Collection
@@ -38,10 +44,13 @@ describe('ConfirmationCode Routes', () => {
 
       const token = jwt.sign({ id, email: 'matheus.oliveira@gmail.com' }, env.secret)
 
-      await request(app).post('/api/account/confirmation').set('Authorization', `Bearer: ${token}`).send({
+      const response = await request(app).post('/api/account/confirmation').set('Authorization', `Bearer: ${token}`).send({
         email: 'matheus.oliveira@gmail.com'
-      }).expect(200)
-    }, 60000)
+      })
+
+      expect(response.status).toBe(200)
+      expect(response.body.message).toBeTruthy()
+    }, 80000)
 
     it('Should return a bad request if email is not registered', async () => {
       const fakeAccount = {
@@ -54,9 +63,12 @@ describe('ConfirmationCode Routes', () => {
 
       const token = jwt.sign({ id, email: 'matheus.oliveira@gmail.com' }, env.secret)
 
-      await request(app).post('/api/account/confirmation').set('Authorization', `Bearer: ${token}`).send({
+      const response = await request(app).post('/api/account/confirmation').set('Authorization', `Bearer: ${token}`).send({
         email: 'matheus.oliveira1@gmail.com'
-      }).expect(400)
+      })
+
+      expect(response.status).toBe(400)
+      expect(response.body).toEqual(appError(new NotFoundError('email')))
     })
 
     it('Should return a bad request if account is already active', async () => {
@@ -70,23 +82,32 @@ describe('ConfirmationCode Routes', () => {
 
       const token = jwt.sign({ id, email: 'matheus.oliveira@gmail.com' }, env.secret)
 
-      await request(app).post('/api/account/confirmation').set('Authorization', `Bearer: ${token}`).send({
+      const response = await request(app).post('/api/account/confirmation').set('Authorization', `Bearer: ${token}`).send({
         email: 'matheus.oliveira@gmail.com'
-      }).expect(400)
+      })
+
+      expect(response.status).toBe(400)
+      expect(response.body).toEqual(appError(new AccountError('Account is already active', 'AccountIsActiveError')))
     })
 
     it('Should return a unauthorized if authentication token is not provided', async () => {
-      await request(app).post('/api/account/confirmation').send({
+      const response = await request(app).post('/api/account/confirmation').send({
         email: 'matheus.oliveira@gmai.com'
-      }).expect(401)
+      })
+
+      expect(response.status).toBe(401)
+      expect(response.body).toEqual(appError(new UnauthenticatedError()))
     })
 
     it('Should return an unauthorized if authentication token is invalid', async () => {
       const token = jwt.sign({ id: 'valid_id', email: 'any_email' }, 'any_secret')
 
-      await request(app).post('/api/account/confirmation').set('Authorization', `Bearer: ${token}`).send({
+      const response = await request(app).post('/api/account/confirmation').set('Authorization', `Bearer: ${token}`).send({
         email: 'matheus.oliveira@gmai.com'
-      }).expect(401)
+      })
+
+      expect(response.status).toBe(401)
+      expect(response.body).toEqual(appError(new UnauthenticatedError()))
     })
   })
 
@@ -111,35 +132,52 @@ describe('ConfirmationCode Routes', () => {
 
       const token = jwt.sign({ id, email: 'matheus.oliveira@gmail.com' }, env.secret)
 
-      await request(app).post('/api/account/activate').set('Authorization', `Bearer: ${token}`).send({
+      const response = await request(app).post('/api/account/activate').set('Authorization', `Bearer: ${token}`).send({
         email: 'matheus.oliveira@gmail.com',
         code: '765D6E85'
-      }).expect(200)
+      })
+
+      expect(response.status).toBe(200)
+
+      expect(response.body.id).toBeTruthy()
+      expect(response.body.username).toBe('Matheus Oliveira')
+      expect(response.body.email).toBe('matheus.oliveira@gmail.com')
+      expect(response.body.password).toBeTruthy()
+      expect(response.body.status).toBe('active')
     })
 
     it('Should return 400 if email is not provided', async () => {
       const token = jwt.sign({ id: '6258ca0f7a2ba94a00fa0e0c', email: 'matheus.oliveira@gmail.com' }, env.secret)
 
-      await request(app).post('/api/account/activate').set('Authorization', `Bearer: ${token}`).send({
+      const response = await request(app).post('/api/account/activate').set('Authorization', `Bearer: ${token}`).send({
         code: '765D6E85'
-      }).expect(400)
+      })
+
+      expect(response.status).toBe(400)
+      expect(response.body).toEqual(appError(new MissingParamError('email')))
     })
 
     it('Should return 400 if confirmation code is not provided', async () => {
       const token = jwt.sign({ id: '6258ca0f7a2ba94a00fa0e0c', email: 'matheus.oliveira@gmail.com' }, env.secret)
 
-      await request(app).post('/api/account/activate').set('Authorization', `Bearer: ${token}`).send({
+      const response = await request(app).post('/api/account/activate').set('Authorization', `Bearer: ${token}`).send({
         email: 'matheus.oliveira@gmail.com'
-      }).expect(400)
+      })
+
+      expect(response.status).toBe(400)
+      expect(response.body).toEqual(appError(new MissingParamError('confirmation code')))
     })
 
     it('Should return 400 if email is invalid', async () => {
       const token = jwt.sign({ id: '6258ca0f7a2ba94a00fa0e0c', email: 'matheus.oliveira@gmail.com' }, env.secret)
 
-      await request(app).post('/api/account/activate').set('Authorization', `Bearer: ${token}`).send({
+      const response = await request(app).post('/api/account/activate').set('Authorization', `Bearer: ${token}`).send({
         email: 'matheus.oliveira',
         code: '765D6E85'
-      }).expect(400)
+      })
+
+      expect(response.status).toBe(400)
+      expect(response.body).toEqual(appError(new InvalidParamError('email')))
     })
 
     it('Should return 404 if email is not registered', async () => {
@@ -162,10 +200,13 @@ describe('ConfirmationCode Routes', () => {
 
       const token = jwt.sign({ id, email: 'matheus.oliveira@gmail.com' }, env.secret)
 
-      await request(app).post('/api/account/activate').set('Authorization', `Bearer: ${token}`).send({
+      const response = await request(app).post('/api/account/activate').set('Authorization', `Bearer: ${token}`).send({
         email: 'matheus.oliveira1@gmail.com',
         code: '765D6E85'
-      }).expect(404)
+      })
+
+      expect(response.status).toBe(404)
+      expect(response.body).toEqual(appError(new NotFoundError('email')))
     })
 
     it('Should return 400 if account is already active', async () => {
@@ -189,10 +230,13 @@ describe('ConfirmationCode Routes', () => {
 
       const token = jwt.sign({ id, email: 'matheus.oliveira@gmail.com' }, env.secret)
 
-      await request(app).post('/api/account/activate').set('Authorization', `Bearer: ${token}`).send({
+      const response = await request(app).post('/api/account/activate').set('Authorization', `Bearer: ${token}`).send({
         email: 'matheus.oliveira@gmail.com',
         code: '765D6E85'
-      }).expect(400)
+      })
+
+      expect(response.status).toBe(400)
+      expect(response.body).toEqual(appError(new AccountError('Account is already active', 'AccountIsActiveError')))
     })
 
     it('Should return 404 if confirmation code is not found', async () => {
@@ -207,10 +251,13 @@ describe('ConfirmationCode Routes', () => {
 
       const token = jwt.sign({ id, email: 'matheus.oliveira@gmail.com' }, env.secret)
 
-      await request(app).post('/api/account/activate').set('Authorization', `Bearer: ${token}`).send({
+      const response = await request(app).post('/api/account/activate').set('Authorization', `Bearer: ${token}`).send({
         email: 'matheus.oliveira@gmail.com',
         code: '765D6E85'
-      }).expect(404)
+      })
+
+      expect(response.status).toBe(404)
+      expect(response.body).toEqual(appError(new NotFoundError('confirmationCode')))
     })
 
     it('Should return 400 if confirmation code has passed of its lifetime', async () => {
@@ -237,10 +284,13 @@ describe('ConfirmationCode Routes', () => {
 
       const token = jwt.sign({ id, email: 'matheus.oliveira@gmail.com' }, env.secret)
 
-      await request(app).post('/api/account/activate').set('Authorization', `Bearer: ${token}`).send({
+      const response = await request(app).post('/api/account/activate').set('Authorization', `Bearer: ${token}`).send({
         email: 'matheus.oliveira@gmail.com',
         code: '765D6E85'
-      }).expect(400)
+      })
+
+      expect(response.status).toBe(400)
+      expect(response.body).toEqual(appError(new InvalidConfirmationCodeError('Confirmation Code has passed of its lifetime')))
     })
 
     it('Should return 400 if confirmation code does not match', async () => {
@@ -254,7 +304,7 @@ describe('ConfirmationCode Routes', () => {
 
       const confirmationCodeCreatedAt = new Date()
       confirmationCodeCreatedAt.setHours(confirmationCodeCreatedAt.getHours() - 6)
-      confirmationCodeCreatedAt.setMinutes(confirmationCodeCreatedAt.getMinutes() - 1)
+      confirmationCodeCreatedAt.setMinutes(confirmationCodeCreatedAt.getMinutes() + 1)
 
       const fakeConfirmationCode = {
         code: '765D6E85',
@@ -267,10 +317,13 @@ describe('ConfirmationCode Routes', () => {
 
       const token = jwt.sign({ id, email: 'matheus.oliveira@gmail.com' }, env.secret)
 
-      await request(app).post('/api/account/activate').set('Authorization', `Bearer: ${token}`).send({
+      const response = await request(app).post('/api/account/activate').set('Authorization', `Bearer: ${token}`).send({
         email: 'matheus.oliveira@gmail.com',
         code: '149E0DC3'
-      }).expect(400)
+      })
+
+      expect(response.status).toBe(400)
+      expect(response.body).toEqual(appError(new InvalidConfirmationCodeError('Invalid Confirmation Code')))
     })
   })
 })
