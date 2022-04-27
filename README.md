@@ -5,7 +5,7 @@
 ## Status
 
 <h4 align="center">
-  :construction: Em desenvolvimento... :construction:
+  :heavy_check_mark: Concluído :heavy_check_mark:
 </h4>
 
 ## Features
