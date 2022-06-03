@@ -17,6 +17,7 @@
  - [x] Ativar conta
 
 Para mais detalhes de requisitos e regras de negócio, veja a [documentação](documentation/README.md).
+Toda nova feature deve ser utilizada com Pull Requests
 
 ## Tecnologias
  + Node.js - v12.22.10
